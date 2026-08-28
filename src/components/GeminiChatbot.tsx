@@ -19,7 +19,11 @@ import {
   ExternalLink,
   Cloud,
   CloudCheck,
-  LogIn
+  LogIn,
+  RefreshCw,
+  AlertTriangle,
+  AlertCircle,
+  Info
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { playClickSound, playSuccessChime } from '../utils/soundEffects';
@@ -46,6 +50,23 @@ export interface ChatMessage {
   sources?: { title: string; uri: string }[];
   searchQueries?: string[];
   hasSearchGrounding?: boolean;
+  isError?: boolean;
+  errorType?: 'quota' | 'auth' | 'timeout' | 'network' | 'server';
+  errorDetail?: string;
+  canRetry?: boolean;
+  failedQuery?: string;
+  isOfflineFallback?: boolean;
+}
+
+export interface HandshakeInfo {
+  status: string;
+  hasApiKey: boolean;
+  runtimeMode: 'live_gemini' | 'portfolio_fallback';
+  defaultModel: string;
+  availableModels: { id: string; name: string; tag: string; isDefault: boolean }[];
+  searchGroundingSupported?: boolean;
+  serverTimestamp: string;
+  message: string;
 }
 
 interface GeminiChatbotProps {
@@ -66,7 +87,7 @@ const ROLES = [
     id: 'general',
     name: 'Rick AI Twin',
     description: 'Comprehensive assistant on projects, experience & background',
-    defaultModel: 'gemini-3.5-flash',
+    defaultModel: 'gemini-3.1-flash-lite',
     icon: Bot,
     badgeColor: 'text-amber-400 bg-amber-400/10 border-amber-400/30'
   },
@@ -74,7 +95,7 @@ const ROLES = [
     id: 'architect',
     name: 'Tech Architect',
     description: 'Deep technical reasoning on WebGL, Three.js & systems',
-    defaultModel: 'gemini-3.1-pro-preview',
+    defaultModel: 'gemini-3.7-flash',
     icon: Cpu,
     badgeColor: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/30'
   },
@@ -82,7 +103,7 @@ const ROLES = [
     id: 'recruiter',
     name: 'Recruiter Matchmaker',
     description: 'Evaluates fit for full-stack, frontend & 3D developer roles',
-    defaultModel: 'gemini-3.5-flash',
+    defaultModel: 'gemini-3.1-flash-lite',
     icon: Briefcase,
     badgeColor: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30'
   }
@@ -90,25 +111,25 @@ const ROLES = [
 
 const MODELS = [
   {
-    id: 'gemini-3.5-flash',
-    name: '3.5 Flash (Grounding)',
-    tag: 'Search Grounded',
-    icon: Sparkles,
-    description: 'Real-time Google Search grounding enabled'
+    id: 'gemini-3.1-flash-lite',
+    name: 'Flash Lite (Ultra Fast)',
+    tag: 'Recommended',
+    icon: Zap,
+    description: 'Ultra-low latency & high rate limits for rapid Q&A'
   },
   {
-    id: 'gemini-3.1-flash-lite',
-    name: 'Flash Lite',
-    tag: 'Fast Tasks',
-    icon: Zap,
-    description: 'Ultra-low latency for quick queries'
+    id: 'gemini-3.7-flash',
+    name: '3.7 Flash',
+    tag: 'Advanced Reasoning',
+    icon: Sparkles,
+    description: 'Advanced reasoning and architecture analysis'
   },
   {
     id: 'gemini-3.1-pro-preview',
     name: '3.1 Pro',
-    tag: 'Complex Tasks',
+    tag: 'Deep Reasoning',
     icon: Cpu,
-    description: 'Advanced reasoning & technical breakdowns'
+    description: 'Comprehensive technical breakdowns & systems design'
   }
 ];
 
@@ -117,27 +138,30 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedRole, setSelectedRole] = useState('general');
-  const [selectedModel, setSelectedModel] = useState('gemini-3.5-flash');
-  const [searchGroundingEnabled, setSearchGroundingEnabled] = useState(true);
+  const [selectedModel, setSelectedModel] = useState('gemini-3.1-flash-lite');
+  const [searchGroundingEnabled, setSearchGroundingEnabled] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Runtime Handshake State
+  const [handshakeStatus, setHandshakeStatus] = useState<'idle' | 'checking' | 'connected' | 'offline_ready' | 'error'>('checking');
+  const [handshakeInfo, setHandshakeInfo] = useState<HandshakeInfo | null>(null);
+  const [handshakeError, setHandshakeError] = useState<string | null>(null);
+
   // Initial welcome greeting
   const initialWelcomeMessage: ChatMessage = {
     id: 'msg-init-1',
     role: 'assistant',
-    content: `Hello! I'm **Rick's AI Twin**, powered by **Google Gemini 3.5 Flash** with **Google Search Grounding**. 
+    content: `Hello! I'm **Rick's AI Twin**, powered by **Google Gemini** (@google/genai SDK). 
 
-I have full context on Rick's **6+ years of full-stack engineering**, **3D WebGL / Three.js client projects for Indian and global brands**, **BCA degree from Techno India University**, and distributed systems work.
-
-With **Search Grounding** active, I can also look up live web information, modern web specifications, framework updates, and real-time tech benchmarks.
+I have full context on Rick's **6+ years of full-stack engineering**, **3D WebGL / Three.js client projects for Indian and global brands**, **BCA degree from Techno India University, Kolkata**, and distributed systems work.
 
 How can I help you today? Feel free to pick a prompt below or ask your question!`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    modelUsed: 'gemini-3.5-flash',
-    hasSearchGrounding: true
+    modelUsed: 'gemini-3.1-flash-lite',
+    hasSearchGrounding: false
   };
 
   const [messages, setMessages] = useState<ChatMessage[]>([initialWelcomeMessage]);
@@ -150,6 +174,50 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   };
+
+  // Perform handshake with server to test runtime environment & API key validity
+  const verifyHandshake = async (silent = false) => {
+    if (!silent) setHandshakeStatus('checking');
+    setHandshakeError(null);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 9000);
+
+    try {
+      const res = await fetch('/api/chat/handshake', {
+        signal: controller.signal,
+        headers: { 'Cache-Control': 'no-cache' }
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        throw new Error(`Server returned status ${res.status}`);
+      }
+
+      const data: HandshakeInfo = await res.json();
+      setHandshakeInfo(data);
+
+      if (data.hasApiKey) {
+        setHandshakeStatus('connected');
+      } else {
+        setHandshakeStatus('offline_ready');
+      }
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      console.warn('Initial Gemini handshake attempt encountered issue:', err);
+      setHandshakeStatus('error');
+      setHandshakeError(
+        err.name === 'AbortError' 
+          ? 'Handshake timed out after 9s. Server might be spinning up.' 
+          : (err.message || 'Unable to connect to /api/chat/handshake')
+      );
+    }
+  };
+
+  // Initial handshake on mount
+  useEffect(() => {
+    verifyHandshake();
+  }, []);
 
   // Load chat history from Firestore when user signs in
   useEffect(() => {
@@ -191,6 +259,10 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
     if (isOpen) {
       scrollToBottom();
       setTimeout(() => inputRef.current?.focus(), 100);
+      // If handshake had an error, try re-verifying softly on open
+      if (handshakeStatus === 'error') {
+        verifyHandshake(true);
+      }
     }
   }, [isOpen, messages]);
 
@@ -239,26 +311,43 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const sendMessage = async (textToSend?: string) => {
+  const sendMessage = async (textToSend?: string, retryMessageId?: string) => {
     const queryText = (textToSend || inputMessage).trim();
     if (!queryText || isLoading) return;
 
     playClickSound();
     const timestampNow = Date.now();
-    const userMsg: ChatMessage = {
-      id: `user-${timestampNow}`,
-      role: 'user',
-      content: queryText,
-      timestamp: new Date(timestampNow).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
 
-    const newMessages = [...messages, userMsg];
+    let newMessages: ChatMessage[];
+    if (retryMessageId) {
+      // Filter out the failed error card
+      newMessages = messages.filter(m => m.id !== retryMessageId);
+      // Ensure the query exists as a user message
+      const lastMsg = newMessages[newMessages.length - 1];
+      if (!lastMsg || lastMsg.role !== 'user' || lastMsg.content !== queryText) {
+        newMessages.push({
+          id: `user-${timestampNow}`,
+          role: 'user',
+          content: queryText,
+          timestamp: new Date(timestampNow).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+      }
+    } else {
+      const userMsg: ChatMessage = {
+        id: `user-${timestampNow}`,
+        role: 'user',
+        content: queryText,
+        timestamp: new Date(timestampNow).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      newMessages = [...messages, userMsg];
+      setInputMessage('');
+    }
+
     setMessages(newMessages);
-    setInputMessage('');
     setIsLoading(true);
 
     // Persist user message to Firestore if authenticated
-    if (user) {
+    if (user && !retryMessageId) {
       addDoc(collection(db, 'users', user.uid, 'chatHistory'), {
         userId: user.uid,
         role: 'user',
@@ -267,12 +356,18 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
       }).catch((err) => console.error('Failed saving user message to Firestore:', err));
     }
 
+    // Set 30s timeout via AbortController for network calls
+    const abortController = new AbortController();
+    const timeoutTimer = setTimeout(() => abortController.abort(), 30000);
+
     try {
-      // Prepare conversation history for multi-turn chat
-      const formattedHistory = newMessages.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        content: m.content
-      }));
+      // Prepare conversation history excluding error blocks
+      const formattedHistory = newMessages
+        .filter(m => !m.isError)
+        .map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          content: m.content
+        }));
 
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -282,30 +377,56 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
           model: selectedModel,
           rolePersona: selectedRole,
           searchGrounding: searchGroundingEnabled,
-        })
+        }),
+        signal: abortController.signal
       });
 
-      if (!res.ok) {
-        throw new Error(`Server returned ${res.status}`);
+      clearTimeout(timeoutTimer);
+
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        console.warn('Unable to parse chat response JSON:', parseErr);
       }
 
-      const data = await res.json();
+      if (!res.ok && !data?.reply) {
+        const status = res.status;
+        let categorizedError: ChatMessage['errorType'] = 'server';
+        if (status === 429) categorizedError = 'quota';
+        else if (status === 401 || status === 403) categorizedError = 'auth';
+
+        throw {
+          type: categorizedError,
+          message: data?.error || `Server responded with status ${status}`
+        };
+      }
+
       const replyTimestamp = Date.now();
-      const grounding = data.groundingMetadata;
+      const grounding = data?.groundingMetadata;
+      const content = data?.reply || "I didn't receive a response. Please try again.";
+      const isOffline = Boolean(data?.isOfflineFallback);
       
       const assistantMsg: ChatMessage = {
         id: `ai-${replyTimestamp}`,
         role: 'assistant',
-        content: data.reply || "I didn't receive a response. Please try again.",
+        content,
         timestamp: new Date(replyTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: data.modelUsed || selectedModel,
+        modelUsed: data?.modelUsed || selectedModel,
         hasSearchGrounding: Boolean(grounding?.hasSearchGrounding),
         sources: grounding?.sources || [],
         searchQueries: grounding?.searchQueries || [],
+        isOfflineFallback: isOffline,
+        errorDetail: data?.errorDetail,
       };
 
       setMessages(prev => [...prev, assistantMsg]);
       playSuccessChime();
+
+      // If successful live response, refresh handshake status to connected
+      if (!isOffline && handshakeStatus !== 'connected') {
+        setHandshakeStatus('connected');
+      }
 
       // Persist assistant message to Firestore if authenticated
       if (user) {
@@ -321,15 +442,43 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
       }
 
     } catch (err: any) {
-      console.error('Chat error:', err);
-      const fallbackMsg: ChatMessage = {
+      clearTimeout(timeoutTimer);
+      console.error('Chat error occurred:', err);
+
+      let errType: ChatMessage['errorType'] = 'server';
+      let userFriendlyText = '';
+
+      if (err.name === 'AbortError') {
+        errType = 'timeout';
+        userFriendlyText = `**Request Timed Out:** The Gemini API did not respond within 30 seconds. The server might be experiencing high latency. You can retry with **Flash Lite** below.`;
+      } else if (err.type === 'quota' || err.message?.includes('429') || err.message?.includes('RESOURCE_EXHAUSTED')) {
+        errType = 'quota';
+        userFriendlyText = `**Gemini Quota Limit:** Service rate limit reached for the current model. Please retry with **Flash Lite** or reach Rick directly at **${PERSONAL_INFO.email}**.`;
+      } else if (err.type === 'auth' || err.message?.includes('401') || err.message?.includes('API key')) {
+        errType = 'auth';
+        userFriendlyText = `**Gemini Runtime Authentication:** Unable to validate Gemini credentials with Google. Rick's verified portfolio intelligence engine is active to answer questions about projects, experience, and contact options.`;
+      } else if (err.name === 'TypeError' || err.message?.includes('Failed to fetch')) {
+        errType = 'network';
+        userFriendlyText = `**Network Connection Error:** Could not reach the backend API proxy. Please check your network connection and click **Retry** below.`;
+      } else {
+        errType = 'server';
+        userFriendlyText = `**Service Error:** ${err.message || 'An unexpected error occurred while communicating with the AI service'}. You can click **Retry** below or reach Rick directly at **${PERSONAL_INFO.email}**.`;
+      }
+
+      const errorMsg: ChatMessage = {
         id: `ai-err-${Date.now()}`,
         role: 'assistant',
-        content: `I couldn't reach the Gemini API endpoint right now. You can also contact Rick directly at **${PERSONAL_INFO.email}** or on Instagram **[@rickbarat047](${PERSONAL_INFO.socials.instagram})**.`,
+        content: userFriendlyText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: selectedModel
+        modelUsed: selectedModel,
+        isError: true,
+        errorType: errType,
+        errorDetail: err.message,
+        canRetry: true,
+        failedQuery: queryText
       };
-      setMessages(prev => [...prev, fallbackMsg]);
+
+      setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
     }
@@ -367,12 +516,28 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
             <div className="text-left hidden sm:block">
               <div className="text-xs font-bold font-display flex items-center gap-1.5">
                 <span>Ask Rick AI</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                {handshakeStatus === 'checking' ? (
+                  <RefreshCw className="w-2.5 h-2.5 text-amber-400 animate-spin" />
+                ) : handshakeStatus === 'error' ? (
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                ) : handshakeStatus === 'offline_ready' ? (
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                ) : (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                )}
               </div>
               <div className="text-[10px] text-amber-300 font-mono flex items-center gap-1">
-                <span>Gemini 3.5</span>
+                <span>Gemini AI</span>
                 <span>•</span>
-                <span className="text-cyan-300">Search Grounded</span>
+                {handshakeStatus === 'checking' ? (
+                  <span className="text-amber-400">Connecting...</span>
+                ) : handshakeStatus === 'error' ? (
+                  <span className="text-rose-400">Offline</span>
+                ) : handshakeStatus === 'offline_ready' ? (
+                  <span className="text-amber-300">Portfolio AI</span>
+                ) : (
+                  <span className="text-emerald-400">Online</span>
+                )}
               </div>
             </div>
 
@@ -400,9 +565,38 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs font-bold text-white tracking-wide">Rick AI Assistant</h3>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    Live
-                  </span>
+                  
+                  {/* Dynamic Handshake Badge */}
+                  {handshakeStatus === 'checking' && (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center gap-1">
+                      <RefreshCw className="w-2.5 h-2.5 animate-spin text-amber-400" />
+                      Connecting...
+                    </span>
+                  )}
+                  {handshakeStatus === 'connected' && (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Online
+                    </span>
+                  )}
+                  {handshakeStatus === 'offline_ready' && (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      Portfolio AI
+                    </span>
+                  )}
+                  {handshakeStatus === 'error' && (
+                    <button 
+                      type="button"
+                      onClick={() => verifyHandshake()}
+                      className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1 hover:bg-rose-500/20 transition-colors"
+                      title="Handshake failed. Click to retry connection."
+                    >
+                      <AlertCircle className="w-2.5 h-2.5 text-rose-400" />
+                      Offline (Retry)
+                    </button>
+                  )}
+
                   {user ? (
                     <span 
                       title="Authenticated with Google • Chat synced to Firestore" 
@@ -424,18 +618,34 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                   )}
                 </div>
                 <div className="text-[10px] font-mono text-neutral-400 flex items-center gap-1.5">
-                  <span className="text-amber-300">gemini-3.5-flash</span>
+                  <span className="text-amber-300">{selectedModel}</span>
                   <span>•</span>
-                  <span className="text-cyan-400 flex items-center gap-0.5">
-                    <Globe className="w-2.5 h-2.5" />
-                    Google Search Grounded
-                  </span>
+                  {searchGroundingEnabled ? (
+                    <span className="text-cyan-400 flex items-center gap-0.5">
+                      <Globe className="w-2.5 h-2.5" />
+                      Search Grounded
+                    </span>
+                  ) : (
+                    <span className="text-emerald-400 flex items-center gap-0.5">
+                      <Zap className="w-2.5 h-2.5" />
+                      Fast Mode
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Controls */}
             <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => verifyHandshake()}
+                title="Refresh runtime handshake & model status"
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-amber-300 hover:bg-neutral-800 transition-colors"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${handshakeStatus === 'checking' ? 'animate-spin text-amber-400' : ''}`} />
+              </button>
+
               <button
                 type="button"
                 onClick={handleClearHistory}
@@ -543,6 +753,69 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
             id="chat-messages-container"
             className="flex-1 overflow-y-auto p-4 space-y-4 text-xs font-sans scroll-smooth"
           >
+            {/* Handshake Loading State Banner */}
+            {handshakeStatus === 'checking' && (
+              <div className="p-3.5 rounded-2xl bg-neutral-950 border border-amber-400/30 text-xs shadow-lg space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-amber-300 font-mono">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                    <span className="font-bold text-xs">Runtime AI Handshake</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-400/10 text-amber-400 border border-amber-400/20">
+                    Connecting
+                  </span>
+                </div>
+                <p className="text-[11px] text-neutral-400 leading-relaxed font-sans">
+                  Validating runtime Gemini API key configuration and checking model availability...
+                </p>
+                <div className="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-amber-400 via-cyan-400 to-amber-400 animate-pulse w-3/4 rounded-full" />
+                </div>
+              </div>
+            )}
+
+            {/* Handshake Error Alert */}
+            {handshakeStatus === 'error' && (
+              <div className="p-3 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs shadow-lg flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2.5 text-rose-200">
+                  <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold text-[11px] text-rose-300 font-mono">API Handshake Interrupted</div>
+                    <div className="text-[11px] text-rose-200/80 mt-0.5 font-sans">
+                      {handshakeError || 'Unable to contact backend server. Chat will attempt direct transmission.'}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => verifyHandshake()}
+                  className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 text-[10px] font-mono flex items-center gap-1 shrink-0 transition-colors"
+                >
+                  <RefreshCw className="w-2.5 h-2.5" />
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {/* Handshake Offline Ready Notice */}
+            {handshakeStatus === 'offline_ready' && (
+              <div className="p-2.5 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-amber-300 font-mono text-[10px]">
+                  <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Portfolio Intelligence Active (Offline mode)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => verifyHandshake()}
+                  className="text-[10px] font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 underline"
+                  title="Check if API key has been added to environment"
+                >
+                  <RefreshCw className="w-2.5 h-2.5" />
+                  Re-check Key
+                </button>
+              </div>
+            )}
+
             {isHistoryLoading && (
               <div className="text-center py-2 text-[11px] font-mono text-neutral-500 flex items-center justify-center gap-1.5">
                 <Sparkles className="w-3 h-3 animate-spin text-amber-400" />
@@ -558,70 +831,105 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                   className={`flex gap-3 ${isAi ? 'justify-start' : 'justify-end'} group`}
                 >
                   {isAi && (
-                    <div className="w-6 h-6 rounded-lg bg-amber-400 text-neutral-950 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                      <Bot className="w-3.5 h-3.5" />
+                    <div className={`w-6 h-6 rounded-lg ${msg.isError ? 'bg-rose-500 text-white' : 'bg-amber-400 text-neutral-950'} flex items-center justify-center shrink-0 mt-0.5 shadow-sm`}>
+                      {msg.isError ? <AlertCircle className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
                     </div>
                   )}
 
-                  <div className={`max-w-[85%] sm:max-w-[82%] space-y-1.5 ${isAi ? 'text-left' : 'text-right'}`}>
-                    <div
-                      className={`p-3.5 rounded-2xl leading-relaxed text-left transition-all ${
-                        isAi
-                          ? 'bg-neutral-950 border border-neutral-800 text-neutral-200 shadow-md'
-                          : 'bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-medium rounded-tr-none'
-                      }`}
-                    >
-                      {isAi ? (
-                        <div className="prose prose-invert prose-xs max-w-none space-y-2 text-neutral-200 [&_a]:text-cyan-400 [&_a]:underline [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_code]:bg-neutral-900 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-amber-300 [&_code]:font-mono [&_pre]:bg-neutral-900 [&_pre]:p-2.5 [&_pre]:rounded-lg [&_pre]:overflow-x-auto">
+                  <div className={`max-w-[88%] sm:max-w-[84%] space-y-1.5 ${isAi ? 'text-left' : 'text-right'}`}>
+                    {/* Error Card Message */}
+                    {msg.isError ? (
+                      <div className="p-3.5 rounded-2xl bg-rose-950/30 border border-rose-500/40 text-rose-200 text-left space-y-2.5 shadow-md">
+                        <div className="flex items-center justify-between gap-2 border-b border-rose-500/20 pb-2">
+                          <div className="flex items-center gap-1.5 text-rose-400 font-mono text-[10px] font-bold uppercase tracking-wider">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            <span>{msg.errorType?.replace('_', ' ') || 'ERROR'}</span>
+                          </div>
+                          {msg.canRetry && msg.failedQuery && (
+                            <button
+                              type="button"
+                              onClick={() => sendMessage(msg.failedQuery, msg.id)}
+                              disabled={isLoading}
+                              className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-100 text-[10px] font-mono flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                            >
+                              <RefreshCw className="w-2.5 h-2.5" />
+                              <span>Retry Prompt</span>
+                            </button>
+                          )}
+                        </div>
+                        <div className="prose prose-invert prose-xs text-rose-200 [&_a]:text-amber-300 [&_a]:underline [&_strong]:text-rose-100">
                           <Markdown>{msg.content}</Markdown>
                         </div>
-                      ) : (
-                        <div className="whitespace-pre-wrap">{msg.content}</div>
-                      )}
+                      </div>
+                    ) : (
+                      /* Standard AI / User Message */
+                      <div
+                        className={`p-3.5 rounded-2xl leading-relaxed text-left transition-all ${
+                          isAi
+                            ? 'bg-neutral-950 border border-neutral-800 text-neutral-200 shadow-md'
+                            : 'bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-medium rounded-tr-none'
+                        }`}
+                      >
+                        {isAi ? (
+                          <div className="prose prose-invert prose-xs max-w-none space-y-2 text-neutral-200 [&_a]:text-cyan-400 [&_a]:underline [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_code]:bg-neutral-900 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-amber-300 [&_code]:font-mono [&_pre]:bg-neutral-900 [&_pre]:p-2.5 [&_pre]:rounded-lg [&_pre]:overflow-x-auto">
+                            <Markdown>{msg.content}</Markdown>
+                          </div>
+                        ) : (
+                          <div className="whitespace-pre-wrap">{msg.content}</div>
+                        )}
 
-                      {/* Google Search Queries if grounded */}
-                      {isAi && msg.searchQueries && msg.searchQueries.length > 0 && (
-                        <div className="mt-3 pt-2 border-t border-neutral-800/80">
-                          <div className="flex items-center gap-1 text-[10px] font-mono text-cyan-400 mb-1">
-                            <Globe className="w-3 h-3" />
-                            <span>Google Search Queries Executed:</span>
+                        {/* Offline Fallback Badge */}
+                        {isAi && msg.isOfflineFallback && (
+                          <div className="mt-2.5 pt-2 border-t border-neutral-800/80 flex items-center gap-1 text-[10px] font-mono text-amber-400">
+                            <Info className="w-3 h-3" />
+                            <span>Verified Portfolio Intelligence Engine</span>
                           </div>
-                          <div className="flex flex-wrap gap-1">
-                            {msg.searchQueries.map((q, qIdx) => (
-                              <span 
-                                key={qIdx}
-                                className="px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-800/50 text-[10px] font-mono text-cyan-200"
-                              >
-                                {q}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Grounding Web Sources Links */}
-                      {isAi && msg.sources && msg.sources.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-neutral-800/80">
-                          <div className="text-[10px] font-mono text-neutral-400 mb-1.5">
-                            Verified Grounding Sources:
+                        {/* Google Search Queries if grounded */}
+                        {isAi && msg.searchQueries && msg.searchQueries.length > 0 && (
+                          <div className="mt-3 pt-2 border-t border-neutral-800/80">
+                            <div className="flex items-center gap-1 text-[10px] font-mono text-cyan-400 mb-1">
+                              <Globe className="w-3 h-3" />
+                              <span>Google Search Queries Executed:</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {msg.searchQueries.map((q, qIdx) => (
+                                <span 
+                                  key={qIdx}
+                                  className="px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-800/50 text-[10px] font-mono text-cyan-200"
+                                >
+                                  {q}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {msg.sources.map((src, sIdx) => (
-                              <a
-                                key={sIdx}
-                                href={src.uri}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 hover:border-cyan-400 text-[10px] font-mono text-cyan-300 hover:text-cyan-200 transition-colors"
-                              >
-                                <ExternalLink className="w-2.5 h-2.5 shrink-0" />
-                                <span className="max-w-[150px] truncate">{src.title || 'Web Reference'}</span>
-                              </a>
-                            ))}
+                        )}
+
+                        {/* Grounding Web Sources Links */}
+                        {isAi && msg.sources && msg.sources.length > 0 && (
+                          <div className="mt-2.5 pt-2 border-t border-neutral-800/80">
+                            <div className="text-[10px] font-mono text-neutral-400 mb-1.5">
+                              Verified Grounding Sources:
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {msg.sources.map((src, sIdx) => (
+                                <a
+                                  key={sIdx}
+                                  href={src.uri}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 hover:border-cyan-400 text-[10px] font-mono text-cyan-300 hover:text-cyan-200 transition-colors"
+                                >
+                                  <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                                  <span className="max-w-[150px] truncate">{src.title || 'Web Reference'}</span>
+                                </a>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Metadata & Copy Action */}
                     <div className={`flex items-center gap-2 text-[10px] font-mono text-neutral-500 ${isAi ? 'justify-start' : 'justify-end'}`}>
@@ -632,7 +940,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                       {msg.hasSearchGrounding && (
                         <span className="text-cyan-400 font-semibold">• Grounded</span>
                       )}
-                      {isAi && (
+                      {isAi && !msg.isError && (
                         <button
                           type="button"
                           onClick={() => handleCopyMessage(msg.id, msg.content)}
@@ -666,7 +974,11 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                 </div>
                 <div className="px-3.5 py-2.5 rounded-2xl bg-neutral-950 border border-neutral-800 text-amber-300 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                  <span>Grounding facts with {selectedModel} & Google Search...</span>
+                  <span>
+                    {searchGroundingEnabled 
+                      ? `Grounding facts with ${selectedModel} & Google Search...` 
+                      : `Querying Rick AI via ${selectedModel}...`}
+                  </span>
                 </div>
               </div>
             )}
