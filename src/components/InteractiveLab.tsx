@@ -12,12 +12,17 @@ import {
   Zap,
   Activity,
   Music,
-  Maximize2
+  Maximize2,
+  Star
 } from 'lucide-react';
 import { LAB_EXPERIMENTS } from '../data/portfolioData';
-import { playClickSound, playSwitchSound, playTerminalBeep } from '../utils/soundEffects';
+import { playClickSound, playSwitchSound, playTerminalBeep, playSuccessChime } from '../utils/soundEffects';
+import { RevealOnScroll } from './RevealOnScroll';
+import { useAuth } from '../context/AuthContext';
 
 export const InteractiveLab: React.FC = () => {
+  const { user, userData, toggleStarredLab, signInWithGoogle } = useAuth();
+  const starredLabIds = userData?.starredLabIds || [];
   const [activeTab, setActiveTab] = useState<'canvas' | 'synth' | 'latency' | 'tokens'>('canvas');
 
   // Canvas Experiment State
@@ -250,92 +255,128 @@ export const InteractiveLab: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-400/10 text-cyan-400 text-xs font-mono border border-cyan-400/20">
-            <FlaskConical className="w-3.5 h-3.5" />
-            <span>INTERACTIVE ENGINEERING LAB & PLAYGROUND</span>
+        <RevealOnScroll direction="up" distance={24} duration={600}>
+          <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-400/10 text-cyan-400 text-xs font-mono border border-cyan-400/20">
+              <FlaskConical className="w-3.5 h-3.5" />
+              <span>INTERACTIVE ENGINEERING LAB & PLAYGROUND</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white font-display tracking-tight">
+              Creative Tech & Experimental Lab
+            </h2>
+            <p className="text-neutral-400 text-sm sm:text-base">
+              Live client-side simulations exploring canvas physics, web audio DSP, distributed cloud topologies, and design systems.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white font-display tracking-tight">
-            Creative Tech & Experimental Lab
-          </h2>
-          <p className="text-neutral-400 text-sm sm:text-base">
-            Live client-side simulations exploring canvas physics, web audio DSP, distributed cloud topologies, and design systems.
-          </p>
-        </div>
+        </RevealOnScroll>
 
         {/* Experiment Tab Switcher */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-          <button
-            id="lab-tab-canvas"
-            type="button"
-            onClick={() => {
-              playSwitchSound();
-              setActiveTab('canvas');
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-              activeTab === 'canvas'
-                ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
-                : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
-            }`}
-          >
-            <Zap className="w-4 h-4" />
-            <span>1. Vector Canvas Physics</span>
-          </button>
+        <RevealOnScroll direction="up" delay={100} duration={600} distance={20}>
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+            <button
+              id="lab-tab-canvas"
+              type="button"
+              onClick={() => {
+                playSwitchSound();
+                setActiveTab('canvas');
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+                activeTab === 'canvas'
+                  ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
+                  : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
+              }`}
+            >
+              <Zap className="w-4 h-4" />
+              <span>1. Vector Canvas Physics</span>
+            </button>
 
-          <button
-            id="lab-tab-synth"
-            type="button"
-            onClick={() => {
-              playSwitchSound();
-              setActiveTab('synth');
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-              activeTab === 'synth'
-                ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
-                : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
-            }`}
-          >
-            <Music className="w-4 h-4" />
-            <span>2. WebAudio Synthesizer</span>
-          </button>
+            <button
+              id="lab-tab-synth"
+              type="button"
+              onClick={() => {
+                playSwitchSound();
+                setActiveTab('synth');
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+                activeTab === 'synth'
+                  ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
+                  : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
+              }`}
+            >
+              <Music className="w-4 h-4" />
+              <span>2. WebAudio Synthesizer</span>
+            </button>
 
-          <button
-            id="lab-tab-latency"
-            type="button"
-            onClick={() => {
-              playSwitchSound();
-              setActiveTab('latency');
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-              activeTab === 'latency'
-                ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
-                : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
-            }`}
-          >
-            <Globe className="w-4 h-4" />
-            <span>3. Edge Latency Bench</span>
-          </button>
+            <button
+              id="lab-tab-latency"
+              type="button"
+              onClick={() => {
+                playSwitchSound();
+                setActiveTab('latency');
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+                activeTab === 'latency'
+                  ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
+                  : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              <span>3. Edge Latency Bench</span>
+            </button>
 
-          <button
-            id="lab-tab-tokens"
-            type="button"
-            onClick={() => {
-              playSwitchSound();
-              setActiveTab('tokens');
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-              activeTab === 'tokens'
-                ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
-                : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
-            }`}
-          >
-            <Palette className="w-4 h-4" />
-            <span>4. Design Token Studio</span>
-          </button>
-        </div>
+            <button
+              id="lab-tab-tokens"
+              type="button"
+              onClick={() => {
+                playSwitchSound();
+                setActiveTab('tokens');
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+                activeTab === 'tokens'
+                  ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
+                  : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
+              }`}
+            >
+              <Palette className="w-4 h-4" />
+              <span>4. Design Token Studio</span>
+            </button>
+          </div>
+        </RevealOnScroll>
 
         {/* Experiment Content Box */}
-        <div className="rounded-2xl bg-neutral-900/80 border border-neutral-800 overflow-hidden shadow-2xl p-6 sm:p-8">
+        <RevealOnScroll direction="up" delay={150} duration={650} distance={28}>
+          <div className="rounded-2xl bg-neutral-900/80 border border-neutral-800 overflow-hidden shadow-2xl p-6 sm:p-8">
+            
+            {/* Top Lab Header with Star Button */}
+            <div className="flex items-center justify-between pb-5 mb-6 border-b border-neutral-800">
+              <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
+                <span className="text-amber-400 font-bold">EXPERIMENT //</span>
+                <span className="uppercase tracking-wider text-neutral-200">{activeTab}</span>
+              </div>
+
+              <button
+                id={`star-lab-btn-${activeTab}`}
+                type="button"
+                onClick={() => {
+                  if (!user) {
+                    playClickSound();
+                    signInWithGoogle();
+                  } else {
+                    playSuccessChime();
+                    toggleStarredLab(activeTab);
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
+                  starredLabIds.includes(activeTab)
+                    ? 'bg-amber-400 text-neutral-950 border-amber-300 font-bold shadow-md'
+                    : 'bg-neutral-950 text-neutral-300 hover:text-white border-neutral-800 hover:border-amber-400/40'
+                }`}
+                title={user ? "Star this experiment (Saved to Firestore)" : "Sign in with Google to star"}
+              >
+                <Star className={`w-3.5 h-3.5 ${starredLabIds.includes(activeTab) ? 'fill-current' : ''}`} />
+                <span>{starredLabIds.includes(activeTab) ? 'Starred Lab' : 'Star Lab'}</span>
+              </button>
+            </div>
           
           {/* TAB 1: CANVAS PHYSICS */}
           {activeTab === 'canvas' && (
@@ -705,7 +746,8 @@ export const InteractiveLab: React.FC = () => {
             </div>
           )}
 
-        </div>
+          </div>
+        </RevealOnScroll>
 
       </div>
     </section>

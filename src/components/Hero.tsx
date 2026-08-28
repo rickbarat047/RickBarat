@@ -7,341 +7,311 @@ import {
   Check, 
   Sparkles, 
   MapPin, 
-  Zap, 
-  ShieldCheck, 
-  Users, 
+  Layers, 
+  Cpu, 
+  Compass, 
   Code2,
-  ExternalLink,
-  Send
+  Send,
+  Eye,
+  Zap,
+  Globe
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { playClickSound, playSuccessChime } from '../utils/soundEffects';
+import { RevealLayer } from './RevealLayer';
 
 interface HeroProps {
   onOpenResume: () => void;
   onNavigateTo: (sectionId: string) => void;
 }
 
+const BG_IMAGE_1 = "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85";
+const BG_IMAGE_2 = "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85";
+
+const SPOTLIGHT_R = 260;
+
+const ROLES = [
+  "Full-Stack Architect",
+  "Creative UI & Motion Specialist",
+  "Distributed Systems Engineer",
+  "AI Agent Pipeline Developer"
+];
+
 export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState('');
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({ x: -999, y: -999 });
+  const [isLayerModalOpen, setIsLayerModalOpen] = useState(false);
+
+  // Typewriter states
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [typedText, setTypedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const roles = [
-    "Full-Stack Architect",
-    "Distributed Systems Engineer",
-    "Creative UI & Motion Specialist",
-    "AI Agent Pipeline Developer"
-  ];
+  const heroRef = useRef<HTMLElement | null>(null);
+  const mouse = useRef<{ x: number; y: number }>({ x: -999, y: -999 });
+  const smooth = useRef<{ x: number; y: number }>({ x: -999, y: -999 });
+  const rafRef = useRef<number | null>(null);
 
-  // Dynamic typewriter effect
+  // Typewriter animation effect - smooth, robust cycle through all ROLES
   useEffect(() => {
-    const currentFullRole = roles[currentRoleIndex];
-    let timer: NodeJS.Timeout;
+    const currentWord = ROLES[roleIndex];
 
     if (!isDeleting) {
-      if (displayedText.length < currentFullRole.length) {
-        timer = setTimeout(() => {
-          setDisplayedText(currentFullRole.slice(0, displayedText.length + 1));
-        }, 65);
+      if (typedText.length < currentWord.length) {
+        // Typing forward: append next character
+        const timeout = setTimeout(() => {
+          setTypedText(currentWord.slice(0, typedText.length + 1));
+        }, 55);
+        return () => clearTimeout(timeout);
       } else {
-        timer = setTimeout(() => {
+        // Word complete: hold so user can read comfortably
+        const timeout = setTimeout(() => {
           setIsDeleting(true);
         }, 2200);
+        return () => clearTimeout(timeout);
       }
     } else {
-      if (displayedText.length > 0) {
-        timer = setTimeout(() => {
-          setDisplayedText(currentFullRole.slice(0, displayedText.length - 1));
-        }, 35);
+      if (typedText.length > 0) {
+        // Backspacing: remove one character
+        const timeout = setTimeout(() => {
+          setTypedText(currentWord.slice(0, typedText.length - 1));
+        }, 28);
+        return () => clearTimeout(timeout);
       } else {
-        setIsDeleting(false);
-        setCurrentRoleIndex((prev) => (prev + 1) % roles.length);
+        // Fully erased: pause briefly and advance to next role
+        const timeout = setTimeout(() => {
+          setIsDeleting(false);
+          setRoleIndex((prev) => (prev + 1) % ROLES.length);
+        }, 360);
+        return () => clearTimeout(timeout);
       }
     }
+  }, [typedText, isDeleting, roleIndex]);
 
-    return () => clearTimeout(timer);
-  }, [displayedText, isDeleting, currentRoleIndex]);
-
-  // Subtle interactive particle mesh on canvas
+  // Mouse & touch tracking with smooth lerp
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let width = (canvas.width = canvas.offsetWidth);
-    let height = (canvas.height = canvas.offsetHeight);
-
-    const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    const particles: { x: number; y: number; vx: number; vy: number; radius: number; alpha: number }[] = [];
-    const particleCount = Math.min(Math.floor((width * height) / 18000), 55);
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        radius: Math.random() * 1.5 + 1,
-        alpha: Math.random() * 0.4 + 0.15,
-      });
-    }
-
-    let mouseX = -1000;
-    let mouseY = -1000;
-
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
+      mouse.current = { x: e.clientX, y: e.clientY };
+      if (smooth.current.x < -500) {
+        smooth.current = { x: e.clientX, y: e.clientY };
+      }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      // Draw subtle connections
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 130) {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(245, 158, 11, ${0.12 * (1 - dist / 130)})`;
-            ctx.lineWidth = 0.6;
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        mouse.current = { x: touch.clientX, y: touch.clientY };
+        if (smooth.current.x < -500) {
+          smooth.current = { x: touch.clientX, y: touch.clientY };
         }
       }
-
-      // Update and draw particles
-      particles.forEach((p) => {
-        // Cursor repulsion
-        const dx = p.x - mouseX;
-        const dy = p.y - mouseY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120 && dist > 0) {
-          const force = (120 - dist) / 120;
-          p.x += (dx / dist) * force * 1.2;
-          p.y += (dy / dist) * force * 1.2;
-        }
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
-        if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(251, 191, 36, ${p.alpha})`;
-        ctx.fill();
-      });
-
-      animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchstart', handleTouchMove, { passive: true });
+
+    const updateCursor = () => {
+      if (mouse.current.x > -500 && mouse.current.y > -500) {
+        smooth.current.x += (mouse.current.x - smooth.current.x) * 0.1;
+        smooth.current.y += (mouse.current.y - smooth.current.y) * 0.1;
+        setCursorPos({ x: smooth.current.x, y: smooth.current.y });
+      }
+      rafRef.current = requestAnimationFrame(updateCursor);
+    };
+
+    rafRef.current = requestAnimationFrame(updateCursor);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchstart', handleTouchMove);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
     };
   }, []);
 
-  const handleCopyEmail = () => {
+  const handleCopyEmail = (e: React.MouseEvent) => {
+    e.stopPropagation();
     navigator.clipboard.writeText(PERSONAL_INFO.email);
-    setCopiedEmail(true);
     playSuccessChime();
+    setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
+  const handleScrollToSection = (sectionId: string) => {
+    playClickSound();
+    onNavigateTo(sectionId);
+  };
+
   return (
-    <section 
-      id="hero-section" 
-      className="relative min-h-[92vh] flex items-center justify-center pt-24 pb-16 overflow-hidden bg-neutral-950"
+    <section
+      ref={heroRef}
+      id="hero"
+      className="relative w-full overflow-hidden h-screen bg-black"
+      style={{ height: '100dvh' }}
     >
-      {/* Background Interactive Particle Canvas */}
-      <canvas 
-        ref={canvasRef} 
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-60 z-0"
+      {/* Layer 1: Base Image (z-10) with slow Ken Burns hero-zoom */}
+      <div
+        id="hero-base-image"
+        className="absolute inset-0 bg-center bg-cover bg-no-repeat z-10 hero-zoom"
+        style={{ backgroundImage: `url("${BG_IMAGE_1}")` }}
       />
 
-      {/* Subtle Radial Glow Backdrops */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-amber-500/10 blur-[130px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute top-2/3 right-10 w-[400px] h-[300px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      {/* Layer 2: Reveal Layer (z-30) showing BG_IMAGE_2 through soft circular spotlight */}
+      <RevealLayer
+        image={BG_IMAGE_2}
+        cursorX={cursorPos.x}
+        cursorY={cursorPos.y}
+        spotlightRadius={SPOTLIGHT_R}
+      />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          
-          {/* Status Badge */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-neutral-900/90 border border-neutral-800 backdrop-blur-md shadow-inner text-xs">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="text-neutral-300 font-medium">{PERSONAL_INFO.status}</span>
-            <span className="text-neutral-600">|</span>
-            <span className="text-neutral-400 flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-amber-400" />
-              {PERSONAL_INFO.location}
-            </span>
-          </div>
+      {/* Subtle atmospheric vignette */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-20 pointer-events-none" />
 
-          {/* Main Title & Role Typer */}
-          <div className="space-y-4">
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white font-display">
-              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500">{PERSONAL_INFO.name}</span>
-            </h1>
-            
-            <div className="h-12 sm:h-14 flex items-center justify-center">
-              <p className="text-xl sm:text-2xl md:text-3xl text-neutral-300 font-mono flex items-center">
-                <span className="text-amber-400 mr-2">&gt;</span>
-                <span>{displayedText}</span>
-                <span className="inline-block w-2.5 h-6 ml-1 bg-amber-400 animate-pulse" />
-              </p>
-            </div>
-
-            <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-              {PERSONAL_INFO.tagline}
-            </p>
-          </div>
-
-          {/* Action CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <button
-              id="hero-explore-work-btn"
-              type="button"
-              onClick={() => {
-                playClickSound();
-                onNavigateTo('projects');
-              }}
-              className="px-6 py-3 rounded-xl bg-amber-400 text-neutral-950 font-bold text-sm hover:bg-amber-300 transition-all duration-200 shadow-lg shadow-amber-500/20 hover:scale-[1.02] flex items-center gap-2"
-            >
-              <span>Explore Projects</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <button
-              id="hero-open-terminal-btn"
-              type="button"
-              onClick={() => {
-                playClickSound(1000);
-                onNavigateTo('terminal');
-              }}
-              className="px-5 py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-200 font-medium text-sm hover:bg-neutral-800 hover:border-neutral-700 transition-all duration-200 flex items-center gap-2"
-            >
-              <TerminalIcon className="w-4 h-4 text-amber-400" />
-              <span>Launch Terminal</span>
-            </button>
-
-            <button
-              id="hero-view-cv-btn"
-              type="button"
-              onClick={() => {
-                playClickSound();
-                onOpenResume();
-              }}
-              className="px-5 py-3 rounded-xl bg-neutral-900/80 border border-neutral-800 text-neutral-300 font-medium text-sm hover:text-white hover:border-neutral-700 transition-all duration-200 flex items-center gap-2"
-            >
-              <FileText className="w-4 h-4 text-neutral-400" />
-              <span>Resume / CV</span>
-            </button>
-
-            <button
-              id="hero-copy-email-btn"
-              type="button"
-              onClick={handleCopyEmail}
-              className="px-4 py-3 rounded-xl bg-neutral-900/60 border border-neutral-800/80 text-neutral-400 hover:text-amber-400 hover:border-neutral-700 text-xs transition-colors flex items-center gap-2 group"
-              title="Copy Rick's direct email"
-            >
-              {copiedEmail ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-400" />
-                  <span className="text-emerald-400 font-medium">Copied {PERSONAL_INFO.email}!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 group-hover:text-amber-400" />
-                  <span>{PERSONAL_INFO.email}</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Quick Metrics Bar */}
-          <div className="pt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
-            <div className="p-4 rounded-xl bg-neutral-900/50 border border-neutral-800/70 backdrop-blur-sm text-left">
-              <div className="flex items-center justify-between text-neutral-500 mb-1">
-                <span className="text-xs font-mono uppercase tracking-wider">Experience</span>
-                <Code2 className="w-4 h-4 text-amber-400/80" />
-              </div>
-              <div className="text-2xl font-bold text-white font-display">{PERSONAL_INFO.yearsOfExp}</div>
-              <div className="text-xs text-neutral-400">Full-stack engineering</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-neutral-900/50 border border-neutral-800/70 backdrop-blur-sm text-left">
-              <div className="flex items-center justify-between text-neutral-500 mb-1">
-                <span className="text-xs font-mono uppercase tracking-wider">Shipped</span>
-                <Zap className="w-4 h-4 text-amber-400/80" />
-              </div>
-              <div className="text-2xl font-bold text-white font-display">{PERSONAL_INFO.completedProjects}</div>
-              <div className="text-xs text-neutral-400">Web & cloud products</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-neutral-900/50 border border-neutral-800/70 backdrop-blur-sm text-left">
-              <div className="flex items-center justify-between text-neutral-500 mb-1">
-                <span className="text-xs font-mono uppercase tracking-wider">Reach</span>
-                <Users className="w-4 h-4 text-amber-400/80" />
-              </div>
-              <div className="text-2xl font-bold text-white font-display">{PERSONAL_INFO.usersServed}</div>
-              <div className="text-xs text-neutral-400">Monthly active users</div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-neutral-900/50 border border-neutral-800/70 backdrop-blur-sm text-left">
-              <div className="flex items-center justify-between text-neutral-500 mb-1">
-                <span className="text-xs font-mono uppercase tracking-wider">Reliability</span>
-                <ShieldCheck className="w-4 h-4 text-amber-400/80" />
-              </div>
-              <div className="text-2xl font-bold text-white font-display">{PERSONAL_INFO.uptimeRecord}</div>
-              <div className="text-xs text-neutral-400">Distributed uptime</div>
-            </div>
-          </div>
-
-          {/* Key Tech Chips */}
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-neutral-400">
-            <span className="text-neutral-500 font-mono text-[11px] mr-1">CORE STACK:</span>
-            {["TypeScript", "React 19", "Next.js", "Node.js", "PostgreSQL", "Gemini 2.5", "Redis", "Docker", "Tailwind"].map((tech) => (
-              <span 
-                key={tech} 
-                className="px-2.5 py-1 rounded-md bg-neutral-900/90 border border-neutral-800 text-neutral-300 hover:text-amber-400 hover:border-amber-500/40 transition-colors cursor-default"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-
+      {/* Status Pill Badge (Top Left / Centered under nav) */}
+      <div className="absolute top-[8%] sm:top-[9%] left-0 right-0 flex justify-center z-50 pointer-events-auto">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-950/70 border border-white/20 backdrop-blur-md text-xs text-neutral-300 font-mono shadow-xl hero-anim hero-reveal" style={{ animationDelay: '0.1s' }}>
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/80" />
+          <span className="text-white font-medium">{PERSONAL_INFO.name}</span>
+          <span className="text-white/40">|</span>
+          <span className="text-amber-400">Systems & Creative Engineering</span>
         </div>
       </div>
+
+      {/* Layer 3: Main Heading (z-50) */}
+      <div className="absolute top-[18%] sm:top-[20%] left-0 right-0 flex flex-col items-center text-center px-6 max-w-4xl mx-auto pointer-events-none z-50">
+        <h1 className="text-white flex flex-col items-center gap-2 sm:gap-3">
+          {/* Greeting Line */}
+          <span
+            className="block font-display font-medium text-3xl sm:text-5xl md:text-6xl text-neutral-300 hero-anim hero-reveal tracking-tight"
+            style={{ animationDelay: '0.2s' }}
+          >
+            Hi, I'm <span className="text-white font-extrabold font-display">Rick Barat</span>
+          </span>
+
+          {/* Role with prompt indicator and typewriter text */}
+          <div
+            className="inline-flex items-center justify-center flex-wrap gap-2 font-display font-bold text-2xl sm:text-4xl md:text-5xl text-amber-400 hero-anim hero-reveal tracking-tight min-h-[2.8rem] sm:min-h-[3.6rem]"
+            style={{ animationDelay: '0.38s' }}
+          >
+            <span className="text-amber-500/80 font-mono text-xl sm:text-3xl font-normal select-none">&gt;</span>
+            <span className="bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 bg-clip-text text-transparent">
+              {typedText}
+            </span>
+            <span 
+              className="inline-block w-[3px] sm:w-[4px] h-[0.85em] bg-amber-400 ml-0.5 translate-y-[2px] rounded-full animate-cursor shadow-sm shadow-amber-400/50" 
+              aria-hidden="true"
+            />
+          </div>
+        </h1>
+
+        {/* Subtitle statement */}
+        <p
+          className="mt-4 sm:mt-6 text-sm sm:text-lg md:text-xl text-neutral-300/90 max-w-2xl font-normal leading-relaxed hero-anim hero-fade font-sans"
+          style={{ animationDelay: '0.55s' }}
+        >
+          Architecting high-performance web systems, distributed backends, and tactile digital experiences.
+        </p>
+      </div>
+
+      {/* Layer 4: Bottom-left narrative block (z-50) */}
+      <div
+        className="hidden sm:block absolute bottom-12 sm:bottom-16 left-8 md:left-14 max-w-[280px] lg:max-w-[320px] hero-anim hero-fade z-50 space-y-3"
+        style={{ animationDelay: '0.7s' }}
+      >
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-mono text-amber-300">
+          <Compass className="w-3.5 h-3.5" />
+          <span>SUBTERRANEAN & DIGITAL ARCHITECTURE</span>
+        </div>
+        <p className="text-xs sm:text-sm text-white/85 leading-relaxed font-sans">
+          Every layer of software records a chapter in engineering—from high-throughput distributed servers to interactive 3D WebGL spaces and autonomous neural pipelines.
+        </p>
+        
+        {/* Quick Email Copy Chip */}
+        <div className="pt-1 flex items-center gap-2">
+          <button
+            id="hero-quick-copy-email"
+            type="button"
+            onClick={handleCopyEmail}
+            className="px-3 py-1.5 rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-white/20 text-white text-xs font-mono flex items-center gap-1.5 transition-all shadow-md cursor-pointer hover:border-amber-400/60"
+          >
+            {copiedEmail ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400">Copied {PERSONAL_INFO.email}!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 text-neutral-400" />
+                <span>{PERSONAL_INFO.email}</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Layer 5: Bottom-right action block (z-50) */}
+      <div
+        className="absolute bottom-8 sm:bottom-16 left-5 right-5 sm:left-auto sm:right-10 md:right-14 max-w-full sm:max-w-[300px] flex flex-col items-start gap-4 sm:gap-5 hero-anim hero-fade z-50"
+        style={{ animationDelay: '0.85s' }}
+      >
+        <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+          Hover across the canvas to peel back the surface layer and reveal internal strata. Explore live projects, 3D labs, and technical benchmarks below.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* Primary Action Button */}
+          <button
+            id="start-exploring-btn"
+            type="button"
+            onClick={() => handleScrollToSection('projects')}
+            className="bg-[#e8702a] hover:bg-[#d2611f] text-white text-sm font-medium px-7 py-3 rounded-full transition-all hover:scale-[1.03] active:scale-95 hover:shadow-lg hover:shadow-[#e8702a]/30 flex items-center gap-2 cursor-pointer shadow-xl"
+          >
+            <span>Explore Work</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+
+          {/* Secondary Resume Button */}
+          <button
+            id="hero-resume-btn"
+            type="button"
+            onClick={() => {
+              playClickSound();
+              onOpenResume();
+            }}
+            className="px-5 py-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-sm font-medium transition-all hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-2"
+          >
+            <FileText className="w-4 h-4 text-amber-300" />
+            <span>Resume</span>
+          </button>
+        </div>
+
+        {/* Quick stats indicator */}
+        <div className="flex items-center gap-4 text-xs font-mono text-neutral-400 pt-1">
+          <span className="flex items-center gap-1 text-white">
+            <span className="text-amber-400 font-bold">5+</span> Yrs Experience
+          </span>
+          <span>•</span>
+          <span className="flex items-center gap-1 text-white">
+            <span className="text-emerald-400 font-bold">14+</span> Live Systems
+          </span>
+        </div>
+      </div>
+
+      {/* Scroll Down Indicator */}
+      <button
+        type="button"
+        onClick={() => handleScrollToSection('projects')}
+        aria-label="Scroll down to projects"
+        className="absolute bottom-3 left-1/2 -translate-x-1/2 z-50 text-white/50 hover:text-white transition-colors cursor-pointer animate-bounce hidden sm:block p-2"
+      >
+        <span className="text-[10px] font-mono tracking-widest uppercase block mb-1">SCROLL DOWN</span>
+        <div className="w-4 h-7 mx-auto rounded-full border-2 border-white/40 flex items-start justify-center p-1">
+          <div className="w-1 h-2 bg-amber-400 rounded-full animate-pulse" />
+        </div>
+      </button>
     </section>
   );
 };

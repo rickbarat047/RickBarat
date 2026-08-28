@@ -1,6 +1,6 @@
 {
-  "name": "Rick Barat - Portfolio",
-  "description": "Interactive portfolio of Rick Barat, Full Stack Engineer & Creative Developer showcasing featured projects, interactive lab sandbox, technical skills matrix, and contact hub.",
+  "name": "Rick Barat - Portfolio & Systems",
+  "description": "Full-stack engineer & systems architect portfolio featuring an interactive cursor spotlight reveal hero, 3D WebGL laboratory, project showcases, interactive UNIX terminal, and live AI assistant.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

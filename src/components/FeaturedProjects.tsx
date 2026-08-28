@@ -13,32 +13,55 @@ import {
   Play,
   RotateCcw,
   Activity,
-  Zap
+  Zap,
+  Bookmark,
+  SlidersHorizontal,
+  FolderGit2
 } from 'lucide-react';
 import { PROJECTS } from '../data/portfolioData';
 import { Project, ProjectCategory } from '../types';
-import { playClickSound, playSwitchSound } from '../utils/soundEffects';
+import { playClickSound, playSwitchSound, playSuccessChime } from '../utils/soundEffects';
+import { RevealOnScroll } from './RevealOnScroll';
+import { useAuth } from '../context/AuthContext';
+import { PrmptArchiveCard } from './PrmptArchiveCard';
 
 export const FeaturedProjects: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>('all');
+  const { user, userData, toggleBookmark, signInWithGoogle } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory | 'bookmarked'>('all');
   const [activeProjectModal, setActiveProjectModal] = useState<Project | null>(null);
   const [demoState, setDemoState] = useState<{ [key: string]: any }>({});
 
-  const categories: { id: ProjectCategory; label: string }[] = [
+  const bookmarkedIds = userData?.bookmarkedProjectIds || [];
+
+  const categories: { id: ProjectCategory | 'bookmarked'; label: string; badge?: number }[] = [
     { id: 'all', label: 'All Projects' },
     { id: 'full-stack', label: 'Full-Stack' },
     { id: 'ai-systems', label: 'AI & Agents' },
     { id: 'creative-ui', label: 'Creative UI & Canvas' },
-    { id: 'cloud-infra', label: 'Cloud & Telemetry' }
+    { id: 'cloud-infra', label: 'Cloud & Telemetry' },
+    ...(bookmarkedIds.length > 0 ? [{ id: 'bookmarked' as const, label: 'Saved Bookmarks', badge: bookmarkedIds.length }] : [])
   ];
 
   const filteredProjects = selectedCategory === 'all'
     ? PROJECTS
+    : selectedCategory === 'bookmarked'
+    ? PROJECTS.filter(p => bookmarkedIds.includes(p.id))
     : PROJECTS.filter(p => p.category === selectedCategory);
 
-  const handleCategoryChange = (cat: ProjectCategory) => {
+  const handleCategoryChange = (cat: ProjectCategory | 'bookmarked') => {
     playSwitchSound();
     setSelectedCategory(cat);
+  };
+
+  const handleToggleBookmark = (projectId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!user) {
+      playClickSound();
+      signInWithGoogle();
+      return;
+    }
+    playSuccessChime();
+    toggleBookmark(projectId);
   };
 
   const handleOpenModal = (project: Project) => {
@@ -52,159 +75,104 @@ export const FeaturedProjects: React.FC = () => {
   };
 
   return (
-    <section id="projects" className="py-24 bg-neutral-950/90 relative border-t border-neutral-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="projects" className="py-24 bg-neutral-950/90 relative border-t border-neutral-800/80 overflow-hidden">
+      {/* Background Archival Grid Accents */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-400/10 text-amber-400 text-xs font-mono mb-3 border border-amber-400/20">
-              <Briefcase className="w-3.5 h-3.5" />
-              <span>SELECTED CASE STUDIES & BUILDS</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white font-display tracking-tight">
-              Featured Engineering Projects
-            </h2>
-            <p className="text-neutral-400 mt-2 max-w-xl text-sm sm:text-base">
-              A curated selection of real-time applications, AI agent systems, distributed architectures, and interactive design systems built for scale.
-            </p>
-          </div>
-
-          {/* Category Filter Tabs */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-neutral-900 rounded-xl border border-neutral-800 self-start md:self-auto">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                id={`project-filter-${cat.id}`}
-                type="button"
-                onClick={() => handleCategoryChange(cat.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
-                  selectedCategory === cat.id
-                    ? 'bg-amber-400 text-neutral-950 font-bold shadow-sm'
-                    : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
-            <div
-              key={project.id}
-              id={`project-card-${project.id}`}
-              className="group rounded-2xl bg-neutral-900/60 border border-neutral-800/80 hover:border-amber-400/40 transition-all duration-300 flex flex-col overflow-hidden hover:shadow-xl hover:shadow-amber-500/5 hover:-translate-y-1"
-            >
-              {/* Image Preview / Banner */}
-              <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-neutral-950">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-85 group-hover:opacity-100"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/30 to-transparent" />
-                
-                {/* Year & Category Badge */}
-                <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                  <span className="px-2 py-0.5 rounded-md bg-neutral-950/80 backdrop-blur-md border border-neutral-700/80 text-neutral-300 text-[11px] font-mono">
-                    {project.year}
-                  </span>
-                  {project.featured && (
-                    <span className="px-2 py-0.5 rounded-md bg-amber-400/90 text-neutral-950 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                      <Sparkles className="w-2.5 h-2.5" />
-                      Featured
-                    </span>
-                  )}
+        {/* Section Header with PRMPT Archive Styling */}
+        <RevealOnScroll direction="up" distance={24} duration={600}>
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-400/10 text-amber-400 text-xs font-mono border border-amber-400/20">
+                  <Briefcase className="w-3.5 h-3.5" />
+                  <span>[ ARCHIVE REPOSITORY // ED. 2026 ]</span>
                 </div>
-
-                {/* Primary Metric Pill */}
-                {project.metrics[0] && (
-                  <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-neutral-950/90 backdrop-blur-md border border-amber-400/30 text-amber-300 text-xs font-mono flex items-center gap-1.5">
-                    <Zap className="w-3 h-3 text-amber-400" />
-                    <span>{project.metrics[0].value} {project.metrics[0].label}</span>
-                  </div>
-                )}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-900 border border-neutral-800 text-[11px] font-mono text-neutral-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  <span>SCALE ENGINE: 0.00x ⇄ 1.00x SCROLL-LINKED (ENTRY & EXIT)</span>
+                </div>
               </div>
 
-              {/* Card Body */}
-              <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors flex items-center justify-between">
-                    <span>{project.title}</span>
-                    <ArrowUpRight className="w-4 h-4 text-neutral-500 group-hover:text-amber-400 transition-colors" />
-                  </h3>
-                  <p className="text-xs font-mono text-amber-400/90">{project.tagline}</p>
-                  <p className="text-sm text-neutral-400 line-clamp-3 leading-relaxed">
-                    {project.description}
-                  </p>
-                </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white font-display tracking-tight">
+                Featured Engineering Archive
+              </h2>
+              <p className="text-neutral-400 mt-2 max-w-xl text-sm sm:text-base leading-relaxed">
+                A curated repository of real-time applications, autonomous AI agent pipelines, distributed systems, and tactile creative engineering artifacts.
+              </p>
+            </div>
 
-                {/* Tech Tags */}
-                <div className="space-y-4">
-                  <div className="flex flex-wrap gap-1.5 pt-2">
-                    {project.tags.slice(0, 4).map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-0.5 rounded bg-neutral-800/80 text-neutral-300 text-[11px] font-mono"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    {project.tags.length > 4 && (
-                      <span className="px-1.5 py-0.5 rounded bg-neutral-800/40 text-neutral-400 text-[10px] font-mono">
-                        +{project.tags.length - 4}
+            {/* Category Filter Tabs & Archive Counter */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="text-[11px] font-mono text-neutral-500 self-start sm:self-center">
+                INDEX: <span className="text-amber-400 font-semibold">{filteredProjects.length}</span> / {PROJECTS.length} ARTIFACTS
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5 p-1 bg-neutral-900 rounded-xl border border-neutral-800 self-start md:self-auto">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    id={`project-filter-${cat.id}`}
+                    type="button"
+                    onClick={() => handleCategoryChange(cat.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-1.5 ${
+                      selectedCategory === cat.id
+                        ? 'bg-amber-400 text-neutral-950 font-bold shadow-sm'
+                        : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                    }`}
+                  >
+                    <span>{cat.label}</span>
+                    {cat.badge !== undefined && (
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                        selectedCategory === cat.id ? 'bg-neutral-950 text-amber-400' : 'bg-neutral-800 text-neutral-300'
+                      }`}>
+                        {cat.badge}
                       </span>
                     )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="pt-3 border-t border-neutral-800 flex items-center justify-between">
-                    <button
-                      id={`project-deepdive-btn-${project.id}`}
-                      type="button"
-                      onClick={() => handleOpenModal(project)}
-                      className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 group/btn"
-                    >
-                      <span>Deep Dive & Architecture</span>
-                      <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                    </button>
-
-                    <div className="flex items-center gap-2">
-                      {project.githubUrl && (
-                        <a
-                          id={`project-github-${project.id}`}
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-neutral-800/70 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"
-                          title="View Source Code"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Github className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                      {project.liveUrl && (
-                        <button
-                          id={`project-quickview-${project.id}`}
-                          type="button"
-                          onClick={() => handleOpenModal(project)}
-                          className="p-1.5 rounded-lg bg-neutral-800/70 text-neutral-400 hover:text-amber-400 hover:bg-neutral-700 transition-colors"
-                          title="Live Interactive Demo"
-                        >
-                          <Play className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  </button>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        </RevealOnScroll>
+
+        {/* Projects Grid with PRMPT Archive Scroll-Scale Entrance Animation (0 to 1) */}
+        {filteredProjects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {filteredProjects.map((project, idx) => (
+              <PrmptArchiveCard
+                key={project.id}
+                project={project}
+                index={idx}
+                isBookmarked={bookmarkedIds.includes(project.id)}
+                onToggleBookmark={handleToggleBookmark}
+                onOpenModal={handleOpenModal}
+                user={user}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="p-12 rounded-2xl bg-neutral-900/50 border border-neutral-800 text-center space-y-4 my-8">
+            <div className="w-12 h-12 rounded-xl bg-neutral-800/80 border border-neutral-700 flex items-center justify-center mx-auto text-amber-400">
+              <Bookmark className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-white font-display">No Bookmarked Artifacts Yet</h3>
+              <p className="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto">
+                Click the bookmark icon on any project card to catalog it in your personal Firestore collection.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleCategoryChange('all')}
+              className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-amber-400 text-xs font-semibold font-mono border border-neutral-700 transition-colors"
+            >
+              Browse All Projects
+            </button>
+          </div>
+        )}
 
       </div>
 
@@ -229,15 +197,32 @@ export const FeaturedProjects: React.FC = () => {
                   {activeProjectModal.title}
                 </h3>
               </div>
-              <button
-                id="modal-close-btn"
-                type="button"
-                onClick={handleCloseModal}
-                className="p-2 rounded-xl bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"
-                aria-label="Close Case Study"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  id={`modal-bookmark-btn-${activeProjectModal.id}`}
+                  type="button"
+                  onClick={(e) => handleToggleBookmark(activeProjectModal.id, e)}
+                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-medium transition-all ${
+                    bookmarkedIds.includes(activeProjectModal.id)
+                      ? 'bg-amber-400 text-neutral-950 border-amber-300 font-bold'
+                      : 'bg-neutral-800 text-neutral-300 hover:text-white border-neutral-700'
+                  }`}
+                  title="Toggle bookmark in Firestore"
+                >
+                  <Bookmark className={`w-3.5 h-3.5 ${bookmarkedIds.includes(activeProjectModal.id) ? 'fill-current' : ''}`} />
+                  <span>{bookmarkedIds.includes(activeProjectModal.id) ? 'Saved' : 'Save Project'}</span>
+                </button>
+
+                <button
+                  id="modal-close-btn"
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="p-2 rounded-xl bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"
+                  aria-label="Close Case Study"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Modal Body Content */}

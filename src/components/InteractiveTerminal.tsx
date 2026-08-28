@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { PERSONAL_INFO, PROJECTS, SKILL_CATEGORIES } from '../data/portfolioData';
 import { playTerminalBeep, playSuccessChime } from '../utils/soundEffects';
+import { RevealOnScroll } from './RevealOnScroll';
 
 interface TerminalLine {
   id: string;
@@ -26,8 +27,9 @@ export const InteractiveTerminal: React.FC = () => {
   const [isMatrixMode, setIsMatrixMode] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
   
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const terminalOutputRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const isFirstMount = useRef<boolean>(true);
 
   const initialLines: TerminalLine[] = [
     {
@@ -58,10 +60,16 @@ export const InteractiveTerminal: React.FC = () => {
   const [lines, setLines] = useState<TerminalLine[]>(initialLines);
 
   const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (terminalOutputRef.current) {
+      terminalOutputRef.current.scrollTop = terminalOutputRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
     scrollToBottom();
   }, [lines]);
 
@@ -102,6 +110,7 @@ export const InteractiveTerminal: React.FC = () => {
               <div><span className="text-amber-300 font-mono">hire</span> - Interactive employment inquiry</div>
               <div><span className="text-amber-300 font-mono">neofetch</span> - System specs & bio banner</div>
               <div><span className="text-amber-300 font-mono">cat resume.json</span> - View raw credentials</div>
+              <div><span className="text-amber-300 font-mono">ai &lt;question&gt;</span> - Query Rick's Gemini AI brain</div>
               <div><span className="text-amber-300 font-mono">matrix</span> - Toggle matrix rain mode</div>
               <div><span className="text-amber-300 font-mono">clear</span> - Clear terminal screen</div>
             </div>
@@ -239,6 +248,39 @@ export const InteractiveTerminal: React.FC = () => {
         }
         break;
 
+      case 'ai':
+      case 'ask':
+      case 'chat':
+        if (args.length === 0) {
+          // Open the floating Gemini chatbot
+          const btn = document.getElementById('open-gemini-chat-btn');
+          if (btn) btn.click();
+          outputContent = (
+            <div className="text-amber-300 text-xs font-mono">
+              Opening Rick Barat Gemini AI multi-turn assistant... You can also query inline using `ai &lt;your question&gt;`
+            </div>
+          );
+        } else {
+          const userQuery = trimmed.replace(/^(ai|ask|chat)\s+/i, '');
+          outputContent = (
+            <div className="space-y-1.5 text-xs">
+              <div className="text-amber-400 font-mono flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 animate-spin" />
+                <span>Gemini AI Response:</span>
+              </div>
+              <div className="text-neutral-200 pl-2 border-l-2 border-amber-400/40 leading-relaxed">
+                {`Thinking on "${userQuery}"... Launching interactive multi-turn session in the floating assistant widget.`}
+              </div>
+            </div>
+          );
+          // Also trigger the floating window
+          setTimeout(() => {
+            const btn = document.getElementById('open-gemini-chat-btn');
+            if (btn) btn.click();
+          }, 300);
+        }
+        break;
+
       case 'matrix':
         setIsMatrixMode(!isMatrixMode);
         outputContent = (
@@ -305,126 +347,132 @@ export const InteractiveTerminal: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-400/10 text-amber-400 text-xs font-mono border border-amber-400/20">
-            <TerminalIcon className="w-3.5 h-3.5" />
-            <span>INTERACTIVE UNIX SHELL</span>
+        <RevealOnScroll direction="up" distance={24} duration={600}>
+          <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-400/10 text-amber-400 text-xs font-mono border border-amber-400/20">
+              <TerminalIcon className="w-3.5 h-3.5" />
+              <span>INTERACTIVE UNIX SHELL</span>
+            </div>
+            <h2 className="text-3xl font-bold text-white font-display tracking-tight">
+              Developer Console & Playground
+            </h2>
+            <p className="text-neutral-400 text-xs sm:text-sm">
+              Execute terminal commands directly in the browser to query skills, project history, or run live diagnostics.
+            </p>
           </div>
-          <h2 className="text-3xl font-bold text-white font-display tracking-tight">
-            Developer Console & Playground
-          </h2>
-          <p className="text-neutral-400 text-xs sm:text-sm">
-            Execute terminal commands directly in the browser to query skills, project history, or run live diagnostics.
-          </p>
-        </div>
+        </RevealOnScroll>
 
         {/* Terminal Window Frame */}
-        <div 
-          className={`rounded-2xl border ${
-            isMatrixMode ? 'border-emerald-500/60 shadow-emerald-500/20' : 'border-neutral-800 shadow-2xl shadow-black/80'
-          } bg-neutral-950 overflow-hidden transition-all duration-300 flex flex-col font-mono text-sm`}
-          style={{ height: isExpanded ? '680px' : '440px' }}
-        >
-          {/* Terminal Titlebar */}
-          <div className="flex items-center justify-between px-4 py-3 bg-neutral-900/90 border-b border-neutral-800 select-none">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
-              <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-              <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
-              <span className="ml-2 text-xs font-mono text-neutral-400">
-                rick@barat-workspace:~ (zsh)
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                id="terminal-clear-btn"
-                type="button"
-                onClick={() => setLines([])}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 text-xs transition-colors"
-                title="Clear screen"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                id="terminal-expand-btn"
-                type="button"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 text-xs transition-colors"
-                title={isExpanded ? "Collapse" : "Expand"}
-              >
-                {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Terminal Output Area */}
+        <RevealOnScroll direction="up" delay={120} duration={650} distance={28}>
           <div 
-            className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-3 bg-neutral-950 font-mono text-xs sm:text-sm text-neutral-200"
-            onClick={() => inputRef.current?.focus()}
+            className={`rounded-2xl border ${
+              isMatrixMode ? 'border-emerald-500/60 shadow-emerald-500/20' : 'border-neutral-800 shadow-2xl shadow-black/80'
+            } bg-neutral-950 overflow-hidden transition-all duration-300 flex flex-col font-mono text-sm`}
+            style={{ height: isExpanded ? '680px' : '440px' }}
           >
-            {lines.map((line) => (
-              <div key={line.id} className="space-y-1">
-                {line.type === 'input' ? (
-                  <div className="flex items-center gap-2 text-neutral-400">
-                    <span className="text-amber-400">rick@barat:~$</span>
-                    <span className="text-white font-bold">{line.content}</span>
-                  </div>
-                ) : (
-                  <div className="pl-4 border-l-2 border-neutral-800 py-0.5">
-                    {line.content}
-                  </div>
-                )}
+            {/* Terminal Titlebar */}
+            <div className="flex items-center justify-between px-4 py-3 bg-neutral-900/90 border-b border-neutral-800 select-none">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+                <span className="ml-2 text-xs font-mono text-neutral-400">
+                  rick@barat-workspace:~ (zsh)
+                </span>
               </div>
-            ))}
-            <div ref={bottomRef} />
-          </div>
 
-          {/* Terminal Input Line */}
-          <div className="p-3 bg-neutral-900/70 border-t border-neutral-800 flex items-center gap-2">
-            <span className="text-amber-400 font-mono text-xs sm:text-sm font-bold pl-2 shrink-0">
-              rick@barat:~$
-            </span>
-            <input
-              ref={inputRef}
-              id="terminal-command-input"
-              type="text"
-              value={inputVal}
-              onChange={(e) => setInputVal(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type a command (e.g. help, about, skills, neofetch, hire)..."
-              className="flex-1 bg-transparent text-white font-mono text-xs sm:text-sm focus:outline-none placeholder:text-neutral-600"
-              autoComplete="off"
-              spellCheck="false"
-            />
-            <button
-              id="terminal-submit-btn"
-              type="button"
-              onClick={() => executeCommand(inputVal)}
-              className="p-1.5 rounded-md bg-amber-400 text-neutral-950 hover:bg-amber-300 transition-colors"
-              title="Execute command"
+              <div className="flex items-center gap-2">
+                <button
+                  id="terminal-clear-btn"
+                  type="button"
+                  onClick={() => setLines([])}
+                  className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 text-xs transition-colors"
+                  title="Clear screen"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  id="terminal-expand-btn"
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 text-xs transition-colors"
+                  title={isExpanded ? "Collapse" : "Expand"}
+                >
+                  {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Terminal Output Area */}
+            <div 
+              ref={terminalOutputRef}
+              className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-3 bg-neutral-950 font-mono text-xs sm:text-sm text-neutral-200"
+              onClick={() => inputRef.current?.focus()}
             >
-              <CornerDownLeft className="w-3.5 h-3.5" />
-            </button>
+              {lines.map((line) => (
+                <div key={line.id} className="space-y-1">
+                  {line.type === 'input' ? (
+                    <div className="flex items-center gap-2 text-neutral-400">
+                      <span className="text-amber-400">rick@barat:~$</span>
+                      <span className="text-white font-bold">{line.content}</span>
+                    </div>
+                  ) : (
+                    <div className="pl-4 border-l-2 border-neutral-800 py-0.5">
+                      {line.content}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Terminal Input Line */}
+            <div className="p-3 bg-neutral-900/70 border-t border-neutral-800 flex items-center gap-2">
+              <span className="text-amber-400 font-mono text-xs sm:text-sm font-bold pl-2 shrink-0">
+                rick@barat:~$
+              </span>
+              <input
+                ref={inputRef}
+                id="terminal-command-input"
+                type="text"
+                value={inputVal}
+                onChange={(e) => setInputVal(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type a command (e.g. help, about, skills, neofetch, hire)..."
+                className="flex-1 bg-transparent text-white font-mono text-xs sm:text-sm focus:outline-none placeholder:text-neutral-600"
+                autoComplete="off"
+                spellCheck="false"
+              />
+              <button
+                id="terminal-submit-btn"
+                type="button"
+                onClick={() => executeCommand(inputVal)}
+                className="p-1.5 rounded-md bg-amber-400 text-neutral-950 hover:bg-amber-300 transition-colors"
+                title="Execute command"
+              >
+                <CornerDownLeft className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
-        </div>
+        </RevealOnScroll>
 
         {/* Quick Command Chips */}
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 text-xs">
-          <span className="text-neutral-500 font-mono text-[11px] mr-1">QUICK SHORTCUTS:</span>
-          {['help', 'about', 'skills', 'projects', 'neofetch', 'hire', 'cat resume.json', 'clear'].map((cmd) => (
-            <button
-              key={cmd}
-              id={`terminal-quick-${cmd.replace(/\s+/g, '-')}`}
-              type="button"
-              onClick={() => handleQuickCommand(cmd)}
-              className="px-2.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-amber-400/50 text-neutral-300 hover:text-amber-300 font-mono text-xs transition-colors"
-            >
-              ${cmd}
-            </button>
-          ))}
-        </div>
+        <RevealOnScroll direction="up" delay={200} duration={600} distance={15}>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 text-xs">
+            <span className="text-neutral-500 font-mono text-[11px] mr-1">QUICK SHORTCUTS:</span>
+            {['help', 'about', 'skills', 'projects', 'neofetch', 'hire', 'cat resume.json', 'clear'].map((cmd) => (
+              <button
+                key={cmd}
+                id={`terminal-quick-${cmd.replace(/\s+/g, '-')}`}
+                type="button"
+                onClick={() => handleQuickCommand(cmd)}
+                className="px-2.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-amber-400/50 text-neutral-300 hover:text-amber-300 font-mono text-xs transition-colors"
+              >
+                ${cmd}
+              </button>
+            ))}
+          </div>
+        </RevealOnScroll>
 
       </div>
     </section>

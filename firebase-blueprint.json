@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with bookmarks and saved preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique user ID from Firebase Auth" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "photoURL": { "type": "string", "description": "User avatar image URL" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" },
+        "lastLoginAt": { "type": "string", "description": "ISO timestamp of last login" },
+        "bookmarkedProjectIds": { "type": "array", "description": "Array of bookmarked project IDs" },
+        "starredLabIds": { "type": "array", "description": "Array of starred interactive lab IDs" }
+      },
+      "required": ["uid", "email"]
+    },
+    "GuestbookEntry": {
+      "title": "GuestbookEntry",
+      "description": "Visitor endorsement or guestbook note for Rick Barat",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string", "description": "User ID of the author" },
+        "authorName": { "type": "string", "description": "Display name of author" },
+        "authorEmail": { "type": "string", "format": "email", "description": "Author email" },
+        "authorPhoto": { "type": "string", "description": "Author avatar URL" },
+        "role": { "type": "string", "enum": ["Recruiter", "Client", "Engineer", "Collaborator", "Visitor"], "description": "Author relationship or role" },
+        "message": { "type": "string", "maxLength": 600, "description": "Endorsement or guestbook message" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["authorId", "authorName", "role", "message", "createdAt"]
+    },
+    "ContactInquiry": {
+      "title": "ContactInquiry",
+      "description": "Contact form inquiry sent to Rick Barat",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Sender name" },
+        "email": { "type": "string", "format": "email", "description": "Sender email" },
+        "subject": { "type": "string", "description": "Inquiry subject" },
+        "message": { "type": "string", "description": "Inquiry message" },
+        "userId": { "type": "string", "description": "Optional author user ID" },
+        "createdAt": { "type": "string", "description": "Submission timestamp" }
+      },
+      "required": ["name", "email", "message", "createdAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Persisted AI chatbot conversation message",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user ID" },
+        "role": { "type": "string", "enum": ["user", "model"], "description": "Message author" },
+        "content": { "type": "string", "description": "Message text" },
+        "timestamp": { "type": "number", "description": "Unix timestamp" },
+        "modelUsed": { "type": "string", "description": "Gemini model used" },
+        "hasSearchGrounding": { "type": "boolean", "description": "Whether Google Search Grounding was active" },
+        "sources": { "type": "array", "description": "Search Grounding reference sources" }
+      },
+      "required": ["userId", "role", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document containing preferences and bookmarks"
+    },
+    "/guestbook/{entryId}": {
+      "schema": "GuestbookEntry",
+      "description": "Public guestbook notes and endorsements left by verified visitors"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "ContactInquiry",
+      "description": "Inquiries submitted via the contact form"
+    },
+    "/users/{userId}/chatHistory/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "AI conversation history for the signed-in user"
+    }
+  }
+}

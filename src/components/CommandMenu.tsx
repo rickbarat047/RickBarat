@@ -134,6 +134,17 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
       }
     },
     {
+      id: 'action-gemini-chat',
+      title: 'Ask Rick AI: Open Gemini 3 Chatbot (Multi-Turn)',
+      category: 'AI Assistant',
+      icon: Sparkles,
+      action: () => {
+        onClose();
+        const btn = document.getElementById('open-gemini-chat-btn');
+        if (btn) btn.click();
+      }
+    },
+    {
       id: 'action-resume',
       title: 'Open Curriculum Vitae / Resume Modal',
       category: 'Actions',

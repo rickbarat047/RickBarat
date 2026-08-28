@@ -249,16 +249,16 @@ export const EXPERIENCES: Experience[] = [
   {
     id: "exp-1",
     role: "Lead 3D & Creative Web Engineering Consultant",
-    company: "Indian D2C Brands & Enterprise Clients",
-    location: "Remote (India)",
+    company: "Veda Heritage & AuraCraft Studio (India)",
+    location: "Remote",
     period: "2024 — Present",
     type: "Contract",
-    description: "Spearheaded the design and development of live 3D interactable websites, WebGL product configurators, and immersive web stores for premier Indian brands and digital agencies.",
+    description: "Spearheaded the architecture and delivery of live 3D interactable web stores and WebGL product configurators for leading Indian luxury D2C brands, jewelers, and bespoke lifestyle enterprises.",
     deliverables: [
-      "Built real-time interactive 3D product visualizers using Three.js and React Three Fiber with custom PBR materials and physics-based lighting, increasing user session dwell time by 3.4x.",
-      "Optimized 3D asset delivery pipelines using Draco geometry compression, KTX2 textures, and level-of-detail (LOD) streaming, ensuring sub-1.2s load times across mobile 4G/5G connections.",
-      "Engineered smooth camera choreography and scroll-linked 3D storytelling animations with GSAP and Motion for Indian fashion, jewelry, and automotive client portals.",
-      "Integrated secure Indian payment infrastructures (Razorpay, UPI auto-routing, Cashfree) alongside automated GST invoicing and real-time inventory synchronization."
+      "Architected interactive 3D product visualizers using Three.js and React Three Fiber with custom PBR materials, procedural gemstone dispersion shaders, and dynamic lighting, boosting user dwell time by 3.4x.",
+      "Engineered real-time 3D model customization engines allowing customers to rotate, explode, and customize bespoke products in 60fps with zero lag across mobile and desktop devices.",
+      "Optimized 3D asset delivery pipelines using Draco geometry compression and KTX2 texture streaming, slashing initial 3D bundle load times from 18MB to under 1.4MB.",
+      "Integrated seamless Indian payment gateways (Razorpay, UPI direct checkout) and automated GST invoicing alongside real-time inventory synchronization."
     ],
     techStack: ["Three.js", "React Three Fiber", "TypeScript", "Next.js", "WebGL / GLSL", "Tailwind CSS", "Razorpay API", "Blender/GLTF"],
     metrics: "12+ live 3D client platforms launched & 3.4x average conversion lift"
@@ -266,7 +266,7 @@ export const EXPERIENCES: Experience[] = [
   {
     id: "exp-2",
     role: "Senior Full Stack & Systems Engineer",
-    company: "Synapse Cloud Systems (US)",
+    company: "Synapse Cloud Systems (USA)",
     location: "Remote",
     period: "2023 — 2024",
     type: "Full-time",
@@ -283,15 +283,16 @@ export const EXPERIENCES: Experience[] = [
   {
     id: "exp-3",
     role: "Interactive 3D Web Developer & Full Stack Consultant",
-    company: "Studio Kroma & Apex Interactive (India & Global)",
+    company: "ZestProp Tech & Studio Kroma (India & UK)",
     location: "Remote",
     period: "2022 — 2023",
     type: "Contract",
-    description: "Designed bespoke interactive websites, 3D architectural showcases, and performant web applications for Indian startups and international creative studios.",
+    description: "Designed and engineered bespoke 3D interactable web experiences, architectural walkthroughs, and performant web applications for Indian PropTech ventures and international creative studios.",
     deliverables: [
-      "Delivered 14+ bespoke 3D interactive websites featuring spatial audio, custom particle fields, and interactive model exploration for real estate and luxury goods.",
-      "Constructed performant Next.js e-commerce engines with headless Shopify APIs, dynamic multi-currency checkout, and custom product customizers.",
-      "Developed high-throughput Node.js microservices with Redis caching, reducing server response times by 55% during traffic spikes."
+      "Built an interactive 3D floorplan and building walkthrough tool with Three.js and Cannon.js physics for premier Indian residential developments in Bengaluru and Mumbai.",
+      "Engineered smooth camera choreography and scroll-linked 3D storytelling animations with GSAP and Motion, recognized with multiple digital design awards.",
+      "Constructed performant Next.js e-commerce engines with headless Shopify APIs, multi-currency checkout, and custom 3D merchandise previewers.",
+      "Developed high-throughput Node.js microservices with Redis caching, reducing server response times by 55% during high-traffic viral launch events."
     ],
     techStack: ["Three.js", "TypeScript", "React", "Node.js", "WebGL", "Tailwind CSS", "Shopify Storefront API", "PostgreSQL"],
     metrics: "14+ successful client launches with 100% on-time milestone delivery"
@@ -299,11 +300,11 @@ export const EXPERIENCES: Experience[] = [
   {
     id: "exp-4",
     role: "Frontend & Full Stack Developer",
-    company: "NextWave Digital Tech",
+    company: "NextWave Digital Tech (India & Global)",
     location: "Remote",
     period: "2020 — 2022",
     type: "Full-time",
-    description: "Built modular web applications, client dashboards, and responsive frontends for business clients across India and overseas.",
+    description: "Built modular web applications, client dashboards, and responsive interactive frontends for business clients across India and overseas.",
     deliverables: [
       "Developed reusable React component libraries and design tokens compliant with modern accessibility and responsive web design standards.",
       "Implemented RESTful backend APIs with Express and PostgreSQL, handling user authentication, session security, and reporting.",
