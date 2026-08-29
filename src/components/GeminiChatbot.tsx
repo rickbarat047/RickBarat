@@ -446,76 +446,25 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
 
       let data: any = null;
       try {
-        data = await res.json();
+        if (res.ok) {
+          data = await res.json();
+        }
       } catch (parseErr) {
         console.warn('Unable to parse chat response JSON:', parseErr);
       }
 
-      if (!res.ok && !data?.reply) {
-        const status = res.status;
-        let categorizedError: ChatMessage['errorType'] = 'server';
-        let userTitle = 'Server Communication Issue';
-        let userMessage = `Server responded with status ${status}.`;
-
-        if (status === 404) {
-          categorizedError = 'not_found';
-          userTitle = 'API Endpoint Not Found (404)';
-          userMessage = 'The chat endpoint was not found on the server. Served local knowledge base.';
-        } else if (status === 429) {
-          categorizedError = 'quota';
-          userTitle = 'Rate Limit Reached (429)';
-          userMessage = 'Gemini API quota or rate limit reached. Switched to fallback response.';
-        } else if (status === 401 || status === 403) {
-          categorizedError = 'auth';
-          userTitle = 'Authentication Error';
-          userMessage = 'API authorization or key configuration error.';
-        } else if (status >= 500) {
-          categorizedError = 'server';
-          userTitle = `Server Error (${status})`;
-          userMessage = 'Backend service encountered a temporary error. Fallback intelligence engaged.';
-        }
-
-        showToast({
-          type: 'warning',
-          title: userTitle,
-          message: userMessage,
-          statusCode: status,
-          failedPrompt: queryText,
-          canRetry: true
-        });
-
-        throw {
-          type: categorizedError,
-          status,
-          message: data?.error || userMessage
-        };
-      }
-
-      // If server returned a reply with an error detail/offline fallback flag, alert user via toast as well
-      if (data?.isOfflineFallback && data?.errorType) {
-        let warnTitle = 'Portfolio AI Mode';
-        let warnMsg = 'Response served via Rick\'s verified portfolio engine.';
-        if (data.errorType === 'QUOTA_EXHAUSTED') {
-          warnTitle = 'Gemini API Busy';
-          warnMsg = 'High request volume detected. Served local portfolio knowledge.';
-        } else if (data.errorType === 'HIGH_DEMAND') {
-          warnTitle = 'High Demand';
-          warnMsg = 'Gemini model is currently experiencing high demand.';
-        }
-
-        showToast({
-          type: 'info',
-          title: warnTitle,
-          message: warnMsg,
-          failedPrompt: queryText,
-          canRetry: true
-        });
-      }
-
       const replyTimestamp = Date.now();
       const grounding = data?.groundingMetadata;
-      const content = data?.reply || "I didn't receive a response. Please try again.";
-      const isOffline = Boolean(data?.isOfflineFallback);
+      
+      // If server provided a valid reply, use it; otherwise seamlessly generate from Portfolio Intelligence
+      let content = data?.reply;
+      let isOffline = Boolean(data?.isOfflineFallback);
+      
+      if (!content || !res.ok) {
+        const localKnowledge = generatePortfolioKnowledge(queryText, selectedRole);
+        content = localKnowledge.reply;
+        isOffline = true;
+      }
       
       const assistantMsg: ChatMessage = {
         id: `ai-${replyTimestamp}`,
@@ -555,25 +504,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
 
     } catch (err: any) {
       clearTimeout(timeoutTimer);
-      console.warn('Live API encountered status or network issue, using verified portfolio intelligence:', err);
-
-      const is404 = err?.status === 404 || err?.type === 'not_found' || String(err?.message || '').includes('404');
-      const isAbort = err?.name === 'AbortError' || String(err?.message || '').includes('aborted');
-
-      if (!activeToast) {
-        showToast({
-          type: 'warning',
-          title: is404 ? 'API 404 Not Found' : isAbort ? 'Request Timeout' : 'Server Reconnecting',
-          message: is404 
-            ? 'The chat endpoint was not found. Using offline portfolio knowledge.' 
-            : isAbort 
-              ? 'Request took too long. Click Retry Prompt to try again.' 
-              : 'Network or server error encountered. Local fallback engaged.',
-          statusCode: err?.status,
-          failedPrompt: queryText,
-          canRetry: true
-        });
-      }
+      console.log('Serving verified portfolio intelligence fallback for prompt:', queryText);
 
       // Instantly generate rich verified response about Rick's projects/skills/contact
       const verifiedKnowledge = generatePortfolioKnowledge(queryText, selectedRole);
@@ -588,7 +519,6 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
         isOfflineFallback: true,
         failedQuery: queryText,
         canRetry: true,
-        errorType: is404 ? 'not_found' : isAbort ? 'timeout' : 'server',
       };
 
       setMessages(prev => [...prev, assistantMsg]);
