@@ -24,8 +24,23 @@ export const ExperienceTimeline: React.FC = () => {
   };
 
   return (
-    <section id="experience" className="py-24 bg-neutral-950/90 relative border-t border-neutral-800">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="experience" className="py-24 relative overflow-hidden bg-neutral-950/90 border-t border-neutral-800">
+      {/* Full-bleed cinematic video animation behind Work Experience & Milestones */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover opacity-35 filter saturate-150 contrast-125 scale-105"
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260429_114316_1c7889ad-2885-410e-b493-98119fee0ddb.mp4"
+        />
+        {/* Soft edge blending gradients */}
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-neutral-950/75 to-neutral-950" />
+        <div className="absolute inset-0 bg-radial-at-c from-transparent via-neutral-950/60 to-neutral-950" />
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
         <RevealOnScroll direction="up" distance={24} duration={600}>
@@ -68,10 +83,10 @@ export const ExperienceTimeline: React.FC = () => {
 
                   {/* Experience Card */}
                   <div 
-                    className={`rounded-2xl border transition-all duration-200 overflow-hidden cursor-pointer ${
+                    className={`rounded-2xl border transition-all duration-200 overflow-hidden cursor-pointer backdrop-blur-md ${
                       isExpanded 
                         ? 'bg-neutral-900/90 border-amber-400/40 shadow-xl shadow-amber-500/5' 
-                        : 'bg-neutral-900/40 border-neutral-800 hover:border-neutral-700 hover:bg-neutral-900/60'
+                        : 'bg-neutral-900/60 border-neutral-800/80 hover:border-neutral-700 hover:bg-neutral-900/80'
                     }`}
                     onClick={() => toggleExpand(exp.id)}
                   >
