@@ -4,13 +4,25 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { generatePortfolioKnowledge } from "./src/utils/portfolioIntelligence";
 
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+// Universal CORS & Preflight Handling
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
+app.use(express.json({ limit: "10mb" }));
 
 // Dynamic runtime resolution of Gemini API key from environment or local config
 function getRuntimeApiKey(): string | null {
@@ -66,98 +78,9 @@ function getGeminiClient(): GoogleGenAI | null {
   });
 }
 
-// Resilient Offline Portfolio Knowledge Engine
+// Resilient Portfolio Knowledge Engine
 function generatePortfolioFallback(query: string, persona: string): string {
-  const q = query.toLowerCase();
-
-  if (q.includes("project") || q.includes("build") || q.includes("work") || q.includes("client") || q.includes("portfolio")) {
-    return `### Rick Barat's Featured Engineering Projects & Client Work:
-
-Over **6+ years of engineering experience**, Rick has shipped **35+ production applications** across 3D WebGL, distributed systems, and modern web architectures:
-
-1. **3D Product Visualizers & WebGL Configurators (2024–Present)**
-   - **Clients:** Indian D2C Brands & Global E-Commerce
-   - **Stack:** Three.js, React Three Fiber, GLSL Shaders, Draco Compression, Razorpay/UPI Checkout.
-   - **Impact:** Drove a verified **3.4x conversion lift** with real-time material switches and 60fps browser rendering.
-
-2. **Distributed Telemetry & Flamegraph Systems (2023–2024)**
-   - **Company:** Synapse Cloud Systems (US)
-   - **Stack:** React, TypeScript, Next.js, Go, WebSockets, HTML5 Canvas.
-   - **Impact:** Engineered custom canvas flamegraphs parsing **500,000 trace spans at 60fps** while maintaining **98+ Lighthouse scores**.
-
-3. **Bespoke 3D Luxury & Interactive Experiences (2022–2023)**
-   - **Agencies:** Studio Kroma & Apex Interactive
-   - **Stack:** React Three Fiber, GSAP timeline choreography, custom post-processing shaders.
-   - **Impact:** Delivered 14+ immersive experiences for luxury real estate and global creative brands.
-
-4. **Scalable Design Systems & Platforms (2020–2022)**
-   - **Company:** NextWave Digital Tech
-   - **Stack:** React, Next.js, TypeScript, Tailwind CSS, Node.js.
-   - **Impact:** Shipped 20+ responsive web platforms and reusable component libraries.
-
-*Feel free to explore the interactive 3D Lab and projects on this page, or connect with Rick at **rickbarat21@gmail.com**.*`;
-  }
-
-  if (q.includes("education") || q.includes("degree") || q.includes("college") || q.includes("university") || q.includes("school") || q.includes("bca") || q.includes("techno")) {
-    return `### Rick Barat's Educational Background:
-
-- **Degree:** Bachelor of Computer Applications (**BCA**)
-- **Institution:** **Techno India University**, Kolkata, India
-- **Focus:** Data Structures & Algorithms, Object-Oriented Software Design, Distributed Computing, Computer Graphics, and Database Management Systems.
-- **Self-Directed Mastery:** Extensive specialized study in WebGL, Three.js shaders, GLSL, Go concurrent pipelines, and modern TypeScript architecture.
-
-Rick pairs formal computer science foundations with over **6 years of hands-on production engineering** and 35+ shipped products.`;
-  }
-
-  if (q.includes("skill") || q.includes("stack") || q.includes("tech") || q.includes("languages") || q.includes("three.js") || q.includes("webgl")) {
-    return `### Rick Barat's Core Technical Stack & Specializations:
-
-1. **3D & Creative Web Engineering:**
-   - Three.js, React Three Fiber (R3F), GLSL custom shaders, Draco 3D mesh compression, PBR material workflows, GSAP scroll choreography.
-2. **Frontend Architecture:**
-   - React 19, TypeScript, Next.js, Tailwind CSS, HTML5 Canvas, Web Audio API, responsive UI design systems.
-3. **Backend & Scalable APIs:**
-   - Node.js, Express, Go (Golang), PostgreSQL, Redis pub/sub caching, WebSockets for low-latency live telemetry.
-4. **AI & Agent Integrations:**
-   - Google Gemini API, LangChain, vector embeddings, client-server proxy architectures.
-
-All applications are built with strict focus on zero-lag 60fps rendering, accessibility, and high conversion impact.`;
-  }
-
-  if (q.includes("contact") || q.includes("email") || q.includes("hire") || q.includes("available") || q.includes("rate") || q.includes("instagram") || q.includes("resume")) {
-    return `### Get in Touch with Rick Barat:
-
-Rick is actively open for **full-time senior engineering roles**, **remote worldwide contracts**, and **bespoke 3D WebGL consultancy**.
-
-- **Email:** [rickbarat21@gmail.com](mailto:rickbarat21@gmail.com)
-- **Instagram:** [@rickbarat047](https://www.instagram.com/rickbarat047/?hl=en)
-- **Location:** India & Remote Worldwide (IST timezone, UTC+5:30)
-- **Typical Turnaround:** Replies within 24 hours.
-
-You can also download Rick's full verified resume using the **Resume** button in the navigation bar.`;
-  }
-
-  if (persona === "recruiter") {
-    return `### Candidate Summary for Recruiters & Hiring Managers:
-
-- **Candidate:** Rick Barat
-- **Roles:** Senior Full Stack Engineer, Frontend Lead, 3D WebGL / Creative Developer.
-- **Experience:** 6+ years of production experience shipping 35+ products for US tech companies, Indian D2C enterprises, and international creative agencies.
-- **Education:** Bachelor of Computer Applications (BCA) from Techno India University, Kolkata.
-- **Strengths:** Rapid end-to-end prototyping, 60fps WebGL optimization, clean TypeScript architecture, and autonomous delivery.
-- **Direct Contact:** [rickbarat21@gmail.com](mailto:rickbarat21@gmail.com)`;
-  }
-
-  return `### Hello! I am Rick Barat's AI Portfolio Assistant.
-
-I have complete knowledge of Rick's **6+ years of full-stack engineering**, **3D WebGL projects for Indian & global brands**, **BCA degree from Techno India University, Kolkata**, and his full technical stack (Three.js, React 19, TypeScript, Go, Node.js).
-
-**What would you like to know?**
-- **Projects & Client Work:** Inquire about his 3D product visualizers, WebGL configurators, or Synapse telemetry dashboards.
-- **Technical Skills:** Ask about his Three.js shader pipelines, React 19 architecture, or backend systems.
-- **Hiring & Availability:** Learn about his availability for full-time roles, contracts, and consultancy.
-
-Feel free to ask any question or email Rick directly at **rickbarat21@gmail.com**!`;
+  return generatePortfolioKnowledge(query, persona).reply;
 }
 
 // System instructions for different chatbot personas
@@ -204,12 +127,19 @@ Provide concise summaries of why Rick is a strong candidate for Senior Full Stac
 };
 
 // Health Check
-app.get("/api/health", (_req, res) => {
+app.all(["/api/health", "/api/health/"], (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+const HANDSHAKE_ENDPOINTS = [
+  "/api/chat/handshake",
+  "/api/chat/handshake/",
+  "/api/handshake",
+  "/api/handshake/",
+];
+
 // Chatbot Initial Handshake & Diagnostics Endpoint
-app.get("/api/chat/handshake", (_req, res) => {
+app.all(HANDSHAKE_ENDPOINTS, (_req, res) => {
   const apiKey = getRuntimeApiKey();
   const hasValidKey = Boolean(apiKey && apiKey.length > 5);
 
@@ -231,18 +161,51 @@ app.get("/api/chat/handshake", (_req, res) => {
   });
 });
 
-// Chatbot API Endpoint with Google Search Grounding & Resilient Fallback
-app.post("/api/chat", async (req, res) => {
+const CHAT_ENDPOINTS = [
+  "/api/chat",
+  "/api/chat/",
+  "/api/portfolio-chat",
+  "/api/portfolio-chat/",
+  "/api/gemini/chat",
+  "/api/gemini/chat/",
+];
+
+// GET handler for chat endpoints (prevents 404 on browser inspect or GET probes)
+app.get(CHAT_ENDPOINTS, (_req, res) => {
+  const apiKey = getRuntimeApiKey();
+  res.json({
+    status: "ok",
+    service: "Rick Barat AI Portfolio Chat Gateway",
+    methods: ["POST", "GET"],
+    defaultModel: "gemini-3.1-flash-lite",
+    hasApiKey: Boolean(apiKey && apiKey.length > 5),
+    handshake: "/api/chat/handshake",
+  });
+});
+
+// Chatbot API Endpoint with Google Search Grounding, Automatic Model Fallback & Resilient Intelligence
+app.post(CHAT_ENDPOINTS, async (req, res) => {
   try {
     const { 
       messages, 
       model = "gemini-3.1-flash-lite", 
       rolePersona = "general", 
       searchGrounding = false 
-    } = req.body;
+    } = req.body || {};
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({ error: "Missing or invalid 'messages' array" });
+      const introText = generatePortfolioFallback("overview", rolePersona);
+      return res.json({
+        reply: introText,
+        modelUsed: "gemini-3.1-flash-lite",
+        rolePersona,
+        isOfflineFallback: true,
+        groundingMetadata: {
+          sources: [],
+          searchQueries: [],
+          hasSearchGrounding: false,
+        },
+      });
     }
 
     // Map requested model to official, supported Gemini models
@@ -323,7 +286,7 @@ app.post("/api/chat", async (req, res) => {
         usedSearchGrounding = true;
       } catch (groundingErr: any) {
         lastErrorDetails = groundingErr?.message || "Search grounding error";
-        console.warn("Search grounding tool failed (likely quota or tier limit). Retrying without Google Search tool:", lastErrorDetails);
+        console.warn("Search grounding tool failed. Retrying without Google Search tool:", lastErrorDetails);
         // Fallback: Retry with the base model without search grounding
         try {
           response = await ai.models.generateContent({
@@ -334,7 +297,6 @@ app.post("/api/chat", async (req, res) => {
           usedSearchGrounding = false;
         } catch (retryErr: any) {
           lastErrorDetails = retryErr?.message || "Model generation retry failed";
-          console.error("Direct model generation retry also failed:", lastErrorDetails);
           response = null;
         }
       }
@@ -348,12 +310,31 @@ app.post("/api/chat", async (req, res) => {
         });
       } catch (directErr: any) {
         lastErrorDetails = directErr?.message || "Direct model error";
-        console.error("Direct model generation failed:", lastErrorDetails);
+        console.warn(`Direct model generation failed for ${selectedModel}:`, lastErrorDetails);
         response = null;
       }
     }
 
-    // 3. If Gemini generation succeeded, format and return response
+    // 3. Automatic Model Fallback: If primary model failed (e.g. 503 high demand or 429 quota), try gemini-3.1-flash-lite
+    if (!response && selectedModel !== "gemini-3.1-flash-lite") {
+      try {
+        console.log(`Primary model (${selectedModel}) unavailable, falling back to gemini-3.1-flash-lite...`);
+        response = await ai.models.generateContent({
+          model: "gemini-3.1-flash-lite",
+          contents,
+          config: baseConfig,
+        });
+        if (response) {
+          selectedModel = "gemini-3.1-flash-lite";
+          usedSearchGrounding = false;
+        }
+      } catch (fallbackModelErr: any) {
+        lastErrorDetails = fallbackModelErr?.message || lastErrorDetails;
+        console.warn("Fallback to gemini-3.1-flash-lite also failed:", lastErrorDetails);
+      }
+    }
+
+    // 4. If Gemini generation succeeded, format and return response
     if (response && response.text) {
       const candidate = response.candidates?.[0];
       const rawGrounding = candidate?.groundingMetadata;
@@ -385,11 +366,13 @@ app.post("/api/chat", async (req, res) => {
       });
     }
 
-    // 4. If Gemini API was unreachable or exceeded rate limits, determine error category
+    // 5. If Gemini API was unreachable or exceeded rate limits, determine error category
     if (lastErrorDetails) {
       const errStr = lastErrorDetails.toLowerCase();
       if (errStr.includes("429") || errStr.includes("resource_exhausted") || errStr.includes("quota")) {
         errorCategory = "QUOTA_EXHAUSTED";
+      } else if (errStr.includes("503") || errStr.includes("unavailable") || errStr.includes("high demand")) {
+        errorCategory = "HIGH_DEMAND";
       } else if (errStr.includes("401") || errStr.includes("403") || errStr.includes("api key") || errStr.includes("permission")) {
         errorCategory = "AUTH_ERROR";
       } else if (errStr.includes("timeout") || errStr.includes("deadline")) {
@@ -401,7 +384,7 @@ app.post("/api/chat", async (req, res) => {
 
     console.warn("Gemini API call failed; serving verified portfolio intelligence fallback. Reason:", errorCategory, lastErrorDetails);
     const fallbackReply = generatePortfolioFallback(lastUserMsg, rolePersona);
-    const userFacingNote = `${fallbackReply}\n\n*(Note: Live Gemini API limit reached; served response from Rick's verified portfolio intelligence. Reach Rick directly at [rickbarat21@gmail.com](mailto:rickbarat21@gmail.com))*`;
+    const userFacingNote = `${fallbackReply}\n\n*(Note: Live Gemini API busy; served response from Rick's verified portfolio intelligence. Reach Rick directly at [rickbarat21@gmail.com](mailto:rickbarat21@gmail.com))*`;
 
     return res.json({
       reply: userFacingNote,
@@ -434,6 +417,16 @@ app.post("/api/chat", async (req, res) => {
       },
     });
   }
+});
+
+// API Gateway Catch-All: ensures NO /api/* call ever responds with HTML 404
+app.all("/api/*", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Rick Barat Portfolio API Gateway",
+    endpoint: req.path,
+    supportedEndpoints: ["/api/chat", "/api/portfolio-chat", "/api/chat/handshake", "/api/health"],
+  });
 });
 
 // Start Server with Vite Dev or Static Production Serving
