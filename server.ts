@@ -83,6 +83,49 @@ function generatePortfolioFallback(query: string, persona: string): string {
   return generatePortfolioKnowledge(query, persona).reply;
 }
 
+// Convert multi-turn history into the required Gemini contents format ensuring valid user/model sequencing
+function formatGeminiContents(rawMessages: any[]): { role: "user" | "model"; parts: { text: string }[] }[] {
+  if (!Array.isArray(rawMessages) || rawMessages.length === 0) {
+    return [];
+  }
+
+  // 1. Clean and normalize each message
+  const cleanList = rawMessages
+    .map((msg) => {
+      const role: "user" | "model" = msg.role === "assistant" || msg.role === "model" ? "model" : "user";
+      const text = (typeof msg.content === "string" ? msg.content : (msg.text || "")).trim();
+      return { role, text };
+    })
+    .filter((m) => m.text.length > 0);
+
+  if (cleanList.length === 0) {
+    return [];
+  }
+
+  // 2. The Gemini API requires the conversation to start with a 'user' turn.
+  // Find the first 'user' message index and drop any prior assistant greetings.
+  const firstUserIdx = cleanList.findIndex((m) => m.role === "user");
+  const prunedList = firstUserIdx !== -1 
+    ? cleanList.slice(firstUserIdx) 
+    : [{ role: "user" as const, text: cleanList[cleanList.length - 1].text }];
+
+  // 3. Ensure alternating sequence: merge consecutive messages with identical roles
+  const alternating: { role: "user" | "model"; parts: { text: string }[] }[] = [];
+  for (const item of prunedList) {
+    const last = alternating[alternating.length - 1];
+    if (last && last.role === item.role) {
+      last.parts[0].text += `\n\n${item.text}`;
+    } else {
+      alternating.push({
+        role: item.role,
+        parts: [{ text: item.text }],
+      });
+    }
+  }
+
+  return alternating;
+}
+
 // System instructions for different chatbot personas
 const ROLE_INSTRUCTIONS: Record<string, string> = {
   general: `You are Rick Barat's AI Portfolio Assistant and technical twin.
@@ -253,14 +296,22 @@ app.post(CHAT_ENDPOINTS, async (req, res) => {
     }
 
     // Convert multi-turn history into the required Gemini contents format
-    const contents = messages.map((msg: { role: string; content?: string; text?: string }) => {
-      const role = msg.role === "assistant" || msg.role === "model" ? "model" : "user";
-      const text = msg.content || msg.text || "";
-      return {
-        role,
-        parts: [{ text }],
-      };
-    });
+    const contents = formatGeminiContents(messages);
+
+    if (contents.length === 0) {
+      const fallbackReply = generatePortfolioFallback(lastUserMsg, rolePersona);
+      return res.json({
+        reply: fallbackReply,
+        modelUsed: selectedModel,
+        rolePersona,
+        isOfflineFallback: true,
+        groundingMetadata: {
+          sources: [],
+          searchQueries: [],
+          hasSearchGrounding: false,
+        },
+      });
+    }
 
     const baseConfig: any = {
       systemInstruction,
@@ -315,22 +366,27 @@ app.post(CHAT_ENDPOINTS, async (req, res) => {
       }
     }
 
-    // 3. Automatic Model Fallback: If primary model failed (e.g. 503 high demand or 429 quota), try gemini-3.1-flash-lite
-    if (!response && selectedModel !== "gemini-3.1-flash-lite") {
+    // 3. Multi-tier Model Fallback: If primary model failed (e.g. 503 high demand or 429 quota), try alternative models
+    const fallbackModelCandidates = ["gemini-3.1-flash-lite", "gemini-3.7-flash", "gemini-flash-latest"];
+    for (const altModel of fallbackModelCandidates) {
+      if (response && response.text) break;
+      if (altModel === selectedModel) continue;
+
       try {
-        console.log(`Primary model (${selectedModel}) unavailable, falling back to gemini-3.1-flash-lite...`);
+        console.log(`Retrying generation with fallback model: ${altModel}...`);
         response = await ai.models.generateContent({
-          model: "gemini-3.1-flash-lite",
+          model: altModel,
           contents,
           config: baseConfig,
         });
-        if (response) {
-          selectedModel = "gemini-3.1-flash-lite";
+        if (response && response.text) {
+          selectedModel = altModel;
           usedSearchGrounding = false;
+          break;
         }
-      } catch (fallbackModelErr: any) {
-        lastErrorDetails = fallbackModelErr?.message || lastErrorDetails;
-        console.warn("Fallback to gemini-3.1-flash-lite also failed:", lastErrorDetails);
+      } catch (altErr: any) {
+        lastErrorDetails = altErr?.message || lastErrorDetails;
+        console.warn(`Fallback model ${altModel} failed:`, altErr?.message);
       }
     }
 

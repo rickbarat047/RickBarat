@@ -52,11 +52,22 @@ export interface ChatMessage {
   searchQueries?: string[];
   hasSearchGrounding?: boolean;
   isError?: boolean;
-  errorType?: 'quota' | 'auth' | 'timeout' | 'network' | 'server';
+  errorType?: 'quota' | 'auth' | 'timeout' | 'network' | 'server' | 'not_found';
   errorDetail?: string;
   canRetry?: boolean;
   failedQuery?: string;
   isOfflineFallback?: boolean;
+}
+
+export interface ChatToast {
+  id: string;
+  type: 'error' | 'warning' | 'info';
+  title: string;
+  message: string;
+  statusCode?: number;
+  failedPrompt?: string;
+  canRetry?: boolean;
+  timestamp: number;
 }
 
 export interface HandshakeInfo {
@@ -150,6 +161,34 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = () => {
   const [handshakeStatus, setHandshakeStatus] = useState<'idle' | 'checking' | 'connected' | 'offline_ready' | 'error'>('checking');
   const [handshakeInfo, setHandshakeInfo] = useState<HandshakeInfo | null>(null);
   const [handshakeError, setHandshakeError] = useState<string | null>(null);
+
+  // Toast Notification State for 404/Server/Network errors
+  const [activeToast, setActiveToast] = useState<ChatToast | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const showToast = (toast: Omit<ChatToast, 'id' | 'timestamp'>) => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    const newToast: ChatToast = {
+      ...toast,
+      id: `toast-${Date.now()}`,
+      timestamp: Date.now(),
+    };
+    setActiveToast(newToast);
+
+    // Auto-dismiss after 9 seconds unless interacted with
+    toastTimeoutRef.current = setTimeout(() => {
+      setActiveToast(null);
+    }, 9000);
+  };
+
+  const dismissToast = () => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    setActiveToast(null);
+  };
 
   // Initial welcome greeting
   const initialWelcomeMessage: ChatMessage = {
@@ -415,13 +454,62 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
       if (!res.ok && !data?.reply) {
         const status = res.status;
         let categorizedError: ChatMessage['errorType'] = 'server';
-        if (status === 429) categorizedError = 'quota';
-        else if (status === 401 || status === 403) categorizedError = 'auth';
+        let userTitle = 'Server Communication Issue';
+        let userMessage = `Server responded with status ${status}.`;
+
+        if (status === 404) {
+          categorizedError = 'not_found';
+          userTitle = 'API Endpoint Not Found (404)';
+          userMessage = 'The chat endpoint was not found on the server. Served local knowledge base.';
+        } else if (status === 429) {
+          categorizedError = 'quota';
+          userTitle = 'Rate Limit Reached (429)';
+          userMessage = 'Gemini API quota or rate limit reached. Switched to fallback response.';
+        } else if (status === 401 || status === 403) {
+          categorizedError = 'auth';
+          userTitle = 'Authentication Error';
+          userMessage = 'API authorization or key configuration error.';
+        } else if (status >= 500) {
+          categorizedError = 'server';
+          userTitle = `Server Error (${status})`;
+          userMessage = 'Backend service encountered a temporary error. Fallback intelligence engaged.';
+        }
+
+        showToast({
+          type: 'warning',
+          title: userTitle,
+          message: userMessage,
+          statusCode: status,
+          failedPrompt: queryText,
+          canRetry: true
+        });
 
         throw {
           type: categorizedError,
-          message: data?.error || `Server responded with status ${status}`
+          status,
+          message: data?.error || userMessage
         };
+      }
+
+      // If server returned a reply with an error detail/offline fallback flag, alert user via toast as well
+      if (data?.isOfflineFallback && data?.errorType) {
+        let warnTitle = 'Portfolio AI Mode';
+        let warnMsg = 'Response served via Rick\'s verified portfolio engine.';
+        if (data.errorType === 'QUOTA_EXHAUSTED') {
+          warnTitle = 'Gemini API Busy';
+          warnMsg = 'High request volume detected. Served local portfolio knowledge.';
+        } else if (data.errorType === 'HIGH_DEMAND') {
+          warnTitle = 'High Demand';
+          warnMsg = 'Gemini model is currently experiencing high demand.';
+        }
+
+        showToast({
+          type: 'info',
+          title: warnTitle,
+          message: warnMsg,
+          failedPrompt: queryText,
+          canRetry: true
+        });
       }
 
       const replyTimestamp = Date.now();
@@ -440,6 +528,8 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
         searchQueries: grounding?.searchQueries || [],
         isOfflineFallback: isOffline,
         errorDetail: data?.errorDetail,
+        failedQuery: isOffline ? queryText : undefined,
+        canRetry: isOffline,
       };
 
       setMessages(prev => [...prev, assistantMsg]);
@@ -467,6 +557,24 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
       clearTimeout(timeoutTimer);
       console.warn('Live API encountered status or network issue, using verified portfolio intelligence:', err);
 
+      const is404 = err?.status === 404 || err?.type === 'not_found' || String(err?.message || '').includes('404');
+      const isAbort = err?.name === 'AbortError' || String(err?.message || '').includes('aborted');
+
+      if (!activeToast) {
+        showToast({
+          type: 'warning',
+          title: is404 ? 'API 404 Not Found' : isAbort ? 'Request Timeout' : 'Server Reconnecting',
+          message: is404 
+            ? 'The chat endpoint was not found. Using offline portfolio knowledge.' 
+            : isAbort 
+              ? 'Request took too long. Click Retry Prompt to try again.' 
+              : 'Network or server error encountered. Local fallback engaged.',
+          statusCode: err?.status,
+          failedPrompt: queryText,
+          canRetry: true
+        });
+      }
+
       // Instantly generate rich verified response about Rick's projects/skills/contact
       const verifiedKnowledge = generatePortfolioKnowledge(queryText, selectedRole);
       const replyTimestamp = Date.now();
@@ -474,10 +582,13 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
       const assistantMsg: ChatMessage = {
         id: `ai-${replyTimestamp}`,
         role: 'assistant',
-        content: `${verifiedKnowledge.reply}\n\n*(Note: Instant response provided by Rick's Portfolio Intelligence Engine. Direct contact: [${PERSONAL_INFO.email}](mailto:${PERSONAL_INFO.email}))*`,
+        content: verifiedKnowledge.reply,
         timestamp: new Date(replyTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         modelUsed: selectedModel || 'gemini-3.1-flash-lite',
         isOfflineFallback: true,
+        failedQuery: queryText,
+        canRetry: true,
+        errorType: is404 ? 'not_found' : isAbort ? 'timeout' : 'server',
       };
 
       setMessages(prev => [...prev, assistantMsg]);
@@ -767,8 +878,81 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
           <div 
             ref={messagesContainerRef}
             id="chat-messages-container"
-            className="flex-1 overflow-y-auto p-4 space-y-4 text-xs font-sans scroll-smooth"
+            className="flex-1 overflow-y-auto p-4 space-y-4 text-xs font-sans scroll-smooth relative"
           >
+            {/* Floating Toast Notification for 404 / Server / Network issues */}
+            {activeToast && (
+              <div 
+                id="chat-error-toast"
+                className={`sticky top-0 z-20 p-3 rounded-xl shadow-xl backdrop-blur-md border transition-all duration-300 animate-in fade-in slide-in-from-top-2 ${
+                  activeToast.type === 'error'
+                    ? 'bg-rose-950/90 border-rose-500/50 text-rose-200 shadow-rose-950/40'
+                    : activeToast.type === 'warning'
+                    ? 'bg-amber-950/90 border-amber-500/50 text-amber-200 shadow-amber-950/40'
+                    : 'bg-cyan-950/90 border-cyan-500/50 text-cyan-200 shadow-cyan-950/40'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2.5">
+                    <div className="mt-0.5 shrink-0">
+                      {activeToast.type === 'error' ? (
+                        <AlertCircle className="w-4 h-4 text-rose-400" />
+                      ) : activeToast.type === 'warning' ? (
+                        <AlertTriangle className="w-4 h-4 text-amber-400" />
+                      ) : (
+                        <Info className="w-4 h-4 text-cyan-400" />
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[11px] font-mono tracking-wide">
+                          {activeToast.title}
+                        </span>
+                        {activeToast.statusCode && (
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-black/40 border border-white/10">
+                            HTTP {activeToast.statusCode}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] opacity-90 leading-tight">
+                        {activeToast.message}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {activeToast.canRetry && activeToast.failedPrompt && (
+                      <button
+                        type="button"
+                        id="toast-retry-prompt-btn"
+                        onClick={() => {
+                          playClickSound();
+                          const promptToRetry = activeToast.failedPrompt;
+                          dismissToast();
+                          if (promptToRetry) {
+                            sendMessage(promptToRetry);
+                          }
+                        }}
+                        disabled={isLoading}
+                        className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-[10px] font-mono flex items-center gap-1 shadow transition-all hover:scale-105 disabled:opacity-50"
+                        title="Retry sending this prompt without page reload"
+                      >
+                        <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
+                        <span>Retry</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={dismissToast}
+                      className="p-1 rounded-lg hover:bg-white/10 opacity-70 hover:opacity-100 transition-opacity text-current"
+                      title="Dismiss notification"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Handshake Loading State Banner */}
             {handshakeStatus === 'checking' && (
               <div className="p-3.5 rounded-2xl bg-neutral-950 border border-amber-400/30 text-xs shadow-lg space-y-2.5">
