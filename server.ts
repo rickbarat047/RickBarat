@@ -438,12 +438,11 @@ app.post(CHAT_ENDPOINTS, async (req, res) => {
       }
     }
 
-    console.warn("Gemini API call failed; serving verified portfolio intelligence fallback. Reason:", errorCategory, lastErrorDetails);
+    console.warn("Gemini API call failed; serving verified portfolio intelligence. Reason:", errorCategory, lastErrorDetails);
     const fallbackReply = generatePortfolioFallback(lastUserMsg, rolePersona);
-    const userFacingNote = `${fallbackReply}\n\n*(Note: Live Gemini API busy; served response from Rick's verified portfolio intelligence. Reach Rick directly at [rickbarat21@gmail.com](mailto:rickbarat21@gmail.com))*`;
 
     return res.json({
-      reply: userFacingNote,
+      reply: fallbackReply,
       modelUsed: selectedModel,
       rolePersona,
       isOfflineFallback: true,
@@ -458,9 +457,10 @@ app.post(CHAT_ENDPOINTS, async (req, res) => {
     });
   } catch (fatalErr: any) {
     console.error("Fatal /api/chat error:", fatalErr);
-    const fallbackReply = generatePortfolioFallback("overview", "general");
+    const lastMsg = req.body?.messages?.[req.body.messages.length - 1]?.content || "overview";
+    const fallbackReply = generatePortfolioFallback(lastMsg, req.body?.rolePersona || "general");
     return res.status(200).json({
-      reply: `${fallbackReply}\n\n*(Note: Temporary server processing error. Rick is available at [rickbarat21@gmail.com](mailto:rickbarat21@gmail.com))*`,
+      reply: fallbackReply,
       modelUsed: "gemini-3.1-flash-lite",
       rolePersona: "general",
       isOfflineFallback: true,
