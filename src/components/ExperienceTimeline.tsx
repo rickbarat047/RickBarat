@@ -16,7 +16,7 @@ import { playClickSound } from '../utils/soundEffects';
 import { RevealOnScroll } from './RevealOnScroll';
 
 export const ExperienceTimeline: React.FC = () => {
-  const [expandedId, setExpandedId] = useState<string | null>(EXPERIENCES[0].id);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
     playClickSound();
