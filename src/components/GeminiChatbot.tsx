@@ -18,7 +18,6 @@ import {
   Globe,
   ExternalLink,
   Cloud,
-  CloudCheck,
   LogIn,
   RefreshCw,
   AlertTriangle,
@@ -325,7 +324,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
         verifyHandshake(true);
       }
     }
-  }, [isOpen, messages]);
+  }, [isOpen, messages, isLoading]);
 
   const handleRoleChange = (roleId: string) => {
     playClickSound();
@@ -1096,19 +1095,67 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
               );
             })}
 
-            {/* Thinking / Loading indicator */}
+            {/* Thinking / AI Processing Skeleton Pulse */}
             {isLoading && (
-              <div className="flex gap-3 justify-start items-center text-xs text-neutral-400 font-mono">
-                <div className="w-6 h-6 rounded-lg bg-amber-400 text-neutral-950 flex items-center justify-center shrink-0 animate-spin">
-                  <Sparkles className="w-3.5 h-3.5" />
+              <div 
+                id="ai-processing-skeleton"
+                className="flex gap-3 justify-start items-start text-xs font-sans animate-in fade-in duration-300"
+              >
+                {/* Pulsing Avatar */}
+                <div className="relative shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-lg bg-amber-400 text-neutral-950 flex items-center justify-center shadow-md relative z-10">
+                    <Sparkles className="w-3.5 h-3.5 animate-spin" />
+                  </div>
+                  <div className="absolute -inset-1 rounded-xl bg-amber-400/30 animate-ping opacity-75 pointer-events-none" />
                 </div>
-                <div className="px-3.5 py-2.5 rounded-2xl bg-neutral-950 border border-neutral-800 text-amber-300 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                  <span>
-                    {searchGroundingEnabled 
-                      ? `Grounding facts with ${selectedModel} & Google Search...` 
-                      : `Querying Rick AI via ${selectedModel}...`}
-                  </span>
+
+                {/* Skeleton Card with Multi-stage Pulse & Shimmer */}
+                <div className="max-w-[88%] sm:max-w-[84%] w-full p-4 rounded-2xl bg-neutral-950 border border-neutral-800 text-neutral-200 shadow-xl space-y-3 relative overflow-hidden">
+                  {/* Subtle Background Shimmer Gradient */}
+                  <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/5 to-transparent animate-chat-shimmer pointer-events-none" />
+
+                  {/* Header Status with Live Ticker */}
+                  <div className="flex items-center justify-between gap-2 border-b border-neutral-800/80 pb-2.5">
+                    <div className="flex items-center gap-2 text-[11px] font-mono text-amber-300 font-semibold">
+                      <span className="relative flex h-2 w-2 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                      </span>
+                      <span className="truncate">
+                        {searchGroundingEnabled 
+                          ? `Grounding with ${selectedModel.replace('gemini-', '')}...` 
+                          : `Generating response via ${selectedModel.replace('gemini-', '')}...`}
+                      </span>
+                    </div>
+
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center gap-1 shrink-0">
+                      <RefreshCw className="w-2.5 h-2.5 animate-spin text-amber-400" />
+                      Thinking
+                    </span>
+                  </div>
+
+                  {/* Skeleton Text Paragraph Bars */}
+                  <div className="space-y-2.5 py-1">
+                    <div className="h-3 bg-neutral-800/90 rounded-md w-11/12 animate-pulse" />
+                    <div className="h-3 bg-neutral-800/70 rounded-md w-full animate-pulse [animation-delay:150ms]" />
+                    <div className="h-3 bg-neutral-800/60 rounded-md w-4/5 animate-pulse [animation-delay:300ms]" />
+                    <div className="h-2.5 bg-neutral-800/40 rounded-md w-2/3 animate-pulse [animation-delay:450ms]" />
+                  </div>
+
+                  {/* Bottom Latency & Telemetry Micro-Indicator */}
+                  <div className="flex items-center justify-between text-[10px] font-mono text-neutral-500 pt-1.5 border-t border-neutral-900">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0" />
+                      <span className="text-neutral-400 text-[10px] truncate">
+                        {searchGroundingEnabled ? 'Connecting to live Google Search index' : 'Analyzing portfolio intelligence knowledge'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-amber-400/70 shrink-0 ml-2">
+                      <span className="inline-block w-1 h-1 rounded-full bg-amber-400 animate-bounce [animation-delay:0ms]" />
+                      <span className="inline-block w-1 h-1 rounded-full bg-amber-400 animate-bounce [animation-delay:150ms]" />
+                      <span className="inline-block w-1 h-1 rounded-full bg-amber-400 animate-bounce [animation-delay:300ms]" />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

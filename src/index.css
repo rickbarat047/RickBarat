@@ -98,6 +98,19 @@
   animation: terminalCursor 0.85s step-end infinite;
 }
 
+@keyframes chatShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-chat-shimmer {
+  animation: chatShimmer 2.2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-anim,
   .hero-zoom,
