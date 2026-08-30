@@ -21,7 +21,7 @@ import {
   Cpu
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { playClickSound, playSuccessChime, getSoundState, setSoundState } from '../utils/soundEffects';
+import { useUISounds } from '../hooks/useUISounds';
 
 interface CommandMenuProps {
   isOpen: boolean;
@@ -38,14 +38,10 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
   onOpenResume,
   onReplayIntro
 }) => {
+  const { soundEnabled, setSound, playClick, playHover, playSuccess, playTransition } = useUISounds();
   const [query, setQuery] = useState('');
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    setSoundEnabled(getSoundState());
-  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -60,7 +56,7 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        playClickSound();
+        playClick();
         if (isOpen) {
           onClose();
         } else {
@@ -73,7 +69,7 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, playClick]);
 
   if (!isOpen) return null;
 
@@ -221,7 +217,7 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
       action: () => {
         navigator.clipboard.writeText(PERSONAL_INFO.email);
         setCopiedEmail(true);
-        playSuccessChime();
+        playSuccess();
         setTimeout(() => {
           setCopiedEmail(false);
           onClose();
@@ -235,9 +231,8 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
       icon: soundEnabled ? VolumeX : Volume2,
       action: () => {
         const next = !soundEnabled;
-        setSoundEnabled(next);
-        setSoundState(next);
-        playClickSound();
+        setSound(next);
+        playClick();
       }
     },
     {
@@ -308,11 +303,12 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
                   key={item.id}
                   id={`cmd-${item.id}`}
                   type="button"
+                  onMouseEnter={() => playHover(1600)}
                   onClick={() => {
-                    playClickSound();
+                    playClick();
                     item.action();
                   }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-neutral-800/80 text-left transition-colors group"
+                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-neutral-800/80 text-left transition-colors group cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-1.5 rounded-lg bg-neutral-950 border border-neutral-800 text-neutral-400 group-hover:text-amber-400 group-hover:border-amber-400/40 transition-colors">

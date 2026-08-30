@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Project } from '../types';
 import { usePrmptScrollScale } from '../hooks/usePrmptScrollScale';
+import { useUISounds } from '../hooks/useUISounds';
 
 interface PrmptArchiveCardProps {
   project: Project;
@@ -30,6 +31,7 @@ export const PrmptArchiveCard: React.FC<PrmptArchiveCardProps> = ({
   user,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { playHover, playClick } = useUISounds();
 
   // Use custom Framer Motion hook to calculate dynamic scroll-linked scale and entrance
   const { scale, opacity, prefersReducedMotion } = usePrmptScrollScale(containerRef, {
@@ -53,8 +55,10 @@ export const PrmptArchiveCard: React.FC<PrmptArchiveCardProps> = ({
           opacity: prefersReducedMotion ? 1 : opacity,
           transformOrigin: 'center center',
         }}
+        onMouseEnter={() => playHover(1350)}
         whileHover={{ y: -6, transition: { duration: 0.2 } }}
-        className="group relative rounded-2xl bg-neutral-900/70 backdrop-blur-md border border-neutral-800/80 hover:border-amber-400/60 transition-colors duration-300 flex flex-col overflow-hidden hover:shadow-2xl hover:shadow-amber-500/10 h-full select-none"
+        className="group relative rounded-2xl bg-neutral-900/70 backdrop-blur-md border border-neutral-800/80 hover:border-amber-400/60 transition-colors duration-300 flex flex-col overflow-hidden hover:shadow-2xl hover:shadow-amber-500/10 h-full select-none cursor-pointer"
+        onClick={() => onOpenModal(project)}
       >
         {/* Archival Drafting Corner Crosshairs */}
         <div className="absolute top-2 left-2 text-[10px] font-mono text-neutral-600/80 pointer-events-none z-10 select-none">

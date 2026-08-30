@@ -21,7 +21,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { playClickSound, playSwitchSound, getSoundState, setSoundState } from '../utils/soundEffects';
+import { useUISounds } from '../hooks/useUISounds';
 import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
@@ -36,14 +36,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeSection 
 }) => {
   const { user, userData, signInWithGoogle, logout } = useAuth();
+  const { soundEnabled, toggleSound, playClick, playHover, playTransition, playSwitch } = useUISounds();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [soundActive, setSoundActive] = useState(true);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   useEffect(() => {
-    setSoundActive(getSoundState());
-
     const handleScroll = () => {
       if (window.scrollY > 30) {
         setIsScrolled(true);
@@ -56,12 +54,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleSound = () => {
-    const newState = !soundActive;
-    setSoundActive(newState);
-    setSoundState(newState);
-    if (newState) {
-      playSwitchSound();
+  const handleToggleSound = () => {
+    const next = toggleSound();
+    if (next) {
+      playSwitch();
     }
   };
 
@@ -75,7 +71,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   const handleNavClick = (href: string) => {
-    playClickSound();
+    playClick();
+    playTransition('in');
     setMobileMenuOpen(false);
     const element = document.querySelector(href);
     if (element) {
@@ -100,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              playClickSound(900);
+              playClick(900);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="flex items-center gap-2.5 group cursor-pointer focus:outline-none"
@@ -131,6 +128,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 key={item.id}
                 id={`nav-item-${item.id}`}
                 href={item.href}
+                onMouseEnter={() => playHover(1600)}
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavClick(item.href);
@@ -153,12 +151,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-sound-toggle"
             type="button"
-            onClick={toggleSound}
-            aria-label={soundActive ? "Mute audio effects" : "Enable audio effects"}
+            onClick={handleToggleSound}
+            onMouseEnter={() => playHover(1400)}
+            aria-label={soundEnabled ? "Mute audio effects" : "Enable audio effects"}
             className="p-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 hover:text-white transition-colors"
-            title={soundActive ? "Sound FX: Enabled" : "Sound FX: Muted"}
+            title={soundEnabled ? "Sound FX: Enabled" : "Sound FX: Muted"}
           >
-            {soundActive ? (
+            {soundEnabled ? (
               <Volume2 className="w-4 h-4 text-amber-400" />
             ) : (
               <VolumeX className="w-4 h-4 text-neutral-400" />
@@ -169,8 +168,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-command-menu-btn"
             type="button"
+            onMouseEnter={() => playHover(1400)}
             onClick={() => {
-              playClickSound();
+              playClick();
+              playTransition('in');
               onOpenCommandMenu();
             }}
             className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-medium transition-colors"
@@ -185,8 +186,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-resume-btn"
             type="button"
+            onMouseEnter={() => playHover(1400)}
             onClick={() => {
-              playClickSound();
+              playClick();
+              playTransition('in');
               onOpenResume();
             }}
             className="hidden lg:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-medium transition-all cursor-pointer"
@@ -302,8 +305,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-google-signin-btn"
               type="button"
+              onMouseEnter={() => playHover(1400)}
               onClick={() => {
-                playClickSound();
+                playClick();
                 signInWithGoogle();
               }}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-medium transition-all cursor-pointer shadow-sm hover:shadow-md"
@@ -336,6 +340,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <a
             id="desktop-signup-btn"
             href="#contact"
+            onMouseEnter={() => playHover(1400)}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('#contact');
@@ -350,7 +355,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             id="mobile-menu-toggle"
             type="button"
             onClick={() => {
-              playClickSound();
+              playClick();
               setMobileMenuOpen(!mobileMenuOpen);
             }}
             className="md:hidden p-2 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 focus:outline-none"

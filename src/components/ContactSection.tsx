@@ -14,14 +14,15 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { playClickSound, playSuccessChime } from '../utils/soundEffects';
-import { RevealOnScroll } from './RevealOnScroll';
+import { useUISounds } from '../hooks/useUISounds';
 import { useAuth } from '../context/AuthContext';
+import { RevealOnScroll } from './RevealOnScroll';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export const ContactSection: React.FC = () => {
   const { user } = useAuth();
+  const { playClick, playSuccess, playHover, playPop } = useUISounds();
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   
@@ -68,12 +69,12 @@ export const ContactSection: React.FC = () => {
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(PERSONAL_INFO.email);
     setCopiedEmail(true);
-    playSuccessChime();
+    playSuccess();
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
   const handleSubjectSelect = (sub: string) => {
-    playClickSound();
+    playPop();
     setFormData(prev => ({ ...prev, subject: sub }));
   };
 
@@ -96,7 +97,7 @@ export const ContactSection: React.FC = () => {
       return;
     }
 
-    playClickSound();
+    playClick();
     setIsSubmitting(true);
 
     try {
@@ -108,12 +109,12 @@ export const ContactSection: React.FC = () => {
         createdAt: serverTimestamp(),
       });
       setIsSubmitted(true);
-      playSuccessChime();
+      playSuccess();
     } catch (err: any) {
       console.error('Failed to submit inquiry to Firestore:', err);
       // Ensure positive feedback even if transient network hiccup
       setIsSubmitted(true);
-      playSuccessChime();
+      playSuccess();
     } finally {
       setIsSubmitting(false);
     }
@@ -280,12 +281,13 @@ export const ContactSection: React.FC = () => {
                     <button
                       id="contact-send-another-btn"
                       type="button"
+                      onMouseEnter={() => playHover(1400)}
                       onClick={() => {
-                        playClickSound();
+                        playClick();
                         setIsSubmitted(false);
                         setFormData({ name: '', email: '', subject: 'Full-time Opportunity', message: '' });
                       }}
-                      className="px-5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-medium transition-colors"
+                      className="px-5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-medium transition-colors cursor-pointer"
                     >
                       Send Another Message
                     </button>
@@ -318,9 +320,11 @@ export const ContactSection: React.FC = () => {
                       ].map((sub) => (
                         <button
                           key={sub}
+                          id={`subject-pill-${sub.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                           type="button"
+                          onMouseEnter={() => playHover(1400)}
                           onClick={() => handleSubjectSelect(sub)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                             formData.subject === sub
                               ? 'bg-amber-400 text-neutral-950 font-bold'
                               : 'bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white'

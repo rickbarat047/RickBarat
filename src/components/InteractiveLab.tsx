@@ -16,12 +16,13 @@ import {
   Star
 } from 'lucide-react';
 import { LAB_EXPERIMENTS } from '../data/portfolioData';
-import { playClickSound, playSwitchSound, playTerminalBeep, playSuccessChime } from '../utils/soundEffects';
+import { useUISounds } from '../hooks/useUISounds';
 import { RevealOnScroll } from './RevealOnScroll';
 import { useAuth } from '../context/AuthContext';
 
 export const InteractiveLab: React.FC = () => {
   const { user, userData, toggleStarredLab, signInWithGoogle } = useAuth();
+  const { playClick, playSwitch, playBeep, playSuccess, playHover } = useUISounds();
   const starredLabIds = userData?.starredLabIds || [];
   const [activeTab, setActiveTab] = useState<'canvas' | 'synth' | 'latency' | 'tokens'>('canvas');
 
@@ -162,7 +163,7 @@ export const InteractiveLab: React.FC = () => {
 
   // Audio Synth Player
   const playSynthNote = (noteName: string, freqMultiplier: number) => {
-    playTerminalBeep(440);
+    playBeep(440);
     setActiveNote(noteName);
     setTimeout(() => setActiveNote(null), 250);
 
@@ -209,7 +210,7 @@ export const InteractiveLab: React.FC = () => {
 
   // Latency Simulator trigger
   const runLatencyTest = () => {
-    playClickSound();
+    playClick();
     setIsPinging(true);
 
     setTimeout(() => {
@@ -243,7 +244,7 @@ export const InteractiveLab: React.FC = () => {
   };
 
   const handleCopyTokenCode = () => {
-    playClickSound();
+    playClick();
     const tokenCode = `:root {\n  --brand-primary: hsl(${brandHue}, 94%, 55%);\n  --brand-surface: hsl(${brandHue}, 15%, 8%);\n  --contrast-ratio: ${contrastRatio}:1;\n}`;
     navigator.clipboard.writeText(tokenCode);
     setCopiedToken(true);
@@ -276,11 +277,12 @@ export const InteractiveLab: React.FC = () => {
             <button
               id="lab-tab-canvas"
               type="button"
+              onMouseEnter={() => playHover(1400)}
               onClick={() => {
-                playSwitchSound();
+                playSwitch();
                 setActiveTab('canvas');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 activeTab === 'canvas'
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
                   : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
@@ -293,11 +295,12 @@ export const InteractiveLab: React.FC = () => {
             <button
               id="lab-tab-synth"
               type="button"
+              onMouseEnter={() => playHover(1400)}
               onClick={() => {
-                playSwitchSound();
+                playSwitch();
                 setActiveTab('synth');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 activeTab === 'synth'
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
                   : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
@@ -310,11 +313,12 @@ export const InteractiveLab: React.FC = () => {
             <button
               id="lab-tab-latency"
               type="button"
+              onMouseEnter={() => playHover(1400)}
               onClick={() => {
-                playSwitchSound();
+                playSwitch();
                 setActiveTab('latency');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 activeTab === 'latency'
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
                   : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
@@ -327,18 +331,19 @@ export const InteractiveLab: React.FC = () => {
             <button
               id="lab-tab-tokens"
               type="button"
+              onMouseEnter={() => playHover(1400)}
               onClick={() => {
-                playSwitchSound();
+                playSwitch();
                 setActiveTab('tokens');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 activeTab === 'tokens'
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
                   : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
               }`}
             >
               <Palette className="w-4 h-4" />
-              <span>4. Design Token Studio</span>
+              <span>4. Dynamic Token Studio</span>
             </button>
           </div>
         </RevealOnScroll>
@@ -357,16 +362,17 @@ export const InteractiveLab: React.FC = () => {
               <button
                 id={`star-lab-btn-${activeTab}`}
                 type="button"
+                onMouseEnter={() => playHover(1400)}
                 onClick={() => {
                   if (!user) {
-                    playClickSound();
+                    playClick();
                     signInWithGoogle();
                   } else {
-                    playSuccessChime();
+                    playSuccess();
                     toggleStarredLab(activeTab);
                   }
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
                   starredLabIds.includes(activeTab)
                     ? 'bg-amber-400 text-neutral-950 border-amber-300 font-bold shadow-md'
                     : 'bg-neutral-950 text-neutral-300 hover:text-white border-neutral-800 hover:border-amber-400/40'
@@ -490,11 +496,12 @@ export const InteractiveLab: React.FC = () => {
                     <button
                       key={wave}
                       type="button"
+                      onMouseEnter={() => playHover(1400)}
                       onClick={() => {
-                        playClickSound();
+                        playClick();
                         setSynthWaveform(wave);
                       }}
-                      className={`px-3 py-1 rounded-lg text-xs font-mono uppercase transition-colors ${
+                      className={`px-3 py-1 rounded-lg text-xs font-mono uppercase transition-colors cursor-pointer ${
                         synthWaveform === wave
                           ? 'bg-amber-400 text-neutral-950 font-bold'
                           : 'bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white'

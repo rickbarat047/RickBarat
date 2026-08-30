@@ -17,7 +17,7 @@ import {
   Globe
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { playClickSound, playSuccessChime } from '../utils/soundEffects';
+import { useUISounds } from '../hooks/useUISounds';
 import { RevealLayer } from './RevealLayer';
 
 interface HeroProps {
@@ -38,6 +38,7 @@ const ROLES = [
 ];
 
 export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
+  const { playClick, playHover, playSuccess, playTransition } = useUISounds();
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({ x: -999, y: -999 });
   const [isLayerModalOpen, setIsLayerModalOpen] = useState(false);
@@ -135,13 +136,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
   const handleCopyEmail = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(PERSONAL_INFO.email);
-    playSuccessChime();
+    playSuccess();
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
   const handleScrollToSection = (sectionId: string) => {
-    playClickSound();
+    playClick();
+    playTransition('in');
     onNavigateTo(sectionId);
   };
 
@@ -266,6 +268,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
           <button
             id="start-exploring-btn"
             type="button"
+            onMouseEnter={() => playHover(1400)}
             onClick={() => handleScrollToSection('projects')}
             className="bg-[#e8702a] hover:bg-[#d2611f] text-white text-sm font-medium px-7 py-3 rounded-full transition-all hover:scale-[1.03] active:scale-95 hover:shadow-lg hover:shadow-[#e8702a]/30 flex items-center gap-2 cursor-pointer shadow-xl"
           >
@@ -277,8 +280,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
           <button
             id="hero-resume-btn"
             type="button"
+            onMouseEnter={() => playHover(1400)}
             onClick={() => {
-              playClickSound();
+              playClick();
+              playTransition('in');
               onOpenResume();
             }}
             className="px-5 py-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-sm font-medium transition-all hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-2"

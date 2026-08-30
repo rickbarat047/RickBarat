@@ -20,13 +20,14 @@ import {
 } from 'lucide-react';
 import { PROJECTS } from '../data/portfolioData';
 import { Project, ProjectCategory } from '../types';
-import { playClickSound, playSwitchSound, playSuccessChime } from '../utils/soundEffects';
+import { useUISounds } from '../hooks/useUISounds';
 import { RevealOnScroll } from './RevealOnScroll';
 import { useAuth } from '../context/AuthContext';
 import { PrmptArchiveCard } from './PrmptArchiveCard';
 
 export const FeaturedProjects: React.FC = () => {
   const { user, userData, toggleBookmark, signInWithGoogle } = useAuth();
+  const { playClick, playSwitch, playSuccess, playHover, playTransition } = useUISounds();
   const [selectedCategory, setSelectedCategory] = useState<ProjectCategory | 'bookmarked'>('all');
   const [activeProjectModal, setActiveProjectModal] = useState<Project | null>(null);
   const [demoState, setDemoState] = useState<{ [key: string]: any }>({});
@@ -49,28 +50,30 @@ export const FeaturedProjects: React.FC = () => {
     : PROJECTS.filter(p => p.category === selectedCategory);
 
   const handleCategoryChange = (cat: ProjectCategory | 'bookmarked') => {
-    playSwitchSound();
+    playSwitch();
     setSelectedCategory(cat);
   };
 
   const handleToggleBookmark = (projectId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!user) {
-      playClickSound();
+      playClick();
       signInWithGoogle();
       return;
     }
-    playSuccessChime();
+    playSuccess();
     toggleBookmark(projectId);
   };
 
   const handleOpenModal = (project: Project) => {
-    playClickSound();
+    playClick();
+    playTransition('in');
     setActiveProjectModal(project);
   };
 
   const handleCloseModal = () => {
-    playClickSound();
+    playClick();
+    playTransition('out');
     setActiveProjectModal(null);
   };
 
@@ -116,8 +119,9 @@ export const FeaturedProjects: React.FC = () => {
                     key={cat.id}
                     id={`project-filter-${cat.id}`}
                     type="button"
+                    onMouseEnter={() => playHover(1500)}
                     onClick={() => handleCategoryChange(cat.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
                       selectedCategory === cat.id
                         ? 'bg-amber-400 text-neutral-950 font-bold shadow-sm'
                         : 'text-neutral-400 hover:text-white hover:bg-neutral-800'

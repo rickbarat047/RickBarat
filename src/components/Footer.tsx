@@ -1,15 +1,18 @@
 import React from 'react';
 import { ArrowUp, Github, Instagram, MessageCircle, Heart, Sparkles, Terminal, Zap } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { playClickSound } from '../utils/soundEffects';
+import { useUISounds } from '../hooks/useUISounds';
 
 interface FooterProps {
   onReplayIntro?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
+  const { playClick, playHover, playTransition } = useUISounds();
+
   const scrollToTop = () => {
-    playClickSound(1000);
+    playClick(1000);
+    playTransition('in');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -44,11 +47,12 @@ export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
               <button
                 id="footer-replay-intro-btn"
                 type="button"
+                onMouseEnter={() => playHover(1400)}
                 onClick={() => {
-                  playClickSound(850);
+                  playClick(850);
                   onReplayIntro();
                 }}
-                className="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-400 hover:border-amber-400/30 transition-colors flex items-center gap-1.5 font-mono text-[11px]"
+                className="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-400 hover:border-amber-400/30 transition-colors flex items-center gap-1.5 font-mono text-[11px] cursor-pointer"
                 title="Replay System Intro Animation"
               >
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
@@ -59,8 +63,9 @@ export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
             <button
               id="footer-back-to-top-btn"
               type="button"
+              onMouseEnter={() => playHover(1400)}
               onClick={scrollToTop}
-              className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-400 hover:border-neutral-700 transition-colors flex items-center gap-1.5"
+              className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-400 hover:border-neutral-700 transition-colors flex items-center gap-1.5 cursor-pointer"
               title="Back to Top"
             >
               <ArrowUp className="w-4 h-4" />

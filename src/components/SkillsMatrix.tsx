@@ -12,10 +12,11 @@ import {
   Award
 } from 'lucide-react';
 import { SKILL_CATEGORIES } from '../data/portfolioData';
-import { playClickSound, playSwitchSound } from '../utils/soundEffects';
+import { useUISounds } from '../hooks/useUISounds';
 import { RevealOnScroll } from './RevealOnScroll';
 
 export const SkillsMatrix: React.FC = () => {
+  const { playClick, playSwitch, playHover } = useUISounds();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
@@ -76,11 +77,12 @@ export const SkillsMatrix: React.FC = () => {
               <button
                 id="skill-cat-all"
                 type="button"
+                onMouseEnter={() => playHover(1500)}
                 onClick={() => {
-                  playSwitchSound();
+                  playSwitch();
                   setActiveCategory('all');
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                   activeCategory === 'all'
                     ? 'bg-amber-400 text-neutral-950 font-bold shadow'
                     : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
@@ -93,11 +95,12 @@ export const SkillsMatrix: React.FC = () => {
                   key={cat.id}
                   id={`skill-cat-${cat.id}`}
                   type="button"
+                  onMouseEnter={() => playHover(1500)}
                   onClick={() => {
-                    playSwitchSound();
+                    playSwitch();
                     setActiveCategory(cat.id);
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     activeCategory === cat.id
                       ? 'bg-amber-400 text-neutral-950 font-bold shadow'
                       : 'text-neutral-400 hover:text-white hover:bg-neutral-800'

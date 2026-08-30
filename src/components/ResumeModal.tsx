@@ -14,7 +14,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { PERSONAL_INFO, EXPERIENCES, SKILL_CATEGORIES } from '../data/portfolioData';
-import { playClickSound, playSuccessChime } from '../utils/soundEffects';
+import { useUISounds } from '../hooks/useUISounds';
 
 interface ResumeModalProps {
   isOpen: boolean;
@@ -22,17 +22,24 @@ interface ResumeModalProps {
 }
 
 export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => {
+  const { playClick, playSuccess, playHover, playTransition } = useUISounds();
   const [copiedMd, setCopiedMd] = useState(false);
 
   if (!isOpen) return null;
 
+  const handleClose = () => {
+    playClick();
+    playTransition('out');
+    onClose();
+  };
+
   const handlePrint = () => {
-    playClickSound();
+    playClick();
     window.print();
   };
 
   const handleCopyMarkdown = () => {
-    playSuccessChime();
+    playSuccess();
     const markdown = `# ${PERSONAL_INFO.name}
 **${PERSONAL_INFO.title}**
 - Email: ${PERSONAL_INFO.email}
@@ -85,8 +92,9 @@ Tech: ${e.techStack.join(', ')}
             <button
               id="resume-copy-md-btn"
               type="button"
+              onMouseEnter={() => playHover(1400)}
               onClick={handleCopyMarkdown}
-              className="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-mono flex items-center gap-1.5 transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
               title="Copy as Markdown"
             >
               {copiedMd ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -96,8 +104,9 @@ Tech: ${e.techStack.join(', ')}
             <button
               id="resume-print-btn"
               type="button"
+              onMouseEnter={() => playHover(1400)}
               onClick={handlePrint}
-              className="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-neutral-950 text-xs font-bold flex items-center gap-1.5 transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-neutral-950 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print / PDF</span>
@@ -106,8 +115,9 @@ Tech: ${e.techStack.join(', ')}
             <button
               id="resume-close-btn"
               type="button"
-              onClick={onClose}
-              className="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"
+              onMouseEnter={() => playHover(1400)}
+              onClick={handleClose}
+              className="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
