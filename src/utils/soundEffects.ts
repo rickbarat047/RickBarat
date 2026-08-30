@@ -119,6 +119,38 @@ export function playTerminalBeep(freq = 1200) {
   }
 }
 
+export function playBootSound() {
+  if (!soundEnabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const chord = [220, 329.63, 440, 659.25, 880]; // A3, E4, A4, E5, A5
+    const now = ctx.currentTime;
+    
+    chord.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(freq * 0.8, now);
+      osc.frequency.exponentialRampToValueAtTime(freq, now + 0.3);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.035 / (idx + 1), now + 0.25);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 1.2);
+    });
+  } catch {
+    // audio context safety
+  }
+}
+
 export function playSuccessChime() {
   if (!soundEnabled) return;
   const ctx = getAudioContext();
@@ -146,3 +178,5 @@ export function playSuccessChime() {
     // audio context safety
   }
 }
+
+

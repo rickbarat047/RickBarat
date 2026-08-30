@@ -14,10 +14,12 @@ import { CommandMenu } from './components/CommandMenu';
 import { ResumeModal } from './components/ResumeModal';
 import { ScrollProgress } from './components/ScrollProgress';
 import { RevealOnScroll } from './components/RevealOnScroll';
+import { IntroAnimation } from './components/IntroAnimation';
 import { playClickSound } from './utils/soundEffects';
 import { AuthProvider } from './context/AuthContext';
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState<boolean>(true);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState<boolean>(false);
   const [isResumeModalOpen, setIsResumeModalOpen] = useState<boolean>(false);
@@ -81,6 +83,11 @@ export default function App() {
       <div 
         className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-amber-400 selection:text-neutral-950 antialiased font-sans relative overflow-x-hidden"
       >
+        {/* Intro Boot Animation on Website Load */}
+        {showIntro && (
+          <IntroAnimation onComplete={() => setShowIntro(false)} />
+        )}
+
         {/* Scroll Progress Bar at the Top */}
         <ScrollProgress />
 
@@ -134,7 +141,7 @@ export default function App() {
         </main>
 
         {/* Footer */}
-        <Footer />
+        <Footer onReplayIntro={() => setShowIntro(true)} />
 
         {/* Interactive AI Portfolio Assistant with Search Grounding */}
         <GeminiChatbot />
@@ -147,6 +154,7 @@ export default function App() {
             setIsCommandMenuOpen(false);
             setIsResumeModalOpen(true);
           }}
+          onReplayIntro={() => setShowIntro(true)}
           onNavigateTo={handleNavigateTo}
         />
 

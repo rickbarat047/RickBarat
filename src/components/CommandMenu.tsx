@@ -15,7 +15,8 @@ import {
   X,
   Sparkles,
   Command as CommandIcon,
-  Check
+  Check,
+  Zap
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { playClickSound, playSuccessChime, getSoundState, setSoundState } from '../utils/soundEffects';
@@ -25,13 +26,15 @@ interface CommandMenuProps {
   onClose: () => void;
   onNavigateTo: (sectionId: string) => void;
   onOpenResume: () => void;
+  onReplayIntro?: () => void;
 }
 
 export const CommandMenu: React.FC<CommandMenuProps> = ({
   isOpen,
   onClose,
   onNavigateTo,
-  onOpenResume
+  onOpenResume,
+  onReplayIntro
 }) => {
   const [query, setQuery] = useState('');
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -142,6 +145,18 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
         onClose();
         const btn = document.getElementById('open-gemini-chat-btn');
         if (btn) btn.click();
+      }
+    },
+    {
+      id: 'action-replay-intro',
+      title: 'Replay System Intro & Boot Animation',
+      category: 'Actions',
+      icon: Zap,
+      action: () => {
+        onClose();
+        if (onReplayIntro) {
+          onReplayIntro();
+        }
       }
     },
     {

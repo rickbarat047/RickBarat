@@ -1,9 +1,13 @@
 import React from 'react';
-import { ArrowUp, Github, Instagram, MessageCircle, Heart, Sparkles, Terminal } from 'lucide-react';
+import { ArrowUp, Github, Instagram, MessageCircle, Heart, Sparkles, Terminal, Zap } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { playClickSound } from '../utils/soundEffects';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onReplayIntro?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
   const scrollToTop = () => {
     playClickSound(1000);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -29,12 +33,28 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* System Status Pill & Back to Top */}
-          <div className="flex items-center gap-4">
+          {/* System Status Pill, Replay Intro & Back to Top */}
+          <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-[11px] font-mono text-neutral-300">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>All Systems Operational (99.98%)</span>
             </div>
+
+            {onReplayIntro && (
+              <button
+                id="footer-replay-intro-btn"
+                type="button"
+                onClick={() => {
+                  playClickSound(850);
+                  onReplayIntro();
+                }}
+                className="px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-400 hover:border-amber-400/30 transition-colors flex items-center gap-1.5 font-mono text-[11px]"
+                title="Replay System Intro Animation"
+              >
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span>Replay Intro</span>
+              </button>
+            )}
 
             <button
               id="footer-back-to-top-btn"
