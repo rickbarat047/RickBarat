@@ -146,3 +146,32 @@
   mask-composite: exclude;
   pointer-events: none;
 }
+
+/* CRT Scanline & Phosphor Aesthetics */
+.crt-scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+.crt-amber-glow {
+  text-shadow: 0 0 6px rgba(251, 191, 36, 0.6), 0 0 12px rgba(245, 158, 11, 0.3);
+}
+
+.crt-green-glow {
+  text-shadow: 0 0 6px rgba(52, 211, 153, 0.7), 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.crt-vignette {
+  background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+}
+

@@ -16,7 +16,9 @@ import {
   Sparkles,
   Command as CommandIcon,
   Check,
-  Zap
+  Zap,
+  Monitor,
+  Cpu
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { playClickSound, playSuccessChime, getSoundState, setSoundState } from '../utils/soundEffects';
@@ -145,6 +147,48 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
         onClose();
         const btn = document.getElementById('open-gemini-chat-btn');
         if (btn) btn.click();
+      }
+    },
+    {
+      id: 'action-theme-crt',
+      title: 'Terminal Theme: Classic CRT (Amber Phosphor & Scanlines)',
+      category: 'Terminal Themes',
+      icon: Monitor,
+      action: () => {
+        onNavigateTo('terminal');
+        onClose();
+        setTimeout(() => {
+          const btn = document.getElementById('terminal-theme-crt-btn');
+          if (btn) btn.click();
+        }, 300);
+      }
+    },
+    {
+      id: 'action-theme-hacker',
+      title: 'Terminal Theme: Hacker Green (Matrix Cyber Shell)',
+      category: 'Terminal Themes',
+      icon: Cpu,
+      action: () => {
+        onNavigateTo('terminal');
+        onClose();
+        setTimeout(() => {
+          const btn = document.getElementById('terminal-theme-hacker-btn');
+          if (btn) btn.click();
+        }, 300);
+      }
+    },
+    {
+      id: 'action-theme-modern',
+      title: 'Terminal Theme: Modern Dark (Crisp ZSH Aesthetic)',
+      category: 'Terminal Themes',
+      icon: Terminal,
+      action: () => {
+        onNavigateTo('terminal');
+        onClose();
+        setTimeout(() => {
+          const btn = document.getElementById('terminal-theme-modern-btn');
+          if (btn) btn.click();
+        }, 300);
       }
     },
     {
