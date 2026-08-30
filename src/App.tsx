@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { FeaturedProjects } from './components/FeaturedProjects';
@@ -84,64 +85,78 @@ export default function App() {
         className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-amber-400 selection:text-neutral-950 antialiased font-sans relative overflow-x-hidden"
       >
         {/* Intro Boot Animation on Website Load */}
-        {showIntro && (
-          <IntroAnimation onComplete={() => setShowIntro(false)} />
-        )}
+        <AnimatePresence mode="wait">
+          {showIntro && (
+            <IntroAnimation onComplete={() => setShowIntro(false)} />
+          )}
+        </AnimatePresence>
 
         {/* Scroll Progress Bar at the Top */}
         <ScrollProgress />
 
-        {/* Fixed Floating Frosted-Glass Navbar */}
-        <Navbar 
-          onOpenCommandMenu={() => setIsCommandMenuOpen(true)}
-          onOpenResume={() => setIsResumeModalOpen(true)}
-          activeSection={activeSection}
-        />
-
-        {/* Main Content Sections */}
-        <main className="relative z-10">
-          {/* Full-Screen Hero Section with Cursor Spotlight Reveal */}
-          <Hero 
+        {/* Main Website Wrapper with Gentle Reveal Animation */}
+        <motion.div
+          initial={showIntro ? { opacity: 0, scale: 0.985, y: 16 } : false}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ 
+            duration: 0.85, 
+            ease: [0.16, 1, 0.3, 1],
+            delay: showIntro ? 0.1 : 0
+          }}
+          className="w-full relative"
+        >
+          {/* Fixed Floating Frosted-Glass Navbar */}
+          <Navbar 
+            onOpenCommandMenu={() => setIsCommandMenuOpen(true)}
             onOpenResume={() => setIsResumeModalOpen(true)}
-            onNavigateTo={handleNavigateTo}
+            activeSection={activeSection}
           />
 
-          {/* Featured Projects Portfolio with prmpt archive scroll-scale animation */}
-          <FeaturedProjects />
+          {/* Main Content Sections */}
+          <main className="relative z-10">
+            {/* Full-Screen Hero Section with Cursor Spotlight Reveal */}
+            <Hero 
+              onOpenResume={() => setIsResumeModalOpen(true)}
+              onNavigateTo={handleNavigateTo}
+            />
 
-          {/* Technical Skills & Architecture Matrix */}
-          <RevealOnScroll direction="up" delay={40}>
-            <SkillsMatrix />
-          </RevealOnScroll>
+            {/* Featured Projects Portfolio with prmpt archive scroll-scale animation */}
+            <FeaturedProjects />
 
-          {/* 3D WebGL & Interactive Graphics Lab */}
-          <RevealOnScroll direction="up" delay={40} scale={0.97}>
-            <InteractiveLab />
-          </RevealOnScroll>
+            {/* Technical Skills & Architecture Matrix */}
+            <RevealOnScroll direction="up" delay={40}>
+              <SkillsMatrix />
+            </RevealOnScroll>
 
-          {/* Interactive UNIX Shell / Terminal Sandbox */}
-          <RevealOnScroll direction="up" delay={40}>
-            <InteractiveTerminal />
-          </RevealOnScroll>
+            {/* 3D WebGL & Interactive Graphics Lab */}
+            <RevealOnScroll direction="up" delay={40} scale={0.97}>
+              <InteractiveLab />
+            </RevealOnScroll>
 
-          {/* Professional Experience & Enterprise Milestones */}
-          <RevealOnScroll direction="up" delay={40}>
-            <ExperienceTimeline />
-          </RevealOnScroll>
+            {/* Interactive UNIX Shell / Terminal Sandbox */}
+            <RevealOnScroll direction="up" delay={40}>
+              <InteractiveTerminal />
+            </RevealOnScroll>
 
-          {/* Client Testimonials & Endorsements ("What Leaders & Teams Say" with requested video animation) */}
-          <RevealOnScroll direction="up" delay={40}>
-            <Testimonials />
-          </RevealOnScroll>
+            {/* Professional Experience & Enterprise Milestones */}
+            <RevealOnScroll direction="up" delay={40}>
+              <ExperienceTimeline />
+            </RevealOnScroll>
 
-          {/* Contact & Consultation Hub */}
-          <RevealOnScroll direction="up" delay={40}>
-            <ContactSection />
-          </RevealOnScroll>
-        </main>
+            {/* Client Testimonials & Endorsements ("What Leaders & Teams Say" with requested video animation) */}
+            <RevealOnScroll direction="up" delay={40}>
+              <Testimonials />
+            </RevealOnScroll>
 
-        {/* Footer */}
-        <Footer onReplayIntro={() => setShowIntro(true)} />
+            {/* Contact & Consultation Hub */}
+            <RevealOnScroll direction="up" delay={40}>
+              <ContactSection />
+            </RevealOnScroll>
+          </main>
+
+          {/* Footer */}
+          <Footer onReplayIntro={() => setShowIntro(true)} />
+        </motion.div>
 
         {/* Interactive AI Portfolio Assistant with Search Grounding */}
         <GeminiChatbot />
