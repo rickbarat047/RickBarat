@@ -1,7 +1,7 @@
 /**
  * Web Audio API procedural sound engine
  * Zero external audio files required, completely synthesized and safe.
- * Specially optimized for mobile touch devices and desktop browsers.
+ * Specially optimized for mobile touch devices (iOS Safari / Android Chrome) and desktop browsers.
  */
 
 let audioCtx: AudioContext | null = null;
@@ -29,7 +29,7 @@ if (typeof window !== 'undefined') {
  * Detect if interaction is coming from touch device or recent touch event
  * to prevent synthetic mouseenter triggers from firing hover sounds right before clicks on mobile.
  */
-function isTouchDeviceOrRecentTouch(): boolean {
+export function isTouchDeviceOrRecentTouch(): boolean {
   if (typeof window === 'undefined') return false;
   const now = performance.now();
   // If a touch occurred in the last 1500ms, suppress hover sound
@@ -53,9 +53,6 @@ export function getAudioContext(): AudioContext | null {
     if (AudioContextClass) {
       audioCtx = new AudioContextClass();
     }
-  }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {});
   }
   return audioCtx;
 }
@@ -181,6 +178,10 @@ export function playHoverSound(pitch = 1400) {
   if (!ctx) return;
 
   try {
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -216,6 +217,10 @@ export function playClickSound(pitch = 800) {
   if (!ctx) return;
 
   try {
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -223,7 +228,7 @@ export function playClickSound(pitch = 800) {
     osc.frequency.setValueAtTime(pitch, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(pitch * 0.5, ctx.currentTime + 0.035);
 
-    gain.gain.setValueAtTime(0.045, ctx.currentTime);
+    gain.gain.setValueAtTime(0.05, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.035);
 
     osc.connect(gain);
@@ -250,6 +255,10 @@ export function playTransitionSound(direction: 'in' | 'out' = 'in') {
   if (!ctx) return;
 
   try {
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -283,6 +292,10 @@ export function playPopSound(freq = 600) {
   if (!ctx) return;
 
   try {
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -312,6 +325,10 @@ export function playSwitchSound() {
   if (!ctx) return;
 
   try {
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -341,6 +358,10 @@ export function playTerminalBeep(freq = 1200) {
   if (!ctx) return;
 
   try {
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -362,37 +383,51 @@ export function playTerminalBeep(freq = 1200) {
 
 /**
  * Cybernetic boot chord sequence.
- * Guaranteed to play even if unlocked during intro sequence.
+ * Tuned with audible harmonics designed for clear projection on mobile phone micro-speakers.
  */
 export function playBootSound() {
   if (!soundEnabled) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
-  try {
-    const chord = [220, 329.63, 440, 659.25, 880]; // A3, E4, A4, E5, A5
-    const now = ctx.currentTime;
+  const playSynthesizedBoot = () => {
+    try {
+      // Harmonic chord: A3 (220Hz), E4 (329.63Hz), A4 (440Hz), C#5 (554.37Hz), E5 (659.25Hz), A5 (880Hz)
+      const chord = [220, 329.63, 440, 554.37, 659.25, 880];
+      const now = ctx.currentTime;
 
-    chord.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      chord.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-      osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
-      osc.frequency.setValueAtTime(freq * 0.8, now);
-      osc.frequency.exponentialRampToValueAtTime(freq, now + 0.3);
+        // Mix sawtooth and triangle for punchy phone speaker presence
+        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq * 0.82, now);
+        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.22);
 
-      gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(0.035 / (idx + 1), now + 0.25);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.05 / (1 + idx * 0.3), now + 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.start(now);
-      osc.stop(now + 1.2);
+        osc.start(now);
+        osc.stop(now + 1.1);
+      });
+    } catch {
+      // audio safety
+    }
+  };
+
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => {
+      playSynthesizedBoot();
+    }).catch(() => {
+      playSynthesizedBoot();
     });
-  } catch {
-    // audio safety
+  } else {
+    playSynthesizedBoot();
   }
 }
 
@@ -404,25 +439,38 @@ export function playSuccessChime() {
   const ctx = getAudioContext();
   if (!ctx) return;
 
-  try {
-    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-    notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+  const playSynthesizedChime = () => {
+    try {
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+      const now = ctx.currentTime;
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.05);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
 
-      gain.gain.setValueAtTime(0.035, ctx.currentTime + idx * 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.05 + 0.2);
+        gain.gain.setValueAtTime(0.04, now + idx * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.05 + 0.22);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.start(ctx.currentTime + idx * 0.05);
-      osc.stop(ctx.currentTime + idx * 0.05 + 0.2);
+        osc.start(now + idx * 0.05);
+        osc.stop(now + idx * 0.05 + 0.22);
+      });
+    } catch {
+      // audio safety
+    }
+  };
+
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => {
+      playSynthesizedChime();
+    }).catch(() => {
+      playSynthesizedChime();
     });
-  } catch {
-    // audio safety
+  } else {
+    playSynthesizedChime();
   }
 }
