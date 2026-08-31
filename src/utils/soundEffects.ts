@@ -1,11 +1,17 @@
 /**
  * Web Audio API procedural sound engine
  * Zero external audio files required, completely synthesized and safe.
+ * Specially optimized for mobile touch devices and desktop browsers.
  */
 
 let audioCtx: AudioContext | null = null;
 let soundEnabled = true;
+let isUnlocked = false;
 let lastHoverTimestamp = 0;
+let lastClickTimestamp = 0;
+let lastTransitionTimestamp = 0;
+let lastTouchTimestamp = 0;
+const unlockListeners: Array<() => void> = [];
 
 // Initialize sound state from localStorage
 if (typeof window !== 'undefined') {
@@ -19,10 +25,31 @@ if (typeof window !== 'undefined') {
   }
 }
 
-function getAudioContext(): AudioContext | null {
+/**
+ * Detect if interaction is coming from touch device or recent touch event
+ * to prevent synthetic mouseenter triggers from firing hover sounds right before clicks on mobile.
+ */
+function isTouchDeviceOrRecentTouch(): boolean {
+  if (typeof window === 'undefined') return false;
+  const now = performance.now();
+  // If a touch occurred in the last 1500ms, suppress hover sound
+  if (now - lastTouchTimestamp < 1500) return true;
+  // If device does not support hover (mobile phones / touchscreens)
+  if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Retrieve or instantiate the centralized AudioContext.
+ */
+export function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (AudioContextClass) {
       audioCtx = new AudioContextClass();
     }
@@ -31,6 +58,91 @@ function getAudioContext(): AudioContext | null {
     audioCtx.resume().catch(() => {});
   }
   return audioCtx;
+}
+
+/**
+ * Mobile-compatible AudioContext Unlocker.
+ * iOS Safari and Chrome Android require an explicit user gesture to activate audio hardware.
+ */
+export function unlockAudioContext(): boolean {
+  if (typeof window === 'undefined') return false;
+  const ctx = getAudioContext();
+  if (!ctx) return false;
+
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+
+  // Play an ultra-short silent buffer to wake up iOS WebKit audio hardware pipeline
+  try {
+    const buffer = ctx.createBuffer(1, 1, 22050);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start(0);
+  } catch {
+    // safe fallback
+  }
+
+  isUnlocked = true;
+  while (unlockListeners.length > 0) {
+    const cb = unlockListeners.shift();
+    try {
+      cb?.();
+    } catch {
+      // ignore
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('portfolio_audio_unlocked'));
+  return true;
+}
+
+export function isAudioUnlocked(): boolean {
+  if (!audioCtx) return false;
+  return audioCtx.state === 'running' || isUnlocked;
+}
+
+export function onAudioUnlocked(callback: () => void) {
+  if (isAudioUnlocked()) {
+    callback();
+    return () => {};
+  }
+  unlockListeners.push(callback);
+  return () => {
+    const idx = unlockListeners.indexOf(callback);
+    if (idx !== -1) unlockListeners.splice(idx, 1);
+  };
+}
+
+// Attach early gesture listeners to unlock AudioContext on first mobile touch/click
+if (typeof window !== 'undefined') {
+  const handleTouchStart = () => {
+    lastTouchTimestamp = performance.now();
+  };
+
+  const handleFirstGesture = () => {
+    lastTouchTimestamp = performance.now();
+    unlockAudioContext();
+    window.removeEventListener('touchstart', handleFirstGesture, true);
+    window.removeEventListener('touchend', handleFirstGesture, true);
+    window.removeEventListener('pointerdown', handleFirstGesture, true);
+    window.removeEventListener('click', handleFirstGesture, true);
+    window.removeEventListener('keydown', handleFirstGesture, true);
+  };
+
+  window.addEventListener('touchstart', handleTouchStart, { capture: true, passive: true });
+  window.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch') {
+      lastTouchTimestamp = performance.now();
+    }
+  }, { capture: true, passive: true });
+
+  window.addEventListener('touchstart', handleFirstGesture, { capture: true, passive: true });
+  window.addEventListener('touchend', handleFirstGesture, { capture: true, passive: true });
+  window.addEventListener('pointerdown', handleFirstGesture, { capture: true, passive: true });
+  window.addEventListener('click', handleFirstGesture, { capture: true, passive: true });
+  window.addEventListener('keydown', handleFirstGesture, { capture: true, passive: true });
 }
 
 export function setSoundState(enabled: boolean) {
@@ -55,12 +167,14 @@ export function toggleSoundState(): boolean {
 
 /**
  * Subtle tactile micro-tick for UI hover interactions.
- * Throttled to prevent cacophony on fast cursor sweeps.
+ * Automatically suppressed on touch interactions & mobile to prevent "double click" sounds.
  */
 export function playHoverSound(pitch = 1400) {
   if (!soundEnabled) return;
+  if (isTouchDeviceOrRecentTouch()) return; // Prevent mobile double-sound glitch
+
   const now = performance.now();
-  if (now - lastHoverTimestamp < 45) return; // Throttle 45ms
+  if (now - lastHoverTimestamp < 50) return; // Throttle 50ms
   lastHoverTimestamp = now;
 
   const ctx = getAudioContext();
@@ -72,9 +186,9 @@ export function playHoverSound(pitch = 1400) {
 
     osc.type = 'sine';
     osc.frequency.setValueAtTime(pitch, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(pitch * 1.3, ctx.currentTime + 0.015);
+    osc.frequency.exponentialRampToValueAtTime(pitch * 1.25, ctx.currentTime + 0.015);
 
-    gain.gain.setValueAtTime(0.015, ctx.currentTime);
+    gain.gain.setValueAtTime(0.012, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.015);
 
     osc.connect(gain);
@@ -83,15 +197,21 @@ export function playHoverSound(pitch = 1400) {
     osc.start();
     osc.stop(ctx.currentTime + 0.015);
   } catch {
-    // audio context safety
+    // audio safety
   }
 }
 
 /**
  * Crisp tactile feedback for button clicks & toggle switches.
+ * Throttled (75ms) to prevent double clicks from mobile synthetic events or event bubbling.
  */
 export function playClickSound(pitch = 800) {
   if (!soundEnabled) return;
+
+  const now = performance.now();
+  if (now - lastClickTimestamp < 75) return; // Debounce 75ms
+  lastClickTimestamp = now;
+
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -112,7 +232,7 @@ export function playClickSound(pitch = 800) {
     osc.start();
     osc.stop(ctx.currentTime + 0.035);
   } catch {
-    // audio context safety
+    // audio safety
   }
 }
 
@@ -121,6 +241,11 @@ export function playClickSound(pitch = 800) {
  */
 export function playTransitionSound(direction: 'in' | 'out' = 'in') {
   if (!soundEnabled) return;
+
+  const now = performance.now();
+  if (now - lastTransitionTimestamp < 90) return;
+  lastTransitionTimestamp = now;
+
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -145,7 +270,7 @@ export function playTransitionSound(direction: 'in' | 'out' = 'in') {
     osc.start();
     osc.stop(ctx.currentTime + 0.12);
   } catch {
-    // audio context safety
+    // audio safety
   }
 }
 
@@ -174,7 +299,7 @@ export function playPopSound(freq = 600) {
     osc.start();
     osc.stop(ctx.currentTime + 0.04);
   } catch {
-    // audio context safety
+    // audio safety
   }
 }
 
@@ -203,7 +328,7 @@ export function playSwitchSound() {
     osc.start();
     osc.stop(ctx.currentTime + 0.05);
   } catch {
-    // audio context safety
+    // audio safety
   }
 }
 
@@ -231,12 +356,13 @@ export function playTerminalBeep(freq = 1200) {
     osc.start();
     osc.stop(ctx.currentTime + 0.03);
   } catch {
-    // audio context safety
+    // audio safety
   }
 }
 
 /**
  * Cybernetic boot chord sequence.
+ * Guaranteed to play even if unlocked during intro sequence.
  */
 export function playBootSound() {
   if (!soundEnabled) return;
@@ -246,7 +372,7 @@ export function playBootSound() {
   try {
     const chord = [220, 329.63, 440, 659.25, 880]; // A3, E4, A4, E5, A5
     const now = ctx.currentTime;
-    
+
     chord.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -266,7 +392,7 @@ export function playBootSound() {
       osc.stop(now + 1.2);
     });
   } catch {
-    // audio context safety
+    // audio safety
   }
 }
 
@@ -297,6 +423,6 @@ export function playSuccessChime() {
       osc.stop(ctx.currentTime + idx * 0.05 + 0.2);
     });
   } catch {
-    // audio context safety
+    // audio safety
   }
 }

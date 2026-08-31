@@ -28,7 +28,6 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
   if (!isOpen) return null;
 
   const handleClose = () => {
-    playClick();
     playTransition('out');
     onClose();
   };

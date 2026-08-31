@@ -66,13 +66,11 @@ export const FeaturedProjects: React.FC = () => {
   };
 
   const handleOpenModal = (project: Project) => {
-    playClick();
     playTransition('in');
     setActiveProjectModal(project);
   };
 
   const handleCloseModal = () => {
-    playClick();
     playTransition('out');
     setActiveProjectModal(null);
   };

@@ -1,7 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, ArrowRight, Zap, ShieldCheck } from 'lucide-react';
-import { playBootSound, playClickSound, getSoundState } from '../utils/soundEffects';
+import { Terminal, ArrowRight, Zap, ShieldCheck, Volume2 } from 'lucide-react';
+import { 
+  playBootSound, 
+  playClickSound, 
+  getSoundState, 
+  unlockAudioContext, 
+  isAudioUnlocked,
+  onAudioUnlocked 
+} from '../utils/soundEffects';
 
 interface IntroAnimationProps {
   onComplete: () => void;
@@ -19,6 +26,7 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
   const [progress, setProgress] = useState(0);
   const [currentLogIndex, setCurrentLogIndex] = useState(0);
   const [isFinishing, setIsFinishing] = useState(false);
+  const bootSoundPlayed = useRef(false);
 
   const finishIntro = useCallback(() => {
     if (isFinishing) return;
@@ -26,14 +34,30 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
     // Smooth transition window matching Motion exit duration
     setTimeout(() => {
       onComplete();
-    }, 700);
+    }, 650);
   }, [isFinishing, onComplete]);
+
+  // Handle playing boot sound with mobile unlock awareness
+  const triggerBootAudio = useCallback(() => {
+    if (bootSoundPlayed.current) return;
+    if (!getSoundState()) return;
+
+    unlockAudioContext();
+    playBootSound();
+    bootSoundPlayed.current = true;
+  }, []);
 
   // Boot sequence timer and progress ticker
   useEffect(() => {
-    if (getSoundState()) {
-      playBootSound();
+    // Attempt playback immediately for browsers that allow it
+    if (isAudioUnlocked() || getSoundState()) {
+      triggerBootAudio();
     }
+
+    // Subscribe to mobile unlock event in case audio context was suspended on load
+    const unsubscribe = onAudioUnlocked(() => {
+      triggerBootAudio();
+    });
 
     const startTime = Date.now();
     const duration = 1600; // Snappy ~1.6s
@@ -60,7 +84,8 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
-        playClickSound(900);
+        triggerBootAudio();
+        playClickSound(880);
         clearInterval(interval);
         finishIntro();
       }
@@ -70,9 +95,20 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
 
     return () => {
       clearInterval(interval);
+      unsubscribe();
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [finishIntro]);
+  }, [finishIntro, triggerBootAudio]);
+
+  const handleInteraction = () => {
+    unlockAudioContext();
+    if (!bootSoundPlayed.current) {
+      triggerBootAudio();
+    } else {
+      playClickSound(850);
+    }
+    finishIntro();
+  };
 
   return (
     <AnimatePresence>
@@ -82,13 +118,10 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
           initial={{ opacity: 1 }}
           exit={{ 
             opacity: 0,
-            transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } 
+            transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } 
           }}
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-neutral-950 text-neutral-100 select-none overflow-hidden cursor-pointer pointer-events-auto"
-          onClick={() => {
-            playClickSound(850);
-            finishIntro();
-          }}
+          onClick={handleInteraction}
         >
           {/* Ambient Background Cybernetic Grid & Glows that smoothly scale out */}
           <motion.div 
@@ -108,14 +141,14 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
           <motion.div 
             exit={{ 
               y: '-100%',
-              transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] }
+              transition: { duration: 0.65, ease: [0.76, 0, 0.24, 1] }
             }}
             className="absolute inset-x-0 top-0 h-1/2 bg-neutral-950/95 pointer-events-none border-b border-amber-400/20"
           />
           <motion.div 
             exit={{ 
               y: '100%',
-              transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] }
+              transition: { duration: 0.65, ease: [0.76, 0, 0.24, 1] }
             }}
             className="absolute inset-x-0 bottom-0 h-1/2 bg-neutral-950/95 pointer-events-none border-t border-amber-400/20"
           />
@@ -212,18 +245,21 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
               </div>
             </div>
 
-            {/* Skip Prompt Notice */}
+            {/* Skip / Touch Prompt Notice */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.7 }}
+              animate={{ opacity: 0.8 }}
               transition={{ delay: 0.25 }}
-              className="mt-6 flex items-center gap-1.5 text-[11px] font-mono text-neutral-400 hover:text-neutral-200 transition-colors"
+              className="mt-6 flex items-center justify-center flex-wrap gap-2 text-[11px] font-mono text-neutral-400 hover:text-neutral-200 transition-colors"
             >
-              <span>Click anywhere or press</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-300 text-[10px]">
-                ESC
-              </kbd>
-              <span>to skip</span>
+              <span className="inline-flex items-center gap-1 text-amber-300/90">
+                <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                Tap anywhere to enter
+              </span>
+              <span className="hidden sm:inline text-neutral-600">/</span>
+              <span className="hidden sm:inline-flex items-center gap-1">
+                press <kbd className="px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-300 text-[10px]">ESC</kbd> to skip
+              </span>
               <ArrowRight className="w-3 h-3 text-amber-400 animate-pulse" />
             </motion.div>
 

@@ -142,7 +142,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
   };
 
   const handleScrollToSection = (sectionId: string) => {
-    playClick();
     playTransition('in');
     onNavigateTo(sectionId);
   };
@@ -282,7 +281,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
             type="button"
             onMouseEnter={() => playHover(1400)}
             onClick={() => {
-              playClick();
               playTransition('in');
               onOpenResume();
             }}

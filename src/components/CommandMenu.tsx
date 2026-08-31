@@ -51,25 +51,17 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
     }
   }, [isOpen]);
 
-  // Global key listener for Cmd+K / Ctrl+K & Escape
+  // Global key listener for Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        playClick();
-        if (isOpen) {
-          onClose();
-        } else {
-          // Open handled by parent or state
-        }
-      } else if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape' && isOpen) {
         onClose();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, playClick]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

@@ -72,7 +72,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleNavClick = (href: string) => {
     playClick();
-    playTransition('in');
     setMobileMenuOpen(false);
     const element = document.querySelector(href);
     if (element) {
