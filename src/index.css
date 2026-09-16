@@ -1,20 +1,174 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Syne:wght@600;700;800&display=swap');
 @import "tailwindcss";
 
-* {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+/* ==========================================================================
+   FLUID TYPOGRAPHIC HIERARCHY (375px -> 1920px Viewport Range)
+   Mathematically calibrated fluid clamp() tokens across mobile, tablet, and desktop
+   without media-query bloat.
+   ========================================================================== */
+
+:root {
+  /* Fluid Font Sizes (Min @ 375px, Max @ 1920px) */
+  --fluid-display-2xl: clamp(2.5rem, 1.65rem + 3.625vw, 6rem);       /* 40px -> 96px (Hero title) */
+  --fluid-display-xl:  clamp(2rem, 1.39rem + 2.59vw, 4.5rem);        /* 32px -> 72px (Primary Section H1) */
+  --fluid-display-lg:  clamp(1.625rem, 1.23rem + 1.68vw, 3.25rem);    /* 26px -> 52px (Section H2) */
+  --fluid-display-md:  clamp(1.25rem, 1.04rem + 0.91vw, 2.125rem);   /* 20px -> 34px (Feature/Card H3) */
+  --fluid-display-sm:  clamp(1.125rem, 1.03rem + 0.39vw, 1.5rem);    /* 18px -> 24px (Subheads H4) */
+  
+  --fluid-body-lead:   clamp(1rem, 0.92rem + 0.32vw, 1.3125rem);      /* 16px -> 21px (Lead paragraphs) */
+  --fluid-body-base:   clamp(0.9375rem, 0.91rem + 0.13vw, 1.0625rem); /* 15px -> 17px (Standard body copy) */
+  --fluid-body-sm:     clamp(0.8125rem, 0.79rem + 0.10vw, 0.90625rem);/* 13px -> 14.5px (UI labels & badges) */
+  --fluid-body-xs:     clamp(0.6875rem, 0.67rem + 0.08vw, 0.75rem);   /* 11px -> 12px (Micro details) */
+
+  /* Typographic Contrast Metrics */
+  --lh-tight: 1.05;
+  --lh-snug: 1.15;
+  --lh-heading: 1.25;
+  --lh-body: 1.65;
+  --lh-relaxed: 1.75;
+
+  --ls-display-loose: -0.04em;
+  --ls-display-tight: -0.03em;
+  --ls-display-subtle: -0.02em;
+  --ls-body: -0.011em;
 }
 
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--fluid-body-base);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  color: #d4d4d8;
+}
+
+/* ==========================================================================
+   TYPOGRAPHIC CONTRAST: HEADLINE 'SYNE' vs BODY 'PLUS JAKARTA SANS'
+   ========================================================================== */
+
+/* Sculptural, High-Impact Display Typography ('Syne') */
 .font-display {
   font-family: 'Syne', sans-serif;
+  letter-spacing: var(--ls-display-tight);
+  text-wrap: balance;
 }
 
+/* Refined, Ergonomic Body Typography ('Plus Jakarta Sans') */
 .font-sans {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: var(--ls-body);
+  line-height: var(--lh-body);
 }
 
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
+}
+
+/* Fluid Heading Hierarchy */
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: var(--fluid-display-xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display-loose);
+  font-weight: 800;
+  color: #fafafa;
+  text-wrap: balance;
+}
+
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: var(--fluid-display-lg);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-display-tight);
+  font-weight: 700;
+  color: #f4f4f5;
+  text-wrap: balance;
+}
+
+h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: var(--fluid-display-md);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-display-subtle);
+  font-weight: 700;
+  color: #f4f4f5;
+}
+
+h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: var(--fluid-display-sm);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-display-subtle);
+  font-weight: 600;
+  color: #e4e4e7;
+}
+
+p {
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+}
+
+/* ==========================================================================
+   FLUID UTILITY CLASSES (Zero Media-Query Bloat)
+   ========================================================================== */
+
+.text-fluid-2xl {
+  font-size: var(--fluid-display-2xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display-loose);
+}
+
+.text-fluid-xl {
+  font-size: var(--fluid-display-xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display-tight);
+}
+
+.text-fluid-lg {
+  font-size: var(--fluid-display-lg);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-display-tight);
+}
+
+.text-fluid-md {
+  font-size: var(--fluid-display-md);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-display-subtle);
+}
+
+.text-fluid-sm {
+  font-size: var(--fluid-display-sm);
+  line-height: var(--lh-heading);
+}
+
+.text-fluid-lead {
+  font-size: var(--fluid-body-lead);
+  line-height: var(--lh-relaxed);
+  letter-spacing: var(--ls-body);
+}
+
+.text-fluid-base {
+  font-size: var(--fluid-body-base);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+}
+
+.text-fluid-caption {
+  font-size: var(--fluid-body-sm);
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+}
+
+.text-fluid-xs {
+  font-size: var(--fluid-body-xs);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
 }
 
 @keyframes heroReveal {

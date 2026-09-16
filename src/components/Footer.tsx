@@ -17,7 +17,7 @@ export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
   };
 
   return (
-    <footer className="bg-neutral-950 border-t border-neutral-800 text-neutral-400 text-xs py-12">
+    <footer className="bg-neutral-950/80 backdrop-blur-[1px] border-t border-neutral-800 text-neutral-400 text-xs py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
         {/* Top Row */}

@@ -17,6 +17,7 @@ import { PERSONAL_INFO } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
 import { useAuth } from '../context/AuthContext';
 import { RevealOnScroll } from './RevealOnScroll';
+import { MagneticButton } from './MagneticButton';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -121,7 +122,7 @@ export const ContactSection: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-24 bg-neutral-950 relative border-t border-neutral-800">
+    <section id="contact" className="py-24 bg-neutral-950/80 backdrop-blur-[1px] relative border-t border-neutral-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -383,11 +384,13 @@ export const ContactSection: React.FC = () => {
                     />
                   </div>
 
-                  <button
+                  <MagneticButton
                     id="contact-submit-btn"
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 rounded-xl bg-amber-400 text-neutral-950 font-bold text-sm hover:bg-amber-300 transition-all duration-200 shadow-lg shadow-amber-500/10 flex items-center justify-center gap-2 hover:scale-[1.01]"
+                    strength={0.25}
+                    onMouseEnter={() => playHover(1400)}
+                    className="w-full py-3.5 rounded-xl bg-amber-400 text-neutral-950 font-bold text-sm hover:bg-amber-300 transition-colors duration-200 shadow-lg shadow-amber-500/10 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>
@@ -400,7 +403,7 @@ export const ContactSection: React.FC = () => {
                         <span>Send Message to Rick</span>
                       </>
                     )}
-                  </button>
+                  </MagneticButton>
                 </form>
               )}
 

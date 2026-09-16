@@ -252,7 +252,7 @@ export const InteractiveLab: React.FC = () => {
   };
 
   return (
-    <section id="lab" className="py-24 bg-neutral-950 relative border-t border-neutral-800">
+    <section id="lab" className="py-24 bg-neutral-950/80 backdrop-blur-[1px] relative border-t border-neutral-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

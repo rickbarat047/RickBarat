@@ -19,6 +19,7 @@ import {
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
 import { RevealLayer } from './RevealLayer';
+import { MagneticButton } from './MagneticButton';
 
 interface HeroProps {
   onOpenResume: () => void;
@@ -264,31 +265,31 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
 
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           {/* Primary Action Button */}
-          <button
+          <MagneticButton
             id="start-exploring-btn"
-            type="button"
+            strength={0.38}
             onMouseEnter={() => playHover(1400)}
             onClick={() => handleScrollToSection('projects')}
-            className="bg-[#e8702a] hover:bg-[#d2611f] text-white text-sm font-medium px-7 py-3 rounded-full transition-all hover:scale-[1.03] active:scale-95 hover:shadow-lg hover:shadow-[#e8702a]/30 flex items-center gap-2 cursor-pointer shadow-xl"
+            className="bg-[#e8702a] hover:bg-[#d2611f] text-white text-sm font-medium px-7 py-3 rounded-full hover:shadow-xl hover:shadow-[#e8702a]/30 flex items-center gap-2 cursor-pointer shadow-xl transition-colors duration-200"
           >
             <span>Explore Work</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+            <ArrowRight className="w-4 h-4 ml-1.5" />
+          </MagneticButton>
 
           {/* Secondary Resume Button */}
-          <button
+          <MagneticButton
             id="hero-resume-btn"
-            type="button"
+            strength={0.32}
             onMouseEnter={() => playHover(1400)}
             onClick={() => {
               playTransition('in');
               onOpenResume();
             }}
-            className="px-5 py-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-sm font-medium transition-all hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center gap-2"
+            className="px-5 py-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-sm font-medium cursor-pointer flex items-center gap-2 transition-colors duration-200"
           >
-            <FileText className="w-4 h-4 text-amber-300" />
+            <FileText className="w-4 h-4 text-amber-300 mr-1.5" />
             <span>Resume</span>
-          </button>
+          </MagneticButton>
         </div>
 
         {/* Quick stats indicator */}

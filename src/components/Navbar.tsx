@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Terminal, 
   Sparkles, 
@@ -18,11 +19,14 @@ import {
   LogOut,
   Bookmark,
   User as UserIcon,
-  ShieldCheck
+  ShieldCheck,
+  ChevronRight,
+  Compass
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
 import { useAuth } from '../context/AuthContext';
+import { MagneticButton } from './MagneticButton';
 
 interface NavbarProps {
   onOpenCommandMenu: () => void;
@@ -54,6 +58,29 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
+  // Close mobile menu on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
   const handleToggleSound = () => {
     const next = toggleSound();
     if (next) {
@@ -62,12 +89,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const navLinks = [
-    { name: 'Projects', href: '#projects', id: 'projects' },
-    { name: 'Skills', href: '#skills', id: 'skills' },
-    { name: 'Lab', href: '#lab', id: 'lab' },
-    { name: 'Terminal', href: '#terminal', id: 'terminal' },
-    { name: 'Experience', href: '#experience', id: 'experience' },
-    { name: 'Contact', href: '#contact', id: 'contact' },
+    { name: 'Projects', href: '#projects', id: 'projects', icon: Layers, tag: '04 WORKS' },
+    { name: 'Skills', href: '#skills', id: 'skills', icon: Code2, tag: 'TECH STACK' },
+    { name: 'Lab', href: '#lab', id: 'lab', icon: FlaskConical, tag: '03 EXPERIMENTS' },
+    { name: 'Terminal', href: '#terminal', id: 'terminal', icon: Terminal, tag: 'CLI SYSTEM' },
+    { name: 'Experience', href: '#experience', id: 'experience', icon: Briefcase, tag: 'TIMELINE' },
+    { name: 'Contact', href: '#contact', id: 'contact', icon: Send, tag: 'GET IN TOUCH' },
   ];
 
   const handleNavClick = (href: string) => {
@@ -182,20 +209,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Resume Trigger */}
-          <button
+          <MagneticButton
             id="nav-resume-btn"
-            type="button"
+            strength={0.28}
             onMouseEnter={() => playHover(1400)}
             onClick={() => {
               playClick();
               playTransition('in');
               onOpenResume();
             }}
-            className="hidden lg:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-medium transition-all cursor-pointer"
+            className="hidden lg:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-medium cursor-pointer transition-colors duration-200"
           >
-            <FileText className="w-3.5 h-3.5 text-amber-300" />
+            <FileText className="w-3.5 h-3.5 text-amber-300 mr-1" />
             <span>Resume</span>
-          </button>
+          </MagneticButton>
 
           {/* Google Sign-in / User Profile Section */}
           {user ? (
@@ -365,122 +392,304 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </nav>
 
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div 
-          id="mobile-nav-drawer"
-          className="fixed inset-0 z-[95] bg-black/90 backdrop-blur-2xl md:hidden pt-24 px-6 flex flex-col justify-between pb-10 animate-fadeIn"
-        >
-          <div className="space-y-3">
-            <div className="text-xs uppercase tracking-widest text-neutral-400 font-mono mb-2">
-              Portfolio Navigation
-            </div>
-            {navLinks.map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(item.href);
-                }}
-                className={`flex items-center justify-between py-3 px-4 rounded-xl text-base font-medium transition-all ${
-                  activeSection === item.id
-                    ? 'bg-white/20 text-white font-semibold'
-                    : 'text-white/80 hover:bg-white/10'
-                }`}
-              >
-                <span>{item.name}</span>
-                <span className="text-xs font-mono text-neutral-500">#{item.id}</span>
-              </a>
-            ))}
-          </div>
+      {/* Sophisticated Mobile Clip-Path Overlay Navigation */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div 
+            id="mobile-nav-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile Navigation"
+            initial={{
+              clipPath: 'circle(0% at calc(100% - 2.25rem) 2.25rem)',
+              opacity: 0.8,
+            }}
+            animate={{
+              clipPath: 'circle(155% at calc(100% - 2.25rem) 2.25rem)',
+              opacity: 1,
+              transition: {
+                clipPath: {
+                  type: 'spring',
+                  stiffness: 150,
+                  damping: 24,
+                  restDelta: 0.001,
+                },
+                opacity: { duration: 0.25 },
+                delayChildren: 0.1,
+                staggerChildren: 0.045,
+              },
+            }}
+            exit={{
+              clipPath: 'circle(0% at calc(100% - 2.25rem) 2.25rem)',
+              opacity: 0.2,
+              transition: {
+                clipPath: {
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 30,
+                  restDelta: 0.001,
+                },
+                opacity: { duration: 0.18 },
+              },
+            }}
+            className="fixed inset-0 z-[105] bg-neutral-950/96 backdrop-blur-3xl md:hidden flex flex-col justify-between overflow-y-auto px-5 py-5 select-none"
+          >
+            {/* Ambient Background Lighting Glow */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-neutral-800/20 rounded-full blur-3xl pointer-events-none -z-10" />
 
-          <div className="space-y-3 pt-6 border-t border-white/10">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenResume();
-                }}
-                className="py-3 rounded-full bg-white/15 border border-white/20 text-white text-xs font-medium text-center hover:bg-white/25 flex items-center justify-center gap-1.5"
-              >
-                <FileText className="w-4 h-4 text-amber-300" />
-                <span>Resume</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenCommandMenu();
-                }}
-                className="py-3 rounded-full bg-white/15 border border-white/20 text-white text-xs font-medium text-center hover:bg-white/25 flex items-center justify-center gap-1.5"
-              >
-                <Command className="w-4 h-4 text-amber-400" />
-                <span>Command ⌘K</span>
-              </button>
-            </div>
-
-            {/* Mobile Auth Button */}
-            {user ? (
-              <div className="p-3 rounded-2xl bg-white/10 border border-amber-400/40 flex items-center justify-between">
-                <div className="flex items-center gap-2.5 overflow-hidden">
-                  {user.photoURL ? (
-                    <img src={user.photoURL} alt="Avatar" className="w-8 h-8 rounded-full object-cover border border-amber-400/60" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-xs">
-                      {user.displayName?.[0] || 'U'}
-                    </div>
-                  )}
-                  <div className="overflow-hidden">
-                    <div className="text-xs font-bold text-white truncate">{user.displayName || 'Member'}</div>
-                    <div className="text-[10px] text-neutral-400 truncate">{user.email}</div>
-                  </div>
+            {/* Mobile Header Bar */}
+            <div className="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 256 256"
+                  fill="#ffffff"
+                  className="shrink-0"
+                >
+                  <path d="M 256 256 L 128 256 L 0 128 L 128 128 Z M 256 128 L 128 128 L 0 0 L 128 0 Z" />
+                </svg>
+                <div className="flex flex-col">
+                  <span className="text-white text-base font-display font-bold tracking-tight leading-none">
+                    {PERSONAL_INFO.name}
+                  </span>
+                  <span className="text-[10px] font-mono text-neutral-400 tracking-wider uppercase mt-0.5">
+                    Portfolio Navigation
+                  </span>
                 </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Sound toggle button */}
+                <button
+                  type="button"
+                  onClick={handleToggleSound}
+                  className="px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-neutral-300 text-xs font-mono flex items-center gap-1.5 active:scale-95 transition-all"
+                  aria-label={soundEnabled ? 'Disable audio feedback' : 'Enable audio feedback'}
+                >
+                  {soundEnabled ? (
+                    <>
+                      <Volume2 className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                      <span className="text-[10px] text-amber-300">SFX</span>
+                    </>
+                  ) : (
+                    <>
+                      <VolumeX className="w-3.5 h-3.5 text-neutral-400" />
+                      <span className="text-[10px] text-neutral-400">MUTE</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Close Overlay Button */}
+                <button
+                  id="mobile-overlay-close-btn"
+                  type="button"
+                  onClick={() => {
+                    playClick();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/25 text-white flex items-center justify-center transition-all cursor-pointer"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Navigation Links with High Touch Usability */}
+            <div className="py-6 flex-1 flex flex-col justify-center space-y-2">
+              <div className="flex items-center justify-between px-1 mb-2">
+                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-mono flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Index Directory
+                </span>
+                <span className="text-[10px] font-mono text-neutral-400">
+                  TAP TO NAVIGATE
+                </span>
+              </div>
+
+              <div className="space-y-1.5">
+                {navLinks.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeSection === item.id;
+
+                  return (
+                    <motion.a
+                      key={item.id}
+                      href={item.href}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -8 }}
+                      transition={{ duration: 0.25 }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavClick(item.href);
+                      }}
+                      className={`min-h-[54px] flex items-center justify-between px-4 py-3 rounded-2xl transition-all active:scale-[0.98] ${
+                        isActive
+                          ? 'bg-white/15 border border-white/25 text-white shadow-lg shadow-black/20 font-semibold'
+                          : 'bg-white/[0.04] hover:bg-white/[0.08] active:bg-white/15 border border-white/5 text-neutral-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                            isActive
+                              ? 'bg-amber-400 text-neutral-950 font-bold'
+                              : 'bg-white/10 text-amber-300'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-base font-display font-semibold tracking-tight text-white">
+                            {item.name}
+                          </span>
+                          <span className="text-[10px] font-mono text-neutral-400 tracking-wider">
+                            {item.tag}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {isActive && (
+                          <span className="w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/80 animate-pulse" />
+                        )}
+                        <ChevronRight
+                          className={`w-4 h-4 transition-transform ${
+                            isActive ? 'text-amber-300 translate-x-0.5' : 'text-neutral-400'
+                          }`}
+                        />
+                      </div>
+                    </motion.a>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Bottom Actions Hub */}
+            <div className="space-y-3 pt-4 border-t border-white/10 shrink-0">
+              {/* Quick Actions Grid */}
+              <div className="grid grid-cols-2 gap-2.5">
                 <button
                   type="button"
                   onClick={() => {
+                    playClick();
                     setMobileMenuOpen(false);
-                    logout();
+                    onOpenResume();
                   }}
-                  className="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 text-xs hover:bg-rose-500/30 transition-colors"
+                  className="min-h-[46px] rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white text-xs font-medium text-center flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  Sign Out
+                  <FileText className="w-4 h-4 text-amber-300" />
+                  <span>Resume</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick();
+                    setMobileMenuOpen(false);
+                    onOpenCommandMenu();
+                  }}
+                  className="min-h-[46px] rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white text-xs font-medium text-center flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <Command className="w-4 h-4 text-amber-400" />
+                  <span>Command ⌘K</span>
                 </button>
               </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  signInWithGoogle();
-                }}
-                className="w-full py-3 rounded-full bg-white/15 border border-white/25 text-white text-xs font-semibold flex items-center justify-center gap-2 hover:bg-white/20 transition-all shadow-sm"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                </svg>
-                <span>Sign in with Google</span>
-              </button>
-            )}
 
-            <a
-              href="#contact"
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('#contact');
-              }}
-              className="block w-full bg-[#e8702a] text-white py-3 rounded-full text-sm font-medium text-center hover:bg-[#d2611f] transition-colors"
-            >
-              Get In Touch
-            </a>
-          </div>
-        </div>
-      )}
+              {/* Mobile Auth Button */}
+              {user ? (
+                <div className="p-3 rounded-xl bg-white/10 border border-amber-400/40 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt="Avatar"
+                        className="w-8 h-8 rounded-full object-cover border border-amber-400/60 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0">
+                        {user.displayName?.[0] || 'U'}
+                      </div>
+                    )}
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-white truncate">
+                        {user.displayName || 'Visitor'}
+                      </div>
+                      <div className="text-[10px] text-neutral-400 truncate font-mono">
+                        {user.email}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick();
+                      setMobileMenuOpen(false);
+                      logout();
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-medium hover:bg-rose-500/30 active:scale-95 transition-all"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick();
+                    setMobileMenuOpen(false);
+                    signInWithGoogle();
+                  }}
+                  className="w-full min-h-[46px] rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 border border-white/25 text-white text-xs font-semibold flex items-center justify-center gap-2.5 transition-all shadow-sm cursor-pointer"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                  <span>Sign in with Google</span>
+                </button>
+              )}
+
+              {/* High Contrast Contact CTA */}
+              <a
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('#contact');
+                }}
+                className="w-full min-h-[48px] bg-[#e8702a] hover:bg-[#d2611f] active:scale-[0.98] text-white py-3.5 rounded-xl text-sm font-semibold text-center flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#e8702a]/20 cursor-pointer"
+              >
+                <Send className="w-4 h-4" />
+                <span>Get In Touch</span>
+              </a>
+
+              {/* Micro Status Footer */}
+              <div className="text-center pt-1 pb-1">
+                <span className="text-[10px] font-mono text-neutral-400 tracking-wider">
+                  RICK BARAT • CREATIVE TECHNOLOGIST
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

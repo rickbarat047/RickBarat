@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -16,10 +16,82 @@ import { ResumeModal } from './components/ResumeModal';
 import { ScrollProgress } from './components/ScrollProgress';
 import { RevealOnScroll } from './components/RevealOnScroll';
 import { IntroAnimation } from './components/IntroAnimation';
+import { BackgroundCanvas } from './components/BackgroundCanvas';
 import { playClickSound } from './utils/soundEffects';
 import { AuthProvider } from './context/AuthContext';
 
+/**
+ * Custom hook that tracks scroll velocity.
+ * Computes instantaneous scroll deltas, smoothly dampens with requestAnimationFrame,
+ * and provides a normalized scroll velocity value that decays to 0 when idle.
+ */
+export function useScrollVelocity(): number {
+  const [scrollVelocity, setScrollVelocity] = useState<number>(0);
+  const lastScrollY = useRef<number>(0);
+  const lastTime = useRef<number>(0);
+  const velocityRef = useRef<number>(0);
+  const rafId = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    lastScrollY.current = window.scrollY;
+    lastTime.current = performance.now();
+
+    const decayVelocity = () => {
+      // Smooth exponential decay towards zero
+      velocityRef.current *= 0.88;
+
+      if (Math.abs(velocityRef.current) < 0.002) {
+        velocityRef.current = 0;
+        setScrollVelocity(0);
+        rafId.current = null;
+        return;
+      }
+
+      setScrollVelocity(parseFloat(velocityRef.current.toFixed(4)));
+      rafId.current = requestAnimationFrame(decayVelocity);
+    };
+
+    const handleScroll = () => {
+      const now = performance.now();
+      const currentScrollY = window.scrollY;
+      const deltaY = currentScrollY - lastScrollY.current;
+      const deltaTime = Math.max(now - lastTime.current, 10);
+
+      lastScrollY.current = currentScrollY;
+      lastTime.current = now;
+
+      // Calculate instantaneous velocity in px/ms and scale for organic shader response
+      const instantVelocity = (deltaY / deltaTime) * 0.9;
+
+      // Responsive low-pass filter
+      velocityRef.current = velocityRef.current * 0.35 + instantVelocity * 0.65;
+
+      // Clamp between -3.5 and 3.5 to prevent extreme spikes on swipe gestures
+      velocityRef.current = Math.max(-3.5, Math.min(3.5, velocityRef.current));
+
+      // Start animation loop if not currently active
+      if (rafId.current === null) {
+        rafId.current = requestAnimationFrame(decayVelocity);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId.current !== null) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, []);
+
+  return scrollVelocity;
+}
+
 export default function App() {
+  const scrollVelocity = useScrollVelocity();
   const [showIntro, setShowIntro] = useState<boolean>(true);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState<boolean>(false);
@@ -84,6 +156,9 @@ export default function App() {
       <div 
         className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-amber-400 selection:text-neutral-950 antialiased font-sans relative overflow-x-hidden"
       >
+        {/* Fixed Procedural WebGL Charcoal Background Canvas Layer */}
+        <BackgroundCanvas scrollVelocity={scrollVelocity} />
+
         {/* Intro Boot Animation on Website Load */}
         <AnimatePresence mode="wait">
           {showIntro && (
