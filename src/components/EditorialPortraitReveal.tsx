@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useInView, useReducedMotion } from 'motion/react';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { RevealLayer } from './RevealLayer';
 
 interface EditorialPortraitRevealProps {
@@ -21,14 +21,24 @@ export const EditorialPortraitReveal: React.FC<EditorialPortraitRevealProps> = (
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
-  
-  // Track when portrait enters viewport on scroll
+
+  // Scroll tracking to provide subtle organic light displacement during scrolling
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end start'],
+  });
+
+  // Track scroll-linked parallax and light drift
+  const lightParallaxX = useTransform(scrollYProgress, [0, 1], ['-20%', '20%']);
+  const portraitScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.05, 1.0, 1.03]);
+
+  // Track when portrait enters viewport on scroll with comfortable margin
   const isInView = useInView(containerRef, {
-    amount: 0.15,
+    amount: 0.12,
     once: false,
   });
 
-  // Track sweep key to trigger fresh directional sweep animation on each viewport entry
+  // Increment sweepCycle when entering viewport on scroll to trigger the directional light sweep
   const [sweepCycle, setSweepCycle] = useState(0);
 
   useEffect(() => {
@@ -44,15 +54,15 @@ export const EditorialPortraitReveal: React.FC<EditorialPortraitRevealProps> = (
       className={`absolute inset-0 overflow-hidden select-none pointer-events-none z-10 ${className}`}
       aria-label="Editorial Portrait - Rick Barat"
     >
-      {/* Editorial Mask Reveal Container */}
+      {/* Editorial Mask Reveal Container powered by CSS clip-path */}
       <motion.div
         key={`mask-${sweepCycle > 0 ? 'active' : 'idle'}`}
         initial={
           prefersReducedMotion
             ? { opacity: 0 }
             : {
-                clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)',
-                opacity: 0.7,
+                clipPath: 'polygon(0% 100%, 100% 94%, 100% 100%, 0% 100%)',
+                opacity: 0.75,
               }
         }
         animate={
@@ -66,34 +76,34 @@ export const EditorialPortraitReveal: React.FC<EditorialPortraitRevealProps> = (
             : prefersReducedMotion
             ? { opacity: 0.5 }
             : {
-                clipPath: 'polygon(0% 15%, 100% 15%, 100% 100%, 0% 100%)',
-                opacity: 0.7,
+                clipPath: 'polygon(0% 100%, 100% 94%, 100% 100%, 0% 100%)',
+                opacity: 0.75,
               }
         }
         transition={{
           clipPath: {
-            duration: 1.35,
-            ease: [0.16, 1, 0.3, 1],
+            duration: 1.45,
+            ease: [0.19, 1, 0.22, 1],
           },
           opacity: {
-            duration: 0.8,
+            duration: 0.85,
             ease: 'easeOut',
           },
+        }}
+        style={{
+          WebkitClipPath: isInView
+            ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
+            : 'polygon(0% 100%, 100% 94%, 100% 100%, 0% 100%)',
         }}
         className="absolute inset-0 w-full h-full"
       >
         {/* Counter-scaling portrait with subtle ambient parallax */}
         <motion.div
-          initial={prefersReducedMotion ? false : { scale: 1.08 }}
-          animate={isInView ? { scale: 1.0 } : { scale: 1.06 }}
-          transition={{
-            duration: 1.8,
-            ease: [0.16, 1, 0.3, 1],
-          }}
-          className="absolute inset-0 w-full h-full bg-center bg-cover bg-no-repeat"
           style={{
+            scale: prefersReducedMotion ? 1 : portraitScale,
             backgroundImage: `url("${baseImage}")`,
           }}
+          className="absolute inset-0 w-full h-full bg-center bg-cover bg-no-repeat transition-transform duration-700 ease-out"
         />
 
         {/* Subterranean/Architecture Spotlight Reveal Layer */}
@@ -104,7 +114,7 @@ export const EditorialPortraitReveal: React.FC<EditorialPortraitRevealProps> = (
           spotlightRadius={spotlightRadius}
         />
 
-        {/* Directional Light Sweep: Beveled angled beam traversing diagonally across portrait */}
+        {/* Directional Light Sweep: An angled, multi-stop specular light beam traversing diagonally across portrait on scroll */}
         {!prefersReducedMotion && (
           <motion.div
             key={`light-sweep-${sweepCycle}`}
@@ -112,26 +122,27 @@ export const EditorialPortraitReveal: React.FC<EditorialPortraitRevealProps> = (
             animate={
               isInView
                 ? {
-                    x: '240%',
-                    opacity: [0, 0.15, 0.9, 0.9, 0.2, 0],
+                    x: '260%',
+                    opacity: [0, 0.2, 0.95, 0.95, 0.25, 0],
                   }
                 : { x: '-160%', opacity: 0 }
             }
             transition={{
-              duration: 1.65,
-              delay: 0.22,
+              duration: 1.7,
+              delay: 0.18,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="absolute inset-y-0 w-[95%] pointer-events-none z-35 -skew-x-12"
+            className="absolute inset-y-0 w-[110%] pointer-events-none z-35 -skew-x-15"
             style={{
+              x: lightParallaxX,
               background:
-                'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.02) 18%, rgba(251, 191, 36, 0.15) 36%, rgba(255, 255, 255, 0.48) 50%, rgba(251, 191, 36, 0.25) 62%, rgba(255, 255, 255, 0.06) 78%, transparent 100%)',
+                'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.02) 15%, rgba(251, 191, 36, 0.18) 32%, rgba(255, 255, 255, 0.65) 50%, rgba(251, 191, 36, 0.28) 64%, rgba(255, 255, 255, 0.08) 80%, transparent 100%)',
               mixBlendMode: 'screen',
             }}
           />
         )}
 
-        {/* Secondary soft luminous highlight bloom */}
+        {/* Secondary soft luminous highlight bloom following the light sweep */}
         {!prefersReducedMotion && (
           <motion.div
             key={`bloom-${sweepCycle}`}
@@ -139,22 +150,36 @@ export const EditorialPortraitReveal: React.FC<EditorialPortraitRevealProps> = (
             animate={
               isInView
                 ? {
-                    x: '200%',
-                    opacity: [0, 0.1, 0.65, 0.65, 0.1, 0],
+                    x: '220%',
+                    opacity: [0, 0.1, 0.7, 0.7, 0.12, 0],
                   }
                 : { x: '-120%', opacity: 0 }
             }
             transition={{
-              duration: 1.65,
-              delay: 0.22,
+              duration: 1.7,
+              delay: 0.18,
               ease: [0.22, 1, 0.36, 1],
             }}
             className="absolute inset-0 pointer-events-none z-36"
             style={{
               background:
-                'radial-gradient(ellipse 70% 50% at 50% 50%, rgba(251, 191, 36, 0.3) 0%, rgba(255, 255, 255, 0.2) 30%, transparent 70%)',
+                'radial-gradient(ellipse 75% 55% at 50% 50%, rgba(251, 191, 36, 0.35) 0%, rgba(255, 255, 255, 0.25) 28%, transparent 70%)',
               mixBlendMode: 'screen',
             }}
+          />
+        )}
+
+        {/* Editorial Leading-Edge Hairline Sweep Accent */}
+        {!prefersReducedMotion && isInView && (
+          <motion.div
+            key={`hairline-${sweepCycle}`}
+            initial={{ y: '100%', opacity: 0.8 }}
+            animate={{ y: '-5%', opacity: 0 }}
+            transition={{
+              duration: 1.45,
+              ease: [0.19, 1, 0.22, 1],
+            }}
+            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-300/80 to-transparent pointer-events-none z-37 shadow-[0_0_12px_rgba(251,191,36,0.6)]"
           />
         )}
 
