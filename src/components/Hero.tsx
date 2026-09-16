@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
-import { RevealLayer } from './RevealLayer';
+import { EditorialPortraitReveal } from './EditorialPortraitReveal';
 import { MagneticButton } from './MagneticButton';
 
 interface HeroProps {
@@ -151,26 +151,21 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
     <section
       ref={heroRef}
       id="hero"
+      aria-label="Personal Introduction"
       className="relative w-full overflow-hidden h-screen bg-black"
       style={{ height: '100dvh' }}
     >
-      {/* Layer 1: Base Image (z-10) with slow Ken Burns hero-zoom */}
-      <div
-        id="hero-base-image"
-        className="absolute inset-0 bg-center bg-cover bg-no-repeat z-10 hero-zoom"
-        style={{ backgroundImage: `url("${BG_IMAGE_1}")` }}
-      />
+      {/* Anchor point for Personal Introduction */}
+      <div id="introduction" className="absolute top-0 pointer-events-none" />
 
-      {/* Layer 2: Reveal Layer (z-30) showing BG_IMAGE_2 through soft circular spotlight */}
-      <RevealLayer
-        image={BG_IMAGE_2}
+      {/* Editorial Mask Reveal with Directional Light Sweep on Viewport Scroll Entry */}
+      <EditorialPortraitReveal
+        baseImage={BG_IMAGE_1}
+        revealImage={BG_IMAGE_2}
         cursorX={cursorPos.x}
         cursorY={cursorPos.y}
         spotlightRadius={SPOTLIGHT_R}
       />
-
-      {/* Subtle atmospheric vignette */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-20 pointer-events-none" />
 
       {/* Status Pill Badge (Top Left / Centered under nav) */}
       <div className="absolute top-[8%] sm:top-[9%] left-0 right-0 flex justify-center z-50 pointer-events-auto">

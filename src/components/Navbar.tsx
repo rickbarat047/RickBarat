@@ -401,45 +401,51 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-modal="true"
             aria-label="Mobile Navigation"
             initial={{
-              clipPath: 'circle(0% at calc(100% - 2.25rem) 2.25rem)',
+              clipPath: 'circle(0% at calc(100% - 34px) 34px)',
               opacity: 0.8,
             }}
             animate={{
-              clipPath: 'circle(155% at calc(100% - 2.25rem) 2.25rem)',
+              clipPath: 'circle(150% at calc(100% - 34px) 34px)',
               opacity: 1,
               transition: {
                 clipPath: {
                   type: 'spring',
-                  stiffness: 150,
-                  damping: 24,
+                  stiffness: 145,
+                  damping: 22,
                   restDelta: 0.001,
                 },
-                opacity: { duration: 0.25 },
-                delayChildren: 0.1,
-                staggerChildren: 0.045,
+                opacity: { duration: 0.22 },
+                delayChildren: 0.08,
+                staggerChildren: 0.04,
               },
             }}
             exit={{
-              clipPath: 'circle(0% at calc(100% - 2.25rem) 2.25rem)',
+              clipPath: 'circle(0% at calc(100% - 34px) 34px)',
               opacity: 0.2,
               transition: {
                 clipPath: {
                   type: 'spring',
                   stiffness: 260,
-                  damping: 30,
+                  damping: 28,
                   restDelta: 0.001,
                 },
-                opacity: { duration: 0.18 },
+                opacity: { duration: 0.16 },
               },
             }}
-            className="fixed inset-0 z-[105] bg-neutral-950/96 backdrop-blur-3xl md:hidden flex flex-col justify-between overflow-y-auto px-5 py-5 select-none"
+            style={{
+              WebkitClipPath: 'inherit',
+            }}
+            className="fixed inset-0 z-[105] bg-neutral-950/96 backdrop-blur-3xl md:hidden flex flex-col justify-between overflow-y-auto px-4 sm:px-5 py-4 select-none"
           >
             {/* Ambient Background Lighting Glow */}
             <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
             <div className="absolute bottom-0 left-0 w-72 h-72 bg-neutral-800/20 rounded-full blur-3xl pointer-events-none -z-10" />
 
+            {/* Mobile Sheet Drag Handle Indicator */}
+            <div className="w-12 h-1 rounded-full bg-white/20 mx-auto -mt-1 mb-2.5 shrink-0" />
+
             {/* Mobile Header Bar */}
-            <div className="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">
+            <div className="flex items-center justify-between pb-3.5 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-2.5">
                 <svg
                   width="22"
@@ -465,7 +471,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   type="button"
                   onClick={handleToggleSound}
-                  className="px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-neutral-300 text-xs font-mono flex items-center gap-1.5 active:scale-95 transition-all"
+                  className="px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-neutral-300 text-xs font-mono flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
                   aria-label={soundEnabled ? 'Disable audio feedback' : 'Enable audio feedback'}
                 >
                   {soundEnabled ? (
@@ -489,7 +495,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     playClick();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/25 text-white flex items-center justify-center transition-all cursor-pointer"
+                  className="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/25 text-white flex items-center justify-center transition-all cursor-pointer"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
@@ -498,7 +504,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             {/* Navigation Links with High Touch Usability */}
-            <div className="py-6 flex-1 flex flex-col justify-center space-y-2">
+            <div className="py-5 flex-1 flex flex-col justify-center space-y-2">
               <div className="flex items-center justify-between px-1 mb-2">
                 <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-mono flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -572,8 +578,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="space-y-3 pt-4 border-t border-white/10 shrink-0">
               {/* Quick Actions Grid */}
               <div className="grid grid-cols-2 gap-2.5">
-                <button
-                  type="button"
+                <MagneticButton
+                  strength={0.2}
                   onClick={() => {
                     playClick();
                     setMobileMenuOpen(false);
@@ -583,10 +589,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <FileText className="w-4 h-4 text-amber-300" />
                   <span>Resume</span>
-                </button>
+                </MagneticButton>
 
-                <button
-                  type="button"
+                <MagneticButton
+                  strength={0.2}
                   onClick={() => {
                     playClick();
                     setMobileMenuOpen(false);
@@ -596,7 +602,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <Command className="w-4 h-4 text-amber-400" />
                   <span>Command ⌘K</span>
-                </button>
+                </MagneticButton>
               </div>
 
               {/* Mobile Auth Button */}
@@ -630,7 +636,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setMobileMenuOpen(false);
                       logout();
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-medium hover:bg-rose-500/30 active:scale-95 transition-all"
+                    className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-medium hover:bg-rose-500/30 active:scale-95 transition-all cursor-pointer"
                   >
                     Sign Out
                   </button>
@@ -667,9 +673,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
 
-              {/* High Contrast Contact CTA */}
-              <a
-                href="#contact"
+              {/* High Contrast Contact CTA with MagneticButton */}
+              <MagneticButton
+                strength={0.25}
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavClick('#contact');
@@ -678,7 +684,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <Send className="w-4 h-4" />
                 <span>Get In Touch</span>
-              </a>
+              </MagneticButton>
 
               {/* Micro Status Footer */}
               <div className="text-center pt-1 pb-1">
