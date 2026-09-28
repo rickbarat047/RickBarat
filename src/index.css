@@ -344,6 +344,38 @@ p {
   -webkit-transform-style: preserve-3d;
 }
 
+/* Card & Figure Layer Containment: Strict bounds without leaking */
+.spatial-card {
+  box-sizing: border-box;
+}
+
+.spatial-card figure {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.spatial-card figure img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.spatial-card-content {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
 @media (max-width: 640px) {
   :root {
     --hw: min(84vw, 360px);

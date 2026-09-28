@@ -259,44 +259,40 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       }
 
       // Update #headline: counter-rotate via inverse quaternion to stay optically centered & upright
+      const currentQ = s.q;
+      const qInv: Quat = [currentQ[0], -currentQ[1], -currentQ[2], -currentQ[3]];
+      const invMatrixStr = quatToMatrix3d(qInv, 0);
+
       if (headlineRef.current) {
         const headlineZ = (radius * 0.62).toFixed(2);
-        const qInv: Quat = [s.q[0], -s.q[1], -s.q[2], -s.q[3]];
-        headlineRef.current.style.transform = `${quatToMatrix3d(qInv, 0)} translateZ(${headlineZ}px)`;
+        headlineRef.current.style.transform = `${invMatrixStr} translateZ(${headlineZ}px)`;
       }
 
-      // Compute Depth Shading for each sphere node in camera space
-      const currentQ = s.q;
+      // Depth Shading for each sphere node in camera space (depth black wash, original spherical attachment)
       spherePositions.forEach((pos, idx) => {
         const el = document.getElementById(`sphere-node-${idx}`);
         if (!el) return;
 
-        // Model coordinate transformed into camera space
-        const mx = pos.x * radius;
-        const my = pos.y * radius;
-        const mz = pos.z * radius;
-        const rotated = rotateVec3ByQuat([mx, my, mz], currentQ);
-        const z2 = rotated[2]; // Z depth in camera space (-radius to +radius)
+        // Model unit vector rotated by orb orientation into camera space
+        const rotated = rotateVec3ByQuat([pos.x, pos.y, pos.z], currentQ);
+        const zf = rotated[2]; // Z depth on unit sphere in camera space (-1 to +1)
 
-        // Normalize depth: z2 goes from -radius to +radius
-        const depthNorm = Math.max(0, Math.min(1, (z2 + radius) / (2 * radius)));
-
-        // Depth-based opacity & shading
-        const opacity = (0.28 + 0.72 * depthNorm).toFixed(3);
-        const brightness = (0.45 + 0.55 * depthNorm).toFixed(3);
+        // Depth shading formula: base = 0.14 + 0.86 * Math.pow((zf + 1) / 2, 0.85)
+        const depthNorm = Math.max(0, Math.min(1, (zf + 1) / 2));
+        const base = 0.14 + 0.86 * Math.pow(depthNorm, 0.85);
+        const wash = Math.max(0, Math.min(1, 1 - base));
         const zIndex = Math.round(depthNorm * 100);
-        const scale = (0.84 + 0.22 * depthNorm).toFixed(3);
 
-        el.style.opacity = opacity;
-        el.style.filter = `brightness(${brightness})`;
+        // Apply depth wash via CSS custom property and zIndex (no filter: brightness, no billboarding)
+        el.style.setProperty('--depth-wash', wash.toFixed(3));
         el.style.zIndex = zIndex.toString();
-        el.style.pointerEvents = depthNorm > 0.35 ? 'auto' : 'none';
+        el.style.pointerEvents = zf > -0.4 ? 'auto' : 'none';
       });
 
       animId = requestAnimationFrame(tick);
     };
 
-    animId = requestAnimationFrame(tick);
+    tick();
     return () => cancelAnimationFrame(animId);
   }, [radius, spherePositions]);
 
@@ -459,13 +455,114 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
             const py = pos.y * radius;
             const pz = pos.z * radius;
 
+            const renderCardFigure = () => (
+              <figure
+                className="relative w-full h-full m-0 p-0 overflow-hidden rounded-xl bg-neutral-900 border border-neutral-800/90 shadow-2xl backdrop-blur-md group-hover:border-amber-400/80 transition-all duration-300"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  margin: 0,
+                  overflow: 'hidden',
+                  boxSizing: 'border-box',
+                  position: 'relative',
+                  borderRadius: '12px',
+                }}
+              >
+                {/* Visual Base Layer: Full-bleed image or dark editorial background */}
+                {item.image ? (
+                  <>
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover block select-none pointer-events-none transition-transform duration-500 group-hover:scale-105"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                    />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/60 pointer-events-none"
+                      style={{ position: 'absolute', inset: 0 }}
+                    />
+                  </>
+                ) : (
+                  <div
+                    className="absolute inset-0 w-full h-full bg-gradient-to-br from-neutral-850 via-neutral-900 to-neutral-950 flex flex-col justify-between p-2.5 sm:p-3 pointer-events-none select-none"
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+                  >
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+                    <div className="my-auto py-1 w-full overflow-hidden z-10">
+                      <p className="text-[10px] sm:text-[11px] font-sans text-neutral-300 line-clamp-3 leading-snug max-w-full overflow-hidden">
+                        {item.shortDesc}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Contained Card Content Layer: Pinned within slide bounds without leaking */}
+                <div
+                  className="spatial-card-content absolute inset-0 w-full h-full p-2.5 sm:p-3 flex flex-col justify-between pointer-events-none z-10"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {/* Top Badge & Number */}
+                  <div className="w-full flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-neutral-300">
+                    <span className="text-amber-400 font-bold drop-shadow">
+                      {item.number}
+                    </span>
+                    <span className="tracking-widest uppercase truncate max-w-[70px] sm:max-w-[80px] drop-shadow text-neutral-400">
+                      {item.badge}
+                    </span>
+                  </div>
+
+                  {/* Bottom Title & Action cue */}
+                  <div className="w-full flex items-center justify-between pt-1 border-t border-white/10 mt-auto">
+                    <h3
+                      className="text-[11px] sm:text-xs font-display font-bold text-white tracking-tight uppercase group-hover:text-amber-300 transition-colors truncate max-w-[calc(100%-20px)] drop-shadow"
+                      style={{
+                        maxWidth: 'calc(100% - 20px)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {item.title}
+                    </h3>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-amber-400 transition-colors flex-shrink-0 drop-shadow ml-1" />
+                  </div>
+                </div>
+
+                {/* Flat Black Wash Depth Shading Overlay (Clipped inside figure corners) */}
+                <div
+                  className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-75 z-20"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    opacity: 'var(--depth-wash, 0)',
+                  }}
+                />
+              </figure>
+            );
+
             return (
               <div
                 key={item.id}
                 id={`sphere-node-${idx}`}
                 onClick={(e) => handleNodeClick(item, e)}
                 data-cursor-hover
-                className="absolute top-0 left-0 preserve-3d group cursor-pointer"
+                className="spatial-card absolute top-0 left-0 preserve-3d group cursor-pointer"
                 style={{
                   width: 'var(--node-w, 140px)',
                   height: 'var(--node-h, 170px)',
@@ -473,45 +570,33 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
                   marginTop: 'calc(-1 * var(--node-h, 170px) / 2)',
                   transform: `translate3d(${px.toFixed(2)}px, ${py.toFixed(2)}px, ${pz.toFixed(2)}px) rotateY(${pos.lon.toFixed(2)}deg) rotateX(${pos.lat.toFixed(2)}deg)`,
                   transformStyle: 'preserve-3d',
+                  boxSizing: 'border-box',
                   transition: 'border-color 0.2s, box-shadow 0.2s',
                 }}
               >
-                {/* Node Card Container */}
-                <div className="w-full h-full rounded-xl bg-neutral-900/90 border border-neutral-800/90 p-2.5 sm:p-3 flex flex-col justify-between shadow-2xl backdrop-blur-md hover:border-amber-400/80 hover:bg-neutral-850 transition-all duration-300">
-                  {/* Top Badge & Number */}
-                  <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-neutral-400">
-                    <span className="text-amber-400 font-bold">{item.number}</span>
-                    <span className="tracking-widest uppercase truncate max-w-[80px]">
-                      {item.badge}
-                    </span>
-                  </div>
+                {/* Front Face: Outward orientation */}
+                <div 
+                  className="card-face card-front absolute inset-0 w-full h-full"
+                  style={{
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {renderCardFigure()}
+                </div>
 
-                  {/* Thumbnail Preview if available */}
-                  {item.image ? (
-                    <div className="my-1.5 w-full h-[62px] sm:h-[80px] rounded-lg overflow-hidden bg-neutral-950 border border-neutral-800/80 relative">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    </div>
-                  ) : (
-                    <div className="my-1.5 w-full h-[62px] sm:h-[80px] rounded-lg bg-neutral-950/80 border border-neutral-800/60 p-2 flex flex-col justify-center">
-                      <p className="text-[11px] sm:text-xs font-sans text-neutral-300 line-clamp-3 leading-snug">
-                        {item.shortDesc}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Bottom Title & Action cue */}
-                  <div className="flex items-end justify-between pt-1 border-t border-neutral-800/60">
-                    <h3 className="text-xs sm:text-sm font-display font-bold text-white tracking-tight uppercase group-hover:text-amber-300 transition-colors truncate">
-                      {item.title}
-                    </h3>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-neutral-400 group-hover:text-amber-400 transition-colors flex-shrink-0" />
-                  </div>
+                {/* Back Face: Identical content oriented at rotateY(180deg) without Z offset */}
+                <div 
+                  className="card-face card-back absolute inset-0 w-full h-full"
+                  style={{
+                    transform: 'rotateY(180deg)',
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {renderCardFigure()}
                 </div>
               </div>
             );
