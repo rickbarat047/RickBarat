@@ -7,6 +7,28 @@ interface SpatialSphereProps {
   isExploreMode: boolean;
 }
 
+// Project screen coordinates to 3D unit vector on virtual trackball
+function projectPointerToSphere(px: number, py: number, width: number, height: number): [number, number, number] {
+  const cx = width / 2;
+  const cy = height / 2;
+  const r = Math.min(width, height) * 0.45;
+
+  const x = (px - cx) / r;
+  const y = (py - cy) / r;
+  const d2 = x * x + y * y;
+
+  let z: number;
+  if (d2 <= 0.5) {
+    z = Math.sqrt(1 - d2);
+  } else {
+    // Hyperbolic falloff outside radius for seamless edge dragging
+    z = 0.5 / Math.sqrt(d2);
+  }
+
+  const len = Math.hypot(x, y, z) || 1;
+  return [x / len, y / len, z / len];
+}
+
 export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, isExploreMode }) => {
   const stageRef = useRef<HTMLDivElement>(null);
   const orbRef = useRef<HTMLDivElement>(null);
@@ -17,11 +39,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
 
   // Rotation angles & physics
   const stateRef = useRef({
-    spin: 25,     // base yaw
-    tilt: 10,     // base pitch
-    dragX: 0,     // accumulated horizontal drag
-    dragY: 0,     // accumulated vertical drag
-    sx: 10,       // pitch (rotateX)
+    sx: 8,        // pitch (rotateX)
     sy: 25,       // yaw (rotateY)
     vx: 0,        // pitch momentum
     vy: 0,        // yaw momentum
@@ -30,6 +48,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     startY: 0,
     lastX: 0,
     lastY: 0,
+    prevVec: [0, 0, 1] as [number, number, number],
     maxDist: 0,
     camZ: 0,
     camZTarget: 0,
@@ -103,35 +122,26 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
 
     const tick = () => {
       const s = stateRef.current;
-      const pitchLimit = 32;
+      const pitchLimit = 80;
 
       // Handle friction & momentum
       if (!s.isDragging) {
-        s.dragX += s.vy;
-        s.dragY += s.vx;
+        s.sy += s.vy;
+        s.sx += s.vx;
 
-        s.vx *= 0.94;
+        // Smooth momentum decay
         s.vy *= 0.94;
+        s.vx *= 0.94;
 
-        // Clamp dragY so momentum does not exceed pitch limit
-        const currentSx = s.tilt + s.dragY;
-        if (currentSx > pitchLimit) {
-          s.dragY = pitchLimit - s.tilt;
-          s.vx = 0;
-        } else if (currentSx < -pitchLimit) {
-          s.dragY = -pitchLimit - s.tilt;
-          s.vx = 0;
-        }
+        // Clamp pitch to pitchLimit
+        s.sx = Math.max(-pitchLimit, Math.min(pitchLimit, s.sx));
 
-        // Idle gentle rotation when velocity drops
+        // When momentum dies down, resume gentle idle drift
         if (Math.abs(s.vx) < 0.005 && Math.abs(s.vy) < 0.005) {
           s.vx = 0;
           s.vy = 0;
-          s.spin += 0.04;
+          s.sy += 0.04;
         }
-
-        s.sy = s.spin + s.dragX;
-        s.sx = s.tilt + s.dragY;
       }
 
       // Clamp pitch to avoid flipping upside down
@@ -200,7 +210,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     return () => cancelAnimationFrame(animId);
   }, [radius, spherePositions]);
 
-  // Unified Pointer Drag Events (Touch + Mouse)
+  // Unified Pointer Drag Events (Touch + Mouse Trackball)
   const handlePointerDown = (e: React.PointerEvent) => {
     // For mouse, only primary button
     if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -215,6 +225,10 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     s.vx = 0;
     s.vy = 0;
 
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    s.prevVec = projectPointerToSphere(e.clientX, e.clientY, w, h);
+
     try {
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     } catch {
@@ -226,40 +240,53 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     const s = stateRef.current;
     if (!s.isDragging) return;
 
-    const dx = e.clientX - s.lastX;
-    const dy = e.clientY - s.lastY;
-
-    const totalDist = Math.hypot(e.clientX - s.startX, e.clientY - s.startY);
-    if (totalDist > s.maxDist) {
-      s.maxDist = totalDist;
+    const distFromStart = Math.hypot(e.clientX - s.startX, e.clientY - s.startY);
+    if (distFromStart > s.maxDist) {
+      s.maxDist = distFromStart;
     }
 
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const currVec = projectPointerToSphere(e.clientX, e.clientY, w, h);
+    const prevVec = s.prevVec;
+
+    // Cross product: axis of rotation = prevVec x currVec
+    const ax = prevVec[1] * currVec[2] - prevVec[2] * currVec[1];
+    const ay = prevVec[2] * currVec[0] - prevVec[0] * currVec[2];
+    const az = prevVec[0] * currVec[1] - prevVec[1] * currVec[0];
+
+    // Dot product: cos(angle)
+    const dot = Math.max(-1, Math.min(1, prevVec[0] * currVec[0] + prevVec[1] * currVec[1] + prevVec[2] * currVec[2]));
+    const angleRad = Math.acos(dot);
+
+    const pitchLimit = 80;
+    const gain = 1.65; // High-fidelity tactile response
+
+    if (angleRad > 1e-4) {
+      const angleDeg = angleRad * (180 / Math.PI) * gain;
+      const axisLen = Math.hypot(ax, ay, az) || 1;
+
+      const ux = ax / axisLen;
+      const uy = ay / axisLen;
+
+      // Delta rotations for yaw and pitch
+      const deltaYaw = uy * angleDeg;
+      const deltaPitch = ux * angleDeg;
+
+      s.sy += deltaYaw;
+      s.sx += deltaPitch;
+
+      // Clamp pitch to 80 degrees
+      s.sx = Math.max(-pitchLimit, Math.min(pitchLimit, s.sx));
+
+      // Exponential moving average for velocity to ensure butter-smooth momentum release
+      s.vy = s.vy * 0.25 + deltaYaw * 0.75;
+      s.vx = s.vx * 0.25 + deltaPitch * 0.75;
+    }
+
+    s.prevVec = currVec;
     s.lastX = e.clientX;
     s.lastY = e.clientY;
-
-    const pitchLimit = 32;
-    const sensitivity = 0.13;
-
-    // Both horizontal (dx) and vertical (dy) drag update the sphere!
-    // Horizontal -> Yaw (sy)
-    // Vertical -> Pitch (sx)
-    s.dragX += dx * sensitivity;
-    s.dragY += dy * sensitivity;
-
-    // Clamp vertical tilt
-    const currentSx = s.tilt + s.dragY;
-    if (currentSx > pitchLimit) {
-      s.dragY = pitchLimit - s.tilt;
-    } else if (currentSx < -pitchLimit) {
-      s.dragY = -pitchLimit - s.tilt;
-    }
-
-    s.sy = s.spin + s.dragX;
-    s.sx = s.tilt + s.dragY;
-
-    // Preserve velocities for natural momentum release
-    s.vy = dx * sensitivity;
-    s.vx = dy * sensitivity;
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
