@@ -17,21 +17,22 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
 
   // Rotation angles & physics
   const stateRef = useRef({
+    spin: 25,     // base yaw
+    tilt: 10,     // base pitch
+    dragX: 0,     // accumulated horizontal drag
+    dragY: 0,     // accumulated vertical drag
     sx: 10,       // pitch (rotateX)
     sy: 25,       // yaw (rotateY)
-    vx: 0,        // pitch velocity
-    vy: 0.12,     // yaw velocity (idle rotation)
+    vx: 0,        // pitch momentum
+    vy: 0,        // yaw momentum
     isDragging: false,
+    startX: 0,
+    startY: 0,
     lastX: 0,
     lastY: 0,
+    maxDist: 0,
     camZ: 0,
     camZTarget: 0,
-    touchStartX: 0,
-    touchStartY: 0,
-    touchLocked: false,
-    touchDirection: '' as 'horizontal' | 'vertical' | '',
-    hasMoved: false,
-    depths: [] as { opacity: number; brightness: number; zIndex: number; scale: number }[]
   });
 
   // Calculate radius based on window width
@@ -70,16 +71,30 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     return { x, y: -y, z, lon, lat };
   });
 
-  // Camera dolly driven by scroll
+  // Camera dolly driven by scroll - safely calibrated to document scrollable range
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY || window.pageYOffset || 0;
-      const p = Math.max(0, Math.min(1, scrollY / (window.innerHeight * 0.16)));
-      stateRef.current.camZTarget = p * Math.min(64, radius * 0.12);
+      const scrollHeight = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+        window.innerHeight
+      );
+      const maxScroll = Math.max(1, scrollHeight - window.innerHeight);
+      const p = Math.max(0, Math.min(1, scrollY / maxScroll));
+      
+      // Safety limit: camera moves forward smoothly but never moves sphere out of view
+      const maxDolly = Math.min(50, radius * 0.14);
+      stateRef.current.camZTarget = p * maxDolly;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, [radius]);
 
   // Main 60fps Animation Loop: Orb Rotation, Headline Counter-Rotation, Depth Shading
@@ -88,30 +103,47 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
 
     const tick = () => {
       const s = stateRef.current;
+      const pitchLimit = 32;
 
       // Handle friction & momentum
       if (!s.isDragging) {
-        // Idle gentle rotation when velocity drops
-        if (Math.abs(s.vx) < 0.005 && Math.abs(s.vy) < 0.005) {
-          s.vy = 0.05;
-        } else {
-          s.vx *= 0.93;
-          s.vy *= 0.93;
+        s.dragX += s.vy;
+        s.dragY += s.vx;
+
+        s.vx *= 0.94;
+        s.vy *= 0.94;
+
+        // Clamp dragY so momentum does not exceed pitch limit
+        const currentSx = s.tilt + s.dragY;
+        if (currentSx > pitchLimit) {
+          s.dragY = pitchLimit - s.tilt;
+          s.vx = 0;
+        } else if (currentSx < -pitchLimit) {
+          s.dragY = -pitchLimit - s.tilt;
+          s.vx = 0;
         }
 
-        s.sx += s.vx;
-        s.sy += s.vy;
+        // Idle gentle rotation when velocity drops
+        if (Math.abs(s.vx) < 0.005 && Math.abs(s.vy) < 0.005) {
+          s.vx = 0;
+          s.vy = 0;
+          s.spin += 0.04;
+        }
+
+        s.sy = s.spin + s.dragX;
+        s.sx = s.tilt + s.dragY;
       }
 
       // Clamp pitch to avoid flipping upside down
-      s.sx = Math.max(-70, Math.min(70, s.sx));
+      s.sx = Math.max(-pitchLimit, Math.min(pitchLimit, s.sx));
 
-      // Ease camera dolly (camZ)
+      // Ease camera dolly (camZ) with safety bounds [0, 54]
       s.camZ += (s.camZTarget - s.camZ) * 0.1;
+      s.camZ = Math.max(0, Math.min(54, s.camZ));
 
-      // Update #orb transform
+      // Update #orb transform: rotateY(sy) rotateX(sx)
       if (orbRef.current) {
-        orbRef.current.style.transform = `translate3d(0, 0, ${s.camZ.toFixed(2)}px) rotateX(${s.sx.toFixed(2)}deg) rotateY(${s.sy.toFixed(2)}deg)`;
+        orbRef.current.style.transform = `translate3d(0, 0, ${s.camZ.toFixed(2)}px) rotateY(${s.sy.toFixed(2)}deg) rotateX(${s.sx.toFixed(2)}deg)`;
       }
 
       // Update #headline: counter-rotate against sphere, centered at exact sphere origin
@@ -168,105 +200,97 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     return () => cancelAnimationFrame(animId);
   }, [radius, spherePositions]);
 
-  // Mouse Drag Events
-  const handleMouseDown = (e: React.MouseEvent) => {
-    // Only primary mouse button
-    if (e.button !== 0) return;
+  // Unified Pointer Drag Events (Touch + Mouse)
+  const handlePointerDown = (e: React.PointerEvent) => {
+    // For mouse, only primary button
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+
     const s = stateRef.current;
     s.isDragging = true;
-    s.hasMoved = false;
+    s.startX = e.clientX;
+    s.startY = e.clientY;
     s.lastX = e.clientX;
     s.lastY = e.clientY;
+    s.maxDist = 0;
     s.vx = 0;
     s.vy = 0;
+
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // Ignore
+    }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.PointerEvent) => {
     const s = stateRef.current;
     if (!s.isDragging) return;
 
     const dx = e.clientX - s.lastX;
     const dy = e.clientY - s.lastY;
 
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-      s.hasMoved = true;
+    const totalDist = Math.hypot(e.clientX - s.startX, e.clientY - s.startY);
+    if (totalDist > s.maxDist) {
+      s.maxDist = totalDist;
     }
 
     s.lastX = e.clientX;
     s.lastY = e.clientY;
 
-    // Horizontal drag -> yaw (sy), Vertical drag -> pitch (sx)
-    s.sy += dx * 0.32;
-    s.sx -= dy * 0.32;
-    s.vy = dx * 0.32;
-    s.vx = -dy * 0.32;
-  };
+    const pitchLimit = 32;
+    const sensitivity = 0.13;
 
-  const handleMouseUp = () => {
-    stateRef.current.isDragging = false;
-  };
+    // Both horizontal (dx) and vertical (dy) drag update the sphere!
+    // Horizontal -> Yaw (sy)
+    // Vertical -> Pitch (sx)
+    s.dragX += dx * sensitivity;
+    s.dragY += dy * sensitivity;
 
-  // Touch Events (Respect Mobile Vertical Scrolling)
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    const s = stateRef.current;
-    s.isDragging = true;
-    s.hasMoved = false;
-    s.touchStartX = touch.clientX;
-    s.touchStartY = touch.clientY;
-    s.lastX = touch.clientX;
-    s.lastY = touch.clientY;
-    s.touchLocked = false;
-    s.touchDirection = '';
-    s.vx = 0;
-    s.vy = 0;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    const s = stateRef.current;
-    if (!s.isDragging) return;
-
-    const totalDx = touch.clientX - s.touchStartX;
-    const totalDy = touch.clientY - s.touchStartY;
-
-    // Detect gesture direction
-    if (!s.touchLocked) {
-      if (Math.abs(totalDy) > Math.abs(totalDx) && Math.abs(totalDy) > 6) {
-        s.touchDirection = 'vertical';
-        s.touchLocked = true;
-        s.isDragging = false; // Give control back to native page scroll
-        return;
-      } else if (Math.abs(totalDx) > Math.abs(totalDy) && Math.abs(totalDx) > 6) {
-        s.touchDirection = 'horizontal';
-        s.touchLocked = true;
-      }
+    // Clamp vertical tilt
+    const currentSx = s.tilt + s.dragY;
+    if (currentSx > pitchLimit) {
+      s.dragY = pitchLimit - s.tilt;
+    } else if (currentSx < -pitchLimit) {
+      s.dragY = -pitchLimit - s.tilt;
     }
 
-    if (s.touchDirection === 'horizontal') {
-      const dx = touch.clientX - s.lastX;
-      s.lastX = touch.clientX;
-      s.lastY = touch.clientY;
-      s.hasMoved = true;
+    s.sy = s.spin + s.dragX;
+    s.sx = s.tilt + s.dragY;
 
-      // Rotate sphere yaw on horizontal swipe
-      s.sy += dx * 0.45;
-      s.vy = dx * 0.45;
-    }
+    // Preserve velocities for natural momentum release
+    s.vy = dx * sensitivity;
+    s.vx = dy * sensitivity;
   };
 
-  const handleTouchEnd = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
     const s = stateRef.current;
     s.isDragging = false;
-    s.touchLocked = false;
-    s.touchDirection = '';
+
+    try {
+      if ((e.currentTarget as HTMLElement).hasPointerCapture(e.pointerId)) {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // Ignore
+    }
   };
 
-  // Node Click with FLIP measurement
-  const handleNodeClick = (item: SpatialItem, e: React.MouseEvent | React.TouchEvent) => {
-    if (stateRef.current.hasMoved) return; // Ignore drag release clicks
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    const s = stateRef.current;
+    s.isDragging = false;
+
+    try {
+      if ((e.currentTarget as HTMLElement).hasPointerCapture(e.pointerId)) {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // Ignore
+    }
+  };
+
+  // Node Click with Tap vs Drag Detection (mobile click slop ≈ 14px)
+  const handleNodeClick = (item: SpatialItem, e: React.MouseEvent | React.PointerEvent) => {
+    if (stateRef.current.maxDist > 14) return; // If moved more than slop, it's a drag
     e.stopPropagation();
     const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
@@ -277,20 +301,18 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     <div
       ref={stageRef}
       id="stage"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      className={`relative w-full h-[88vh] sm:h-screen overflow-hidden select-none cursor-grab active:cursor-grabbing transition-opacity duration-700 ${
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      className={`fixed inset-0 w-screen h-[100svh] h-[100dvh] overflow-hidden select-none cursor-grab active:cursor-grabbing transition-opacity duration-700 z-10 touch-none ${
         isExploreMode ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       style={{
         perspective: '1000px',
         WebkitPerspective: '1000px',
-        transformStyle: 'preserve-3d'
+        transformStyle: 'preserve-3d',
+        touchAction: 'none'
       }}
     >
       {/* Background Spatial Atmosphere */}

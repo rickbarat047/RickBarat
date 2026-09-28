@@ -62,7 +62,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-[170vh] bg-black text-neutral-100 selection:bg-amber-400 selection:text-neutral-950 font-sans antialiased overflow-x-hidden">
+    <div className="relative min-h-[100svh] min-h-[100dvh] bg-black text-neutral-100 selection:bg-amber-400 selection:text-neutral-950 font-sans antialiased overflow-x-hidden">
       {/* Custom Circular Cursor for fine pointer devices */}
       <CustomCursor />
 
@@ -89,22 +89,30 @@ export default function App() {
         onToggleExplore={() => setIsExploreMode(prev => !prev)}
       />
 
-      {/* Sticky Stage Viewport Container: Drives Camera Dolly via Natural Scroll */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden">
-        {isExploreMode ? (
-          <div className="flex-1 overflow-y-auto">
-            <ExploreGridView
-              onSelectObject={handleSelectObject}
-              onCloseGrid={() => setIsExploreMode(false)}
-            />
-          </div>
-        ) : (
-          <SpatialSphere
+      {/* FIXED 3D Spatial Sphere: Stays locked to the viewport */}
+      <SpatialSphere
+        onSelectObject={handleSelectObject}
+        isExploreMode={isExploreMode}
+      />
+
+      {/* Explore Grid Mode: Scrollable overlay when toggled */}
+      {isExploreMode && (
+        <div className="fixed inset-0 z-20 overflow-y-auto bg-black/95 backdrop-blur-md pt-20 pb-16">
+          <ExploreGridView
             onSelectObject={handleSelectObject}
-            isExploreMode={isExploreMode}
+            onCloseGrid={() => setIsExploreMode(false)}
           />
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Controlled Scroll Track / Spacer: Calibrated for camera dolly distance without empty black void */}
+      {!isExploreMode && (
+        <div
+          className="relative pointer-events-none w-full"
+          style={{ height: 'calc(100svh + 300px)' }}
+          aria-hidden="true"
+        />
+      )}
 
       {/* FLIP Detail Transition Dialog */}
       <FlipDetailModal
