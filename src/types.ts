@@ -11,10 +11,17 @@ export interface Project {
   category: ProjectCategory;
   featured: boolean;
   tags: string[];
-  metrics: { label: string; value: string }[];
+  metrics?: { label: string; value: string }[];
+  status?: string;
+  whatIsIt?: string;
   problem: string;
+  approach?: string;
+  howItWorks?: string;
+  keyFeatures?: string[];
   solution: string;
-  architectureHighlights: string[];
+  architectureHighlights?: string[];
+  challenges?: string;
+  whatILearned?: string;
   githubUrl?: string;
   liveUrl?: string;
   image: string;
@@ -22,18 +29,18 @@ export interface Project {
   year: string;
 }
 
+export interface SkillItem {
+  name: string;
+  usedIn?: string;
+  category?: string;
+}
+
 export interface SkillCategory {
   id: string;
   name: string;
   iconName: string;
   description: string;
-  skills: {
-    name: string;
-    level: number; // 0 - 100
-    years: string;
-    isPrimary?: boolean;
-    tag?: string;
-  }[];
+  skills: SkillItem[];
 }
 
 export interface Experience {

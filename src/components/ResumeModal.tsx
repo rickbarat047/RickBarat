@@ -239,14 +239,14 @@ Tech: ${e.techStack.join(', ')}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3 rounded-lg bg-neutral-900/60 border border-neutral-800">
                 <div className="font-bold text-white">Bachelor of Computer Applications (BCA)</div>
-                <div className="text-neutral-400">Techno India University, Kolkata</div>
+                <div className="text-neutral-400">Techno India University</div>
                 <div className="text-[11px] font-mono text-amber-400 mt-1">Computer Applications & Software Engineering</div>
               </div>
 
               <div className="p-3 rounded-lg bg-neutral-900/60 border border-neutral-800">
-                <div className="font-bold text-white">Google Cloud Certified</div>
-                <div className="text-neutral-400">Professional Cloud Architect</div>
-                <div className="text-[11px] font-mono text-emerald-400 mt-1">Verified Credential</div>
+                <div className="font-bold text-white">Independent Developer & AI Builder</div>
+                <div className="text-neutral-400">Web, AI Workflows & Automation</div>
+                <div className="text-[11px] font-mono text-emerald-400 mt-1">Active Projects: AutoTube, PC Toolkit</div>
               </div>
             </div>
           </div>

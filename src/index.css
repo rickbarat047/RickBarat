@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Syne:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Syne:wght@600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ==========================================================================
@@ -8,6 +8,10 @@
    ========================================================================== */
 
 :root {
+  --hw: min(84vw, 420px);
+  --node-w: 140px;
+  --node-h: 170px;
+
   /* Fluid Font Sizes (Min @ 375px, Max @ 1920px) */
   --fluid-display-2xl: clamp(2.5rem, 1.65rem + 3.625vw, 6rem);       /* 40px -> 96px (Hero title) */
   --fluid-display-xl:  clamp(2rem, 1.39rem + 2.59vw, 4.5rem);        /* 32px -> 72px (Primary Section H1) */
@@ -57,6 +61,11 @@ body {
   font-family: 'Syne', sans-serif;
   letter-spacing: var(--ls-display-tight);
   text-wrap: balance;
+}
+
+/* Editorial Serif Accent Typography ('Instrument Serif') */
+.font-serif {
+  font-family: 'Instrument Serif', Georgia, serif;
 }
 
 /* Refined, Ergonomic Body Typography ('Plus Jakarta Sans') */
@@ -327,5 +336,27 @@ p {
 .crt-vignette {
   background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.55) 100%);
   pointer-events: none;
+}
+
+/* 3D Spatial Preservation & Mobile Responsive Variables */
+.preserve-3d {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --hw: min(84vw, 360px);
+    --node-w: 120px;
+    --node-h: 155px;
+  }
+}
+
+@media (max-width: 380px) {
+  :root {
+    --hw: min(88vw, 320px);
+    --node-w: 108px;
+    --node-h: 140px;
+  }
 }
 

@@ -147,11 +147,11 @@ export const InteractiveTerminal: React.FC = () => {
       type: 'system',
       content: (
         <div className="space-y-1">
-          <div className="font-bold">
-            Rick Barat Interactive Developer Terminal [Version 2.6.0-prod]
+          <div className="font-bold text-amber-400">
+            RICK OS [Minimalist Terminal Interface v1.0]
           </div>
-          <div className="text-xs opacity-90">
-            Type <span className="font-semibold underline">help</span> or switch themes via the titlebar controls to experience CRT, Hacker-Green, or Modern Dark mode.
+          <div className="text-xs opacity-90 text-neutral-300">
+            Type <span className="font-semibold text-white underline">help</span> to view available system commands (about, projects, skills, contact, clear).
           </div>
         </div>
       )
@@ -160,8 +160,8 @@ export const InteractiveTerminal: React.FC = () => {
       id: 'init-2',
       type: 'output',
       content: (
-        <div className="text-xs font-mono">
-          ✓ Host connected: ais-rick-barat-node01.sanfrancisco.us-west.cloud (Latency: 11ms)
+        <div className="text-xs font-mono text-neutral-400">
+          ✓ Rick Barat Workspace loaded · Status: Available for projects
         </div>
       )
     }
@@ -475,13 +475,14 @@ export const InteractiveTerminal: React.FC = () => {
               }}
             >
 {JSON.stringify({
-  candidate: PERSONAL_INFO.name,
+  developer: PERSONAL_INFO.name,
   role: PERSONAL_INFO.title,
   email: PERSONAL_INFO.email,
-  years_experience: PERSONAL_INFO.yearsOfExp,
-  delivered_projects: PERSONAL_INFO.completedProjects,
-  primary_technologies: ["Three.js / WebGL", "TypeScript", "React 19", "Next.js", "Node.js", "PostgreSQL", "Gemini AI", "Redis"],
-  client_engagements: "Indian D2C Brands & Enterprise Clients, Synapse Cloud (US), Studio Kroma (India), Apex Interactive"
+  education: PERSONAL_INFO.education.degree + " — " + PERSONAL_INFO.education.institution,
+  location: PERSONAL_INFO.location,
+  status: PERSONAL_INFO.status,
+  primary_focus: PERSONAL_INFO.primaryFocus,
+  active_projects: ["AutoTube", "PC Toolkit", "AI Lab Workflows", "Krypton UI"]
 }, null, 2)}
             </pre>
           );
@@ -583,13 +584,13 @@ export const InteractiveTerminal: React.FC = () => {
           <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-400/10 text-amber-400 text-xs font-mono border border-amber-400/20">
               <TerminalIcon className="w-3.5 h-3.5" />
-              <span>INTERACTIVE UNIX SHELL</span>
+              <span>SIGNATURE INTERACTION</span>
             </div>
             <h2 className="text-3xl font-bold text-white font-display tracking-tight">
-              Developer Console & Playground
+              Rick OS
             </h2>
             <p className="text-neutral-400 text-xs sm:text-sm">
-              Execute terminal commands directly in the browser with customizable theme aesthetics (Classic CRT, Hacker Green, and Modern Dark).
+              A minimalist terminal interface and signature developer Easter egg. Type <span className="text-amber-400 font-mono">help</span> to explore.
             </p>
           </div>
         </RevealOnScroll>

@@ -67,52 +67,62 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
 
   const actions = [
     {
-      id: 'nav-projects',
-      title: 'Navigate: Featured Projects',
+      id: 'nav-work',
+      title: 'Navigate: Featured Work & Case Studies',
       category: 'Navigation',
       icon: Briefcase,
       action: () => {
-        onNavigateTo('projects');
+        onNavigateTo('work');
+        onClose();
+      }
+    },
+    {
+      id: 'nav-what-i-build',
+      title: 'Navigate: What I Build (Disciplines)',
+      category: 'Navigation',
+      icon: Layers,
+      action: () => {
+        onNavigateTo('what-i-build');
+        onClose();
+      }
+    },
+    {
+      id: 'nav-ai-lab',
+      title: 'Navigate: AI Lab & Experiments',
+      category: 'Navigation',
+      icon: FlaskConical,
+      action: () => {
+        onNavigateTo('ai-lab');
         onClose();
       }
     },
     {
       id: 'nav-skills',
-      title: 'Navigate: Technical Skills Matrix',
+      title: 'Navigate: Skills & Technologies',
       category: 'Navigation',
-      icon: Layers,
+      icon: Code2,
       action: () => {
         onNavigateTo('skills');
         onClose();
       }
     },
     {
-      id: 'nav-lab',
-      title: 'Navigate: Interactive Lab & Playground',
+      id: 'nav-about',
+      title: 'Navigate: About Rick Barat',
       category: 'Navigation',
-      icon: FlaskConical,
+      icon: Layers,
       action: () => {
-        onNavigateTo('lab');
+        onNavigateTo('about');
         onClose();
       }
     },
     {
       id: 'nav-terminal',
-      title: 'Navigate: Developer Terminal',
+      title: 'Navigate: Rick OS (Terminal)',
       category: 'Navigation',
       icon: Terminal,
       action: () => {
         onNavigateTo('terminal');
-        onClose();
-      }
-    },
-    {
-      id: 'nav-experience',
-      title: 'Navigate: Work Experience',
-      category: 'Navigation',
-      icon: Code2,
-      action: () => {
-        onNavigateTo('experience');
         onClose();
       }
     },

@@ -32,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
               </span>
             </div>
             <p className="text-neutral-400 max-w-sm text-xs leading-relaxed">
-              Full Stack Engineer & Creative Technologist crafting zero-lag distributed web systems and thoughtful design interactions.
+              Independent developer building modern websites, AI-powered applications, automation systems, and digital experiences.
             </p>
           </div>
 
@@ -40,7 +40,7 @@ export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-[11px] font-mono text-neutral-300">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>All Systems Operational (99.98%)</span>
+              <span>Available for projects</span>
             </div>
 
             {onReplayIntro && (

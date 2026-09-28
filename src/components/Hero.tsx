@@ -1,20 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowRight, 
-  Terminal as TerminalIcon, 
+  Send,
   FileText, 
   Copy, 
   Check, 
-  Sparkles, 
   MapPin, 
-  Layers, 
-  Cpu, 
-  Compass, 
-  Code2,
-  Send,
-  Eye,
-  Zap,
-  Globe
+  Sparkles,
+  Code2
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -31,64 +24,15 @@ const BG_IMAGE_2 = "https://images.higgs.ai/?default=1&output=webp&url=https%3A%
 
 const SPOTLIGHT_R = 260;
 
-const ROLES = [
-  "Full-Stack Architect",
-  "Creative UI & Motion Specialist",
-  "Distributed Systems Engineer",
-  "AI Agent Pipeline Developer"
-];
-
 export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
   const { playClick, playHover, playSuccess, playTransition } = useUISounds();
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({ x: -999, y: -999 });
-  const [isLayerModalOpen, setIsLayerModalOpen] = useState(false);
-
-  // Typewriter states
-  const [roleIndex, setRoleIndex] = useState(0);
-  const [typedText, setTypedText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const heroRef = useRef<HTMLElement | null>(null);
   const mouse = useRef<{ x: number; y: number }>({ x: -999, y: -999 });
   const smooth = useRef<{ x: number; y: number }>({ x: -999, y: -999 });
   const rafRef = useRef<number | null>(null);
-
-  // Typewriter animation effect - smooth, robust cycle through all ROLES
-  useEffect(() => {
-    const currentWord = ROLES[roleIndex];
-
-    if (!isDeleting) {
-      if (typedText.length < currentWord.length) {
-        // Typing forward: append next character
-        const timeout = setTimeout(() => {
-          setTypedText(currentWord.slice(0, typedText.length + 1));
-        }, 55);
-        return () => clearTimeout(timeout);
-      } else {
-        // Word complete: hold so user can read comfortably
-        const timeout = setTimeout(() => {
-          setIsDeleting(true);
-        }, 2200);
-        return () => clearTimeout(timeout);
-      }
-    } else {
-      if (typedText.length > 0) {
-        // Backspacing: remove one character
-        const timeout = setTimeout(() => {
-          setTypedText(currentWord.slice(0, typedText.length - 1));
-        }, 28);
-        return () => clearTimeout(timeout);
-      } else {
-        // Fully erased: pause briefly and advance to next role
-        const timeout = setTimeout(() => {
-          setIsDeleting(false);
-          setRoleIndex((prev) => (prev + 1) % ROLES.length);
-        }, 360);
-        return () => clearTimeout(timeout);
-      }
-    }
-  }, [typedText, isDeleting, roleIndex]);
 
   // Mouse & touch tracking with smooth lerp
   useEffect(() => {
@@ -151,7 +95,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
     <section
       ref={heroRef}
       id="hero"
-      aria-label="Personal Introduction"
+      aria-label="Rick Barat - Hero Section"
       className="relative w-full overflow-hidden h-screen bg-black"
       style={{ height: '100dvh' }}
     >
@@ -167,66 +111,69 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
         spotlightRadius={SPOTLIGHT_R}
       />
 
-      {/* Status Pill Badge (Top Left / Centered under nav) */}
+      {/* Status indicator: ● Available for projects */}
       <div className="absolute top-[8%] sm:top-[9%] left-0 right-0 flex justify-center z-50 pointer-events-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-950/70 border border-white/20 backdrop-blur-md text-xs text-neutral-300 font-mono shadow-xl hero-anim hero-reveal" style={{ animationDelay: '0.1s' }}>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-950/70 border border-white/15 backdrop-blur-md text-xs text-neutral-300 font-mono shadow-xl hero-anim hero-reveal" style={{ animationDelay: '0.1s' }}>
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/80" />
-          <span className="text-white font-medium">{PERSONAL_INFO.name}</span>
-          <span className="text-white/40">|</span>
-          <span className="text-amber-400">Systems & Creative Engineering</span>
+          <span className="text-white font-medium">Rick Barat</span>
+          <span className="text-white/30">/</span>
+          <span className="text-emerald-400 font-medium">Available for projects</span>
         </div>
       </div>
 
-      {/* Layer 3: Main Heading (z-50) */}
+      {/* Main Headline & Supporting Text */}
       <div className="absolute top-[18%] sm:top-[20%] left-0 right-0 flex flex-col items-center text-center px-6 max-w-4xl mx-auto pointer-events-none z-50">
-        <h1 className="text-white flex flex-col items-center gap-2 sm:gap-3">
-          {/* Greeting Line */}
+        <h1 className="text-white flex flex-col items-center gap-3">
+          {/* Rick Barat Name */}
           <span
-            className="block font-display font-medium text-3xl sm:text-5xl md:text-6xl text-neutral-300 hero-anim hero-reveal tracking-tight"
-            style={{ animationDelay: '0.2s' }}
+            className="block font-display font-semibold text-2xl sm:text-3xl text-neutral-400 tracking-tight hero-anim hero-reveal"
+            style={{ animationDelay: '0.15s' }}
           >
-            Hi, I'm <span className="text-white font-extrabold font-display">Rick Barat</span>
+            Rick Barat
           </span>
 
-          {/* Role with prompt indicator and typewriter text */}
-          <div
-            className="inline-flex items-center justify-center flex-wrap gap-2 font-display font-bold text-2xl sm:text-4xl md:text-5xl text-amber-400 hero-anim hero-reveal tracking-tight min-h-[2.8rem] sm:min-h-[3.6rem]"
-            style={{ animationDelay: '0.38s' }}
+          {/* Primary Editorial Headline */}
+          <span
+            className="block font-display font-bold text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.12] max-w-3xl text-balance hero-anim hero-reveal"
+            style={{ animationDelay: '0.28s' }}
           >
-            <span className="text-amber-500/80 font-mono text-xl sm:text-3xl font-normal select-none">&gt;</span>
-            <span className="bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 bg-clip-text text-transparent">
-              {typedText}
-            </span>
-            <span 
-              className="inline-block w-[3px] sm:w-[4px] h-[0.85em] bg-amber-400 ml-0.5 translate-y-[2px] rounded-full animate-cursor shadow-sm shadow-amber-400/50" 
-              aria-hidden="true"
-            />
-          </div>
+            Building digital experiences, AI systems & tools that feel different.
+          </span>
         </h1>
 
-        {/* Subtitle statement */}
+        {/* Supporting statement */}
         <p
-          className="mt-4 sm:mt-6 text-sm sm:text-lg md:text-xl text-neutral-300/90 max-w-2xl font-normal leading-relaxed hero-anim hero-fade font-sans"
+          className="mt-4 sm:mt-6 text-sm sm:text-lg md:text-xl text-neutral-300/90 max-w-2xl font-normal leading-relaxed hero-anim hero-fade font-sans text-balance"
+          style={{ animationDelay: '0.45s' }}
+        >
+          Independent developer focused on modern web experiences, AI-powered applications and automation.
+        </p>
+
+        {/* Core ethos statement */}
+        <div 
+          className="mt-3 inline-flex items-center gap-2 text-xs font-mono text-amber-400/90 hero-anim hero-fade"
           style={{ animationDelay: '0.55s' }}
         >
-          Architecting high-performance web systems, distributed backends, and tactile digital experiences.
-        </p>
+          <span className="text-neutral-500 font-normal">&quot;</span>
+          <span>I don&apos;t just know technologies. I build things.</span>
+          <span className="text-neutral-500 font-normal">&quot;</span>
+        </div>
       </div>
 
-      {/* Layer 4: Bottom-left narrative block (z-50) */}
+      {/* Bottom-left narrative block */}
       <div
         className="hidden sm:block absolute bottom-12 sm:bottom-16 left-8 md:left-14 max-w-[280px] lg:max-w-[320px] hero-anim hero-fade z-50 space-y-3"
         style={{ animationDelay: '0.7s' }}
       >
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-mono text-amber-300">
-          <Compass className="w-3.5 h-3.5" />
-          <span>SUBTERRANEAN & DIGITAL ARCHITECTURE</span>
+        <div className="text-xs text-neutral-400 font-mono flex items-center gap-2">
+          <MapPin className="w-3.5 h-3.5 text-amber-400" />
+          <span>West Bengal, India · Remote</span>
         </div>
-        <p className="text-xs sm:text-sm text-white/85 leading-relaxed font-sans">
-          Every layer of software records a chapter in engineering—from high-throughput distributed servers to interactive 3D WebGL spaces and autonomous neural pipelines.
+        <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-sans">
+          BCA graduate from Techno India University. Turning complex ideas into intuitive websites, automation pipelines, and AI systems.
         </p>
         
-        {/* Quick Email Copy Chip */}
+        {/* Quick Email Copy */}
         <div className="pt-1 flex items-center gap-2">
           <button
             id="hero-quick-copy-email"
@@ -237,7 +184,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
             {copiedEmail ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400">Copied {PERSONAL_INFO.email}!</span>
+                <span className="text-emerald-400">Copied!</span>
               </>
             ) : (
               <>
@@ -249,61 +196,50 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
         </div>
       </div>
 
-      {/* Layer 5: Bottom-right action block (z-50) */}
+      {/* Bottom-right action block: CTAs */}
       <div
-        className="absolute bottom-8 sm:bottom-16 left-5 right-5 sm:left-auto sm:right-10 md:right-14 max-w-full sm:max-w-[300px] flex flex-col items-start gap-4 sm:gap-5 hero-anim hero-fade z-50"
+        className="absolute bottom-8 sm:bottom-16 left-5 right-5 sm:left-auto sm:right-10 md:right-14 max-w-full sm:max-w-[320px] flex flex-col items-start gap-4 hero-anim hero-fade z-50"
         style={{ animationDelay: '0.85s' }}
       >
-        <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
-          Hover across the canvas to peel back the surface layer and reveal internal strata. Explore live projects, 3D labs, and technical benchmarks below.
-        </p>
-
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-          {/* Primary Action Button */}
+          {/* Primary CTA: Explore My Work */}
           <MagneticButton
-            id="start-exploring-btn"
+            id="explore-work-btn"
             strength={0.38}
             onMouseEnter={() => playHover(1400)}
-            onClick={() => handleScrollToSection('projects')}
-            className="bg-[#e8702a] hover:bg-[#d2611f] text-white text-sm font-medium px-7 py-3 rounded-full hover:shadow-xl hover:shadow-[#e8702a]/30 flex items-center gap-2 cursor-pointer shadow-xl transition-colors duration-200"
+            onClick={() => handleScrollToSection('work')}
+            className="bg-white hover:bg-neutral-200 text-neutral-950 text-sm font-semibold px-6 py-3 rounded-full flex items-center gap-2 cursor-pointer shadow-xl transition-all duration-200"
           >
-            <span>Explore Work</span>
-            <ArrowRight className="w-4 h-4 ml-1.5" />
+            <span>Explore My Work</span>
+            <ArrowRight className="w-4 h-4" />
           </MagneticButton>
 
-          {/* Secondary Resume Button */}
+          {/* Secondary CTA: Let's Work Together */}
           <MagneticButton
-            id="hero-resume-btn"
+            id="work-together-btn"
             strength={0.32}
             onMouseEnter={() => playHover(1400)}
-            onClick={() => {
-              playTransition('in');
-              onOpenResume();
-            }}
+            onClick={() => handleScrollToSection('contact')}
             className="px-5 py-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-sm font-medium cursor-pointer flex items-center gap-2 transition-colors duration-200"
           >
-            <FileText className="w-4 h-4 text-amber-300 mr-1.5" />
-            <span>Resume</span>
+            <Send className="w-4 h-4 text-amber-300" />
+            <span>Let&apos;s Work Together</span>
           </MagneticButton>
         </div>
 
-        {/* Quick stats indicator */}
-        <div className="flex items-center gap-4 text-xs font-mono text-neutral-400 pt-1">
-          <span className="flex items-center gap-1 text-white">
-            <span className="text-amber-400 font-bold">5+</span> Yrs Experience
-          </span>
-          <span>•</span>
-          <span className="flex items-center gap-1 text-white">
-            <span className="text-emerald-400 font-bold">14+</span> Live Systems
-          </span>
+        {/* Credentials / Status */}
+        <div className="flex items-center gap-3 text-xs font-mono text-neutral-400 pt-1">
+          <span className="text-white">BCA · Techno India University</span>
+          <span>·</span>
+          <span className="text-emerald-400">Available</span>
         </div>
       </div>
 
       {/* Scroll Down Indicator */}
       <button
         type="button"
-        onClick={() => handleScrollToSection('projects')}
-        aria-label="Scroll down to projects"
+        onClick={() => handleScrollToSection('what-i-build')}
+        aria-label="Scroll down to exploration"
         className="absolute bottom-3 left-1/2 -translate-x-1/2 z-50 text-white/50 hover:text-white transition-colors cursor-pointer animate-bounce hidden sm:block p-2"
       >
         <span className="text-[10px] font-mono tracking-widest uppercase block mb-1">SCROLL DOWN</span>

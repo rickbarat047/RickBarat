@@ -89,16 +89,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const navLinks = [
-    { name: 'Introduction', href: '#hero', id: 'hero', icon: Compass, tag: 'PORTRAIT & BIO', number: '01' },
-    { name: 'Projects', href: '#projects', id: 'projects', icon: Layers, tag: '04 WORKS & CASE STUDIES', number: '02' },
-    { name: 'Skills', href: '#skills', id: 'skills', icon: Code2, tag: 'TECH ARCHITECTURE', number: '03' },
-    { name: 'Lab', href: '#lab', id: 'lab', icon: FlaskConical, tag: '3D GRAPHICS & SHADERS', number: '04' },
-    { name: 'Terminal', href: '#terminal', id: 'terminal', icon: Terminal, tag: 'UNIX CLI SANDBOX', number: '05' },
-    { name: 'Experience', href: '#experience', id: 'experience', icon: Briefcase, tag: 'ENTERPRISE MILESTONES', number: '06' },
-    { name: 'Contact', href: '#contact', id: 'contact', icon: Send, tag: 'GET IN TOUCH', number: '07' },
+    { name: 'WORK', href: '#work', id: 'work', icon: Layers, tag: 'FEATURED CASE STUDIES', number: '01' },
+    { name: 'AI LAB', href: '#ai-lab', id: 'ai-lab', icon: FlaskConical, tag: 'EXPERIMENTS & AGENTS', number: '02' },
+    { name: 'ABOUT', href: '#about', id: 'about', icon: Compass, tag: 'BACKGROUND & ETHOS', number: '03' },
+    { name: 'CONTACT', href: '#contact', id: 'contact', icon: Send, tag: "LET'S WORK TOGETHER", number: '04' },
+    { name: 'RICK OS', href: '#terminal', id: 'terminal', icon: Terminal, tag: 'MINIMALIST SHELL', number: '05' },
   ];
 
-  const desktopNavLinks = navLinks.filter((item) => item.id !== 'hero');
+  const desktopNavLinks = navLinks.filter((item) => item.id !== 'terminal');
 
   const handleNavClick = (href: string) => {
     playClick();
