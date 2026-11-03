@@ -412,14 +412,14 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
-      className={`fixed inset-0 w-screen h-[100svh] h-[100dvh] overflow-hidden select-none cursor-grab active:cursor-grabbing transition-opacity duration-700 z-10 touch-none ${
+      className={`fixed inset-0 w-screen h-[100svh] h-[100dvh] overflow-hidden select-none cursor-grab active:cursor-grabbing transition-opacity duration-700 z-10 touch-pan-y ${
         isExploreMode ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       style={{
         perspective: '1000px',
         WebkitPerspective: '1000px',
         transformStyle: 'preserve-3d',
-        touchAction: 'none',
+        touchAction: 'pan-y',
       }}
     >
       {/* Background Spatial Atmosphere */}

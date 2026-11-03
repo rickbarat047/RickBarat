@@ -172,7 +172,6 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     badge: "PERSONAL SPACE",
     shortDesc: "A quiet, handcrafted corner of the internet.",
     fullDesc: "Welcome to my digital home. Not a corporate resume or a cookie-cutter portfolio, but a spatial corner designed to share what I care about. Feel free to rotate the sphere, explore each node, and check out what I've shipped.",
-    image: "/assets/images/creative_corner_art_1790612718363.jpg",
     tags: ["Rick Barat", "Personal Space", "2026", "West Bengal"],
     meta: [
       { label: "Owner", value: "Rick Barat" },
@@ -296,3 +295,28 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     accentColor: "#f59e0b"
   }
 ];
+
+// Dev-time validation for duplicate project/image data
+if ((import.meta as any).env?.DEV) {
+  const seenIds = new Set<string>();
+  const seenImages = new Map<string, string>();
+  SPATIAL_OBJECTS.forEach((item) => {
+    if (seenIds.has(item.id)) {
+      console.warn(`[spatialData] Duplicate item id detected: ${item.id}`);
+    }
+    seenIds.add(item.id);
+
+    if (item.image) {
+      if (seenImages.has(item.image)) {
+        console.warn(
+          `[spatialData] Duplicate image "${item.image}" used by "${item.id}" and "${seenImages.get(item.image)}"`
+        );
+      }
+      seenImages.set(item.image, item.id);
+    }
+
+    if (item.category === "PROJECT" && !item.url) {
+      console.warn(`[spatialData] Project "${item.id}" is missing a URL`);
+    }
+  });
+}
