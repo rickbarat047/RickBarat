@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SplashScreen } from './components/motion/SplashScreen';
 import { CinematicIntro } from './components/motion/CinematicIntro';
 import { SpatialSphere } from './components/motion/SpatialSphere';
+import { MobileProjectCarousel } from './components/motion/MobileProjectCarousel';
 import { FlipDetailModal } from './components/motion/FlipDetailModal';
 import { ExploreGridView } from './components/motion/ExploreGridView';
 import { FullscreenMenu } from './components/motion/FullscreenMenu';
@@ -89,11 +90,20 @@ export default function App() {
         onToggleExplore={() => setIsExploreMode(prev => !prev)}
       />
 
-      {/* FIXED 3D Spatial Sphere: Stays locked to the viewport */}
-      <SpatialSphere
-        onSelectObject={handleSelectObject}
-        isExploreMode={isExploreMode}
-      />
+      {/* FIXED 3D Spatial Sphere: Stays locked to the viewport (desktop) */}
+      <div className="hidden md:block">
+        <SpatialSphere
+          onSelectObject={handleSelectObject}
+          isExploreMode={isExploreMode}
+        />
+      </div>
+
+      {/* Mobile: native horizontal scroll-snap carousel for smooth interaction */}
+      {!isExploreMode && (
+        <div className="md:hidden relative z-10 px-4 py-6">
+          <MobileProjectCarousel onSelectObject={handleSelectObject} />
+        </div>
+      )}
 
       {/* Explore Grid Mode: Scrollable overlay when toggled */}
       {isExploreMode && (
@@ -105,10 +115,10 @@ export default function App() {
         </div>
       )}
 
-      {/* Controlled Scroll Track / Spacer: Calibrated for camera dolly distance without empty black void */}
+      {/* Controlled Scroll Track / Spacer: Calibrated for camera dolly distance without empty black void (desktop) */}
       {!isExploreMode && (
         <div
-          className="relative pointer-events-none w-full"
+          className="hidden md:block relative pointer-events-none w-full"
           style={{ height: 'calc(100svh + 300px)' }}
           aria-hidden="true"
         />
