@@ -223,35 +223,45 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
   useEffect(() => {
     let animId: number;
 
-    const tick = () => {
+    let lastTime = performance.now();
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const tick = (now: number) => {
       const s = stateRef.current;
+      const dt = Math.min(Math.max((now - lastTime) / 1000, 0), 0.1);
+      lastTime = now;
 
       // Handle friction & 3D momentum when not actively dragging
-      if (!s.isDragging) {
+      if (!s.isDragging && !reduceMotion) {
         const speed = Math.hypot(s.omega[0], s.omega[1], s.omega[2]);
 
         if (speed > 1e-4) {
           const u: Vec3 = [s.omega[0] / speed, s.omega[1] / speed, s.omega[2] / speed];
-          const stepQ = quatFromAxisAngle(u, speed);
+          // omega is stored per 60fps frame; scale by actual elapsed time
+          const stepAngle = speed * (dt * 60);
+          const stepQ = quatFromAxisAngle(u, stepAngle);
           s.q = quatNormalize(quatMultiply(stepQ, s.q));
 
-          // Physical 3D friction decay
-          s.omega[0] *= 0.94;
-          s.omega[1] *= 0.94;
-          s.omega[2] *= 0.94;
+          // Frame-rate-independent friction decay
+          const decay = Math.pow(0.94, dt * 60);
+          s.omega[0] *= decay;
+          s.omega[1] *= decay;
+          s.omega[2] *= decay;
         } else {
           // When momentum settles, maintain a gentle, premium idle drift around Y axis
           s.omega[0] = 0;
           s.omega[1] = 0;
           s.omega[2] = 0;
 
-          const idleStep = quatFromAxisAngle([0, 1, 0], 0.0006);
+          const idleAngle = 0.0006 * (dt * 60);
+          const idleStep = quatFromAxisAngle([0, 1, 0], idleAngle);
           s.q = quatNormalize(quatMultiply(idleStep, s.q));
         }
       }
 
-      // Ease camera dolly (camZ) with safety bounds [0, 54]
-      s.camZ += (s.camZTarget - s.camZ) * 0.1;
+      // Ease camera dolly (camZ) with safety bounds [0, 54] (frame-rate independent)
+      const camLerp = 1 - Math.exp(-10 * dt);
+      s.camZ += (s.camZTarget - s.camZ) * camLerp;
       s.camZ = Math.max(0, Math.min(54, s.camZ));
 
       // Update #orb transform via full 3D rotation matrix
@@ -293,7 +303,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       animId = requestAnimationFrame(tick);
     };
 
-    tick();
+    animId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animId);
   }, [radius, spherePositions]);
 
