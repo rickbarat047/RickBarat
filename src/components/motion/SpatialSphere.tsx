@@ -117,6 +117,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
   const stageRef = useRef<HTMLDivElement>(null);
   const orbRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
+  const nodeElementsRef = useRef<HTMLElement[]>([]);
 
   // Responsive Radius R
   const [radius, setRadius] = useState<number>(280);
@@ -270,7 +271,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
 
       // Depth Shading for each sphere node in camera space (depth black wash, original spherical attachment)
       spherePositions.forEach((pos, idx) => {
-        const el = document.getElementById(`sphere-node-${idx}`);
+        const el = nodeElementsRef.current[idx];
         if (!el) return;
 
         // Model unit vector rotated by orb orientation into camera space
@@ -446,6 +447,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
             width: 0,
             height: 0,
             transformStyle: 'preserve-3d',
+            willChange: 'transform',
           }}
         >
           {/* Fibonacci Distributed Spatial Nodes */}
@@ -561,6 +563,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
               <div
                 key={item.id}
                 id={`sphere-node-${idx}`}
+                ref={(el) => { if (el) nodeElementsRef.current[idx] = el; }}
                 onClick={(e) => handleNodeClick(item, e)}
                 data-cursor-hover
                 className="spatial-card absolute top-0 left-0 preserve-3d group cursor-pointer"
@@ -573,6 +576,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
                   transformStyle: 'preserve-3d',
                   boxSizing: 'border-box',
                   transition: 'border-color 0.2s, box-shadow 0.2s',
+                  willChange: 'transform',
                 }}
               >
                 {/* Front Face: Outward orientation */}
