@@ -124,6 +124,7 @@ export const FlipDetailModal: React.FC<FlipDetailModalProps> = ({ item, sourceRe
                 <img
                   src={item.image}
                   alt={item.title}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = '/assets/images/creative_corner_art_1790612718363.jpg'; }}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-80" />

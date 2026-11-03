@@ -110,7 +110,7 @@ export const PROJECTS: Project[] = [
     ],
     solution: "A clean, mobile-friendly storefront that brings traditional Indian pickle-making to a modern audience.",
     liveUrl: "https://munjoypickles-zeta.vercel.app",
-    image: "/src/assets/images/munjoy_preview.png",
+    image: "/assets/images/munjoy_preview.png",
     demoType: "interactive-flow"
   },
   {
@@ -135,7 +135,7 @@ export const PROJECTS: Project[] = [
     ],
     solution: "A focused, mobile-friendly catalogue that connects shoppers directly to verified product listings.",
     liveUrl: "https://the-fashion-hub-store.vercel.app",
-    image: "/src/assets/images/fashionhub_preview.png",
+    image: "/assets/images/fashionhub_preview.png",
     demoType: "interactive-flow"
   },
   {
@@ -160,7 +160,7 @@ export const PROJECTS: Project[] = [
     ],
     solution: "A studio site that showcases AI-generated product campaigns and invites brands to commission videos.",
     liveUrl: "https://vesper-studio-gamma.vercel.app",
-    image: "/src/assets/images/vesper_preview.png",
+    image: "/assets/images/vesper_preview.png",
     demoType: "dashboard"
   },
   {
@@ -185,7 +185,7 @@ export const PROJECTS: Project[] = [
     ],
     solution: "A review-first workflow that turns invoices into accurate, auditable inventory updates.",
     liveUrl: "https://storeflow-lilac.vercel.app",
-    image: "/src/assets/images/storeflow_preview.png",
+    image: "/assets/images/storeflow_preview.png",
     demoType: "dashboard"
   },
   {
@@ -211,7 +211,7 @@ export const PROJECTS: Project[] = [
     ],
     solution: "A follow-up engine that runs the shift businesses never had time for.",
     liveUrl: "https://leadpilot-sepia-six.vercel.app",
-    image: "/src/assets/images/leadpilot_preview.png",
+    image: "/assets/images/leadpilot_preview.png",
     demoType: "dashboard"
   },
   {
@@ -238,7 +238,7 @@ export const PROJECTS: Project[] = [
     solution: "A calm, background-running career agent that keeps the user as decision maker.",
     githubUrl: "https://github.com/rickbarat047/job-pilot",
     liveUrl: "https://jobpilot-ai-sand.vercel.app",
-    image: "/src/assets/images/jobpilot_preview.png",
+    image: "/assets/images/jobpilot_preview.png",
     demoType: "dashboard"
   },
   {
@@ -266,7 +266,7 @@ export const PROJECTS: Project[] = [
     solution: "A dashboard-driven pipeline that automates YouTube pre-production and publishing.",
     githubUrl: "https://github.com/rickbarat047/Auto-Tube-.ai",
     liveUrl: "https://autotube-tau.vercel.app",
-    image: "/src/assets/images/autotube_preview_new.png",
+    image: "/assets/images/autotube_preview_new.png",
     demoType: "dashboard"
   },
   {
@@ -293,7 +293,7 @@ export const PROJECTS: Project[] = [
     solution: "A pipeline that produces and publishes children's animated stories with minimal manual effort.",
     githubUrl: "https://github.com/rickbarat047/newtube-automation",
     liveUrl: "https://newtube-automation-zeta.vercel.app",
-    image: "/src/assets/images/newtube_preview.png",
+    image: "/assets/images/newtube_preview.png",
     demoType: "dashboard"
   }
 ];

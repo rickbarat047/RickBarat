@@ -475,6 +475,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
                       src={item.image}
                       alt={item.title}
                       loading="lazy"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = '/assets/images/creative_corner_art_1790612718363.jpg'; }}
                       className="absolute inset-0 w-full h-full object-cover block select-none pointer-events-none transition-transform duration-500 group-hover:scale-105"
                       style={{
                         position: 'absolute',

@@ -64,6 +64,7 @@ export const ExploreGridView: React.FC<ExploreGridViewProps> = ({ onSelectObject
                 <img
                   src={item.image}
                   alt={item.title}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).onerror = null; (e.currentTarget as HTMLImageElement).src = '/assets/images/creative_corner_art_1790612718363.jpg'; }}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

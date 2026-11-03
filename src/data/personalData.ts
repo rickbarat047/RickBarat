@@ -110,7 +110,7 @@ export const PERSONAL_DATA = {
   ] as CurrentlyItem[],
 
   portraitPlaceholder: {
-    image: "/src/assets/images/creative_corner_art_1790612718363.jpg",
+    image: "/assets/images/creative_corner_art_1790612718363.jpg",
     caption: "A glimpse of where ideas start taking shape.",
     subcaption: "Rick's Creative Space · West Bengal"
   },
@@ -132,7 +132,7 @@ export const PERSONAL_DATA = {
       shortDescription: "A little website I made for a homemade pickle brand.",
       category: "Web Experience",
       url: "https://munjoypickles-zeta.vercel.app/",
-      image: "/src/assets/images/munjoy_preview_1790612699399.jpg",
+      image: "/assets/images/munjoy_preview_1790612699399.jpg",
       year: "2025",
       tags: ["Brand Identity", "Next.js", "E-Commerce", "Tailwind"]
     },
@@ -142,7 +142,7 @@ export const PERSONAL_DATA = {
       shortDescription: "An AI-powered YouTube automation project.",
       category: "AI & Automation",
       url: "https://autotube-tau.vercel.app/",
-      image: "/src/assets/images/autotube_preview_1790611524328.jpg",
+      image: "/assets/images/autotube_preview_1790611524328.jpg",
       year: "2025 - 2026",
       tags: ["AI Pipeline", "Automation", "Video Scripting", "Python + React"]
     }

@@ -11,9 +11,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   useEffect(() => {
     // Preload key images in parallel with progress bar
     const imageUrls = [
-      '/src/assets/images/munjoy_preview_1790612699399.jpg',
-      '/src/assets/images/autotube_preview_1790611524328.jpg',
-      '/src/assets/images/creative_corner_art_1790612718363.jpg'
+      '/assets/images/munjoy_preview_1790612699399.jpg',
+      '/assets/images/autotube_preview_1790611524328.jpg',
+      '/assets/images/creative_corner_art_1790612718363.jpg'
     ];
 
     imageUrls.forEach((src) => {
