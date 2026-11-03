@@ -312,6 +312,13 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     // For mouse, only primary button
     if (e.pointerType === 'mouse' && e.button !== 0) return;
 
+    // Do not initiate sphere drag when interacting with a project card.
+    // This keeps card clicks working and avoids pointer-capture retargeting.
+    const target = e.target as HTMLElement;
+    if (target && target.closest && target.closest('.spatial-card')) {
+      return;
+    }
+
     updateStageGeometry();
     const geom = stageGeometryRef.current;
     const s = stateRef.current;
