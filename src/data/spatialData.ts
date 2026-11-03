@@ -1,4 +1,4 @@
-export interface SpatialItem {
+﻿export interface SpatialItem {
   id: string;
   number: string;
   title: string;
@@ -25,7 +25,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     fullDesc: "A bespoke e-commerce and brand presence crafted for Munjoy Pickles, an artisanal homemade pickle brand. Built with a rich tactile visual identity, responsive shopping flow, and product storytelling that honors authentic culinary tradition.",
     image: "/assets/images/munjoy_preview.png",
     url: "https://munjoypickles-zeta.vercel.app/",
-    urlLabel: "OPEN WEBSITE ↗",
+    urlLabel: "OPEN WEBSITE â†—",
     tags: ["Brand Experience", "E-Commerce", "Next.js", "Tailwind CSS"],
     meta: [
       { label: "Status", value: "Live & Deployed" },
@@ -44,7 +44,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     fullDesc: "An end-to-end automation experiment leveraging AI models to research trending topics, synthesize scripts, generate media, and streamline the content production pipeline for video creators.",
     image: "/assets/images/autotube_preview_new.png",
     url: "https://autotube-tau.vercel.app/",
-    urlLabel: "OPEN WEBSITE ↗",
+    urlLabel: "OPEN WEBSITE â†—",
     tags: ["AI Pipeline", "Automation", "Video Scripting", "Python + React"],
     meta: [
       { label: "Focus", value: "Generative Workflows" },
@@ -190,7 +190,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     fullDesc: "A curated fashion storefront surfacing handpicked women's wear and ethnic wear with direct affiliate links to Meesho listings, built for clean mobile browsing.",
     image: "/assets/images/fashionhub_preview.png",
     url: "https://the-fashion-hub-store.vercel.app/",
-    urlLabel: "OPEN WEBSITE →",
+    urlLabel: "OPEN WEBSITE â†’",
     tags: ["Curated Fashion", "Affiliate", "Vite", "E-Commerce"],
     meta: [
       { label: "Status", value: "Live & Deployed" },
@@ -209,7 +209,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     fullDesc: "An AI-assisted product advertising studio that turns product photos into realistic AI model videos, product ads, and social-first content for brands.",
     image: "/assets/images/vesper_preview.png",
     url: "https://vesper-studio-gamma.vercel.app/",
-    urlLabel: "OPEN WEBSITE →",
+    urlLabel: "OPEN WEBSITE â†’",
     tags: ["AI Advertising", "Product Videos", "Next.js", "Creative"],
     meta: [
       { label: "Status", value: "Live & Deployed" },
@@ -228,7 +228,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     fullDesc: "A B2B SaaS tool that converts supplier invoices into verified inventory updates for electronics retailers, with AI extraction, IMEI tracking, and Excel export.",
     image: "/assets/images/storeflow_preview.png",
     url: "https://storeflow-lilac.vercel.app/",
-    urlLabel: "OPEN WEBSITE →",
+    urlLabel: "OPEN WEBSITE â†’",
     tags: ["B2B SaaS", "Invoice AI", "Inventory", "Supabase"],
     meta: [
       { label: "Status", value: "Live & Deployed" },
@@ -247,7 +247,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     fullDesc: "Lead recovery and booking automation that instantly responds to new leads, follows up automatically, qualifies prospects, and books appointments for service businesses.",
     image: "/assets/images/leadpilot_preview.png",
     url: "https://leadpilot-sepia-six.vercel.app/",
-    urlLabel: "OPEN WEBSITE →",
+    urlLabel: "OPEN WEBSITE â†’",
     tags: ["Lead Automation", "Booking", "Next.js", "SaaS"],
     meta: [
       { label: "Status", value: "Live & Deployed" },
@@ -266,7 +266,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     fullDesc: "An AI-powered job hunting assistant for India that discovers opportunities, prepares applications, and tracks progress from CV to interview with approval-first submissions.",
     image: "/assets/images/jobpilot_preview.png",
     url: "https://jobpilot-ai-sand.vercel.app/",
-    urlLabel: "OPEN WEBSITE →",
+    urlLabel: "OPEN WEBSITE â†’",
     tags: ["Career Agent", "Next.js", "Supabase", "AI"],
     meta: [
       { label: "Status", value: "In Progress" },
@@ -285,7 +285,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     fullDesc: "A production-grade automated AI animation pipeline and YouTube publishing studio for high-quality children's storytelling.",
     image: "/assets/images/newtube_preview.png",
     url: "https://newtube-automation-zeta.vercel.app/",
-    urlLabel: "OPEN WEBSITE →",
+    urlLabel: "OPEN WEBSITE â†’",
     tags: ["Animation", "AI Pipeline", "Vite", "YouTube"],
     meta: [
       { label: "Status", value: "In Progress" },
@@ -320,3 +320,5 @@ if ((import.meta as any).env?.DEV) {
     }
   });
 }
+
+

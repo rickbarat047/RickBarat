@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ArrowUp, Github, Instagram, MessageCircle, Heart, Sparkles, Terminal, Zap } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -113,3 +113,5 @@ export const Footer: React.FC<FooterProps> = ({ onReplayIntro }) => {
     </footer>
   );
 };
+
+

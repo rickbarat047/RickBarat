@@ -1,4 +1,4 @@
-export interface ProjectItem {
+﻿export interface ProjectItem {
   id: string;
   name: string;
   shortDescription: string;
@@ -29,13 +29,13 @@ export const PERSONAL_DATA = {
   preferredName: "Rick",
   location: "West Bengal, India",
   instagramUrl: "https://www.instagram.com/rickbarat047/?hl=en",
-  githubUrl: "https://github.com/rickbarat",
+  githubUrl: "https://github.com/rickbarat047",
   email: "rickbarat21@gmail.com",
 
   arrival: {
     greeting: "Hey, I'm Rick.",
     subgreeting: "Welcome to my little corner of the internet.",
-    invitation: "Scroll around ↓"
+    invitation: "Scroll around."
   },
 
   whoAmI: {
@@ -112,7 +112,7 @@ export const PERSONAL_DATA = {
   portraitPlaceholder: {
     image: "/assets/images/creative_corner_art_1790612718363.jpg",
     caption: "A glimpse of where ideas start taking shape.",
-    subcaption: "Rick's Creative Space · West Bengal"
+    subcaption: "Rick's Creative Space Â· West Bengal"
   },
 
   interestsWall: [
@@ -165,3 +165,4 @@ export const PERSONAL_DATA = {
     subtext: "Come back sometime."
   }
 };
+
