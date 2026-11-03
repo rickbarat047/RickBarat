@@ -23,7 +23,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     badge: "PROJECT 01",
     shortDesc: "A website I made for a homemade pickle brand.",
     fullDesc: "A bespoke e-commerce and brand presence crafted for Munjoy Pickles, an artisanal homemade pickle brand. Built with a rich tactile visual identity, responsive shopping flow, and product storytelling that honors authentic culinary tradition.",
-    image: "/src/assets/images/munjoy_preview_1790612699399.jpg",
+    image: "/src/assets/images/munjoy_preview.png",
     url: "https://munjoypickles-zeta.vercel.app/",
     urlLabel: "OPEN WEBSITE ↗",
     tags: ["Brand Experience", "E-Commerce", "Next.js", "Tailwind CSS"],
@@ -42,7 +42,7 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
     badge: "PROJECT 02",
     shortDesc: "An AI-powered YouTube automation project.",
     fullDesc: "An end-to-end automation experiment leveraging AI models to research trending topics, synthesize scripts, generate media, and streamline the content production pipeline for video creators.",
-    image: "/src/assets/images/autotube_preview_1790611524328.jpg",
+    image: "/src/assets/images/autotube_preview_new.png",
     url: "https://autotube-tau.vercel.app/",
     urlLabel: "OPEN WEBSITE ↗",
     tags: ["AI Pipeline", "Automation", "Video Scripting", "Python + React"],
@@ -180,5 +180,119 @@ export const SPATIAL_OBJECTS: SpatialItem[] = [
       { label: "Instagram", value: "@rickbarat047" }
     ],
     accentColor: "#fbbf24"
+  },
+  {
+    id: "fashion-hub",
+    number: "11",
+    title: "FASHION HUB",
+    category: "PROJECT",
+    badge: "PROJECT 03",
+    shortDesc: "A curated edit of women's fashion and ethnic wear.",
+    fullDesc: "A curated fashion storefront surfacing handpicked women's wear and ethnic wear with direct affiliate links to Meesho listings, built for clean mobile browsing.",
+    image: "/src/assets/images/fashionhub_preview.png",
+    url: "https://the-fashion-hub-store.vercel.app/",
+    urlLabel: "OPEN WEBSITE →",
+    tags: ["Curated Fashion", "Affiliate", "Vite", "E-Commerce"],
+    meta: [
+      { label: "Status", value: "Live & Deployed" },
+      { label: "Role", value: "Design & Full Implementation" },
+      { label: "Destination", value: "the-fashion-hub-store.vercel.app" }
+    ],
+    accentColor: "#ec4899"
+  },
+  {
+    id: "vesper-studio",
+    number: "12",
+    title: "VESPER STUDIO",
+    category: "PROJECT",
+    badge: "PROJECT 04",
+    shortDesc: "AI product advertising studio for brands.",
+    fullDesc: "An AI-assisted product advertising studio that turns product photos into realistic AI model videos, product ads, and social-first content for brands.",
+    image: "/src/assets/images/vesper_preview.png",
+    url: "https://vesper-studio-gamma.vercel.app/",
+    urlLabel: "OPEN WEBSITE →",
+    tags: ["AI Advertising", "Product Videos", "Next.js", "Creative"],
+    meta: [
+      { label: "Status", value: "Live & Deployed" },
+      { label: "Role", value: "Design & Full Implementation" },
+      { label: "Destination", value: "vesper-studio-gamma.vercel.app" }
+    ],
+    accentColor: "#8b5cf6"
+  },
+  {
+    id: "storeflow",
+    number: "13",
+    title: "STOREFLOW",
+    category: "PROJECT",
+    badge: "PROJECT 05",
+    shortDesc: "Supplier invoice to verified inventory.",
+    fullDesc: "A B2B SaaS tool that converts supplier invoices into verified inventory updates for electronics retailers, with AI extraction, IMEI tracking, and Excel export.",
+    image: "/src/assets/images/storeflow_preview.png",
+    url: "https://storeflow-lilac.vercel.app/",
+    urlLabel: "OPEN WEBSITE →",
+    tags: ["B2B SaaS", "Invoice AI", "Inventory", "Supabase"],
+    meta: [
+      { label: "Status", value: "Live & Deployed" },
+      { label: "Role", value: "Design & Full Implementation" },
+      { label: "Destination", value: "storeflow-lilac.vercel.app" }
+    ],
+    accentColor: "#06b6d4"
+  },
+  {
+    id: "leadpilot",
+    number: "14",
+    title: "LEADPILOT",
+    category: "PROJECT",
+    badge: "PROJECT 06",
+    shortDesc: "Turn missed leads into booked customers.",
+    fullDesc: "Lead recovery and booking automation that instantly responds to new leads, follows up automatically, qualifies prospects, and books appointments for service businesses.",
+    image: "/src/assets/images/leadpilot_preview.png",
+    url: "https://leadpilot-sepia-six.vercel.app/",
+    urlLabel: "OPEN WEBSITE →",
+    tags: ["Lead Automation", "Booking", "Next.js", "SaaS"],
+    meta: [
+      { label: "Status", value: "Live & Deployed" },
+      { label: "Role", value: "Design & Full Implementation" },
+      { label: "Destination", value: "leadpilot-sepia-six.vercel.app" }
+    ],
+    accentColor: "#10b981"
+  },
+  {
+    id: "jobpilot-ai",
+    number: "15",
+    title: "JOBPILOT AI",
+    category: "PROJECT",
+    badge: "PROJECT 07",
+    shortDesc: "Autonomous job hunting for India.",
+    fullDesc: "An AI-powered job hunting assistant for India that discovers opportunities, prepares applications, and tracks progress from CV to interview with approval-first submissions.",
+    image: "/src/assets/images/jobpilot_preview.png",
+    url: "https://jobpilot-ai-sand.vercel.app/",
+    urlLabel: "OPEN WEBSITE →",
+    tags: ["Career Agent", "Next.js", "Supabase", "AI"],
+    meta: [
+      { label: "Status", value: "In Progress" },
+      { label: "Role", value: "Design & Full Implementation" },
+      { label: "Destination", value: "jobpilot-ai-sand.vercel.app" }
+    ],
+    accentColor: "#3b82f6"
+  },
+  {
+    id: "autotube-studio",
+    number: "16",
+    title: "AUTOTUBE STUDIO",
+    category: "PROJECT",
+    badge: "PROJECT 08",
+    shortDesc: "Automated kids story animation system.",
+    fullDesc: "A production-grade automated AI animation pipeline and YouTube publishing studio for high-quality children's storytelling.",
+    image: "/src/assets/images/newtube_preview.png",
+    url: "https://newtube-automation-zeta.vercel.app/",
+    urlLabel: "OPEN WEBSITE →",
+    tags: ["Animation", "AI Pipeline", "Vite", "YouTube"],
+    meta: [
+      { label: "Status", value: "In Progress" },
+      { label: "Role", value: "Design & Full Implementation" },
+      { label: "Destination", value: "newtube-automation-zeta.vercel.app" }
+    ],
+    accentColor: "#f59e0b"
   }
 ];
