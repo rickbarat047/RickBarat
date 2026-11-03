@@ -232,7 +232,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       lastTime = now;
 
       // Handle friction & 3D momentum when not actively dragging
-      if (!s.isDragging && !reduceMotion) {
+      if (!s.isDragging) {
         const speed = Math.hypot(s.omega[0], s.omega[1], s.omega[2]);
 
         if (speed > 1e-4) {
