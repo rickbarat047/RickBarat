@@ -1,6 +1,6 @@
-﻿"use client"
+"use client"
 
-// Folder Tab Portfolio Template â€” a whole designer portfolio built from file
+// Folder Tab Portfolio Template — a whole designer portfolio built from file
 // folders. A blue masthead tab, a sticky page counter, and seven "sheets" that
 // read like the pages of a printed portfolio deck: a cover with a drawn-on
 // wordmark and a fan of frosted category folders, a catalogue of chapters that
@@ -91,7 +91,7 @@ export interface FolderTabPortfolioTemplateProps {
   timeZone?: string
   /** Override any folder colour. */
   colors?: Partial<Record<FolderTone, string>>
-  /** Join "OO" into one pill, as in PORTFâ—¯â—¯LIO. */
+  /** Join "OO" into one pill, as in PORTF◯◯LIO. */
   ligatures?: boolean
   defaultTheme?: "system" | "light" | "dark"
   onThemeChange?: (theme: "light" | "dark") => void
@@ -102,17 +102,17 @@ export interface FolderTabPortfolioTemplateProps {
 
 // #region content
 const DEFAULT_CATEGORIES: FolderCategory[] = [
-  { id: "others", label: "Others", local: "å…¶ä»–ä½œå“", tone: "orange", kind: "brand" },
-  { id: "render", label: "Render", local: "æ¸²æŸ“æµ·å ±", tone: "green", kind: "render" },
-  { id: "sale", label: "Sale page", local: "æ´»å‹•å°ˆé¡Œé ", tone: "yellow", kind: "sale" },
-  { id: "details", label: "Details", local: "è©³æƒ…é è¨­è¨ˆ", tone: "green", kind: "page" },
-  { id: "posters", label: "Posters", local: "é‹ç‡Ÿæµ·å ±", tone: "blue", kind: "poster" },
+  { id: "others", label: "Others", local: "其他作品", tone: "orange", kind: "brand" },
+  { id: "render", label: "Render", local: "渲染海報", tone: "green", kind: "render" },
+  { id: "sale", label: "Sale page", local: "活動專題頁", tone: "yellow", kind: "sale" },
+  { id: "details", label: "Details", local: "詳情頁設計", tone: "green", kind: "page" },
+  { id: "posters", label: "Posters", local: "運營海報", tone: "blue", kind: "poster" },
 ]
 
 const DEFAULT_PROJECTS: FolderProject[] = [
   {
     title: "Cloudmilk yogurt details page",
-    local: "é›²æœµé…¸å¥¶è©³æƒ…é ",
+    local: "雲朵酸奶詳情頁",
     category: "details",
     year: "2026",
     client: "Cloudmilk",
@@ -127,7 +127,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "Linen & Co. bedding details",
-    local: "äºžéº»å¯¢å…·è©³æƒ…é ",
+    local: "亞麻寢具詳情頁",
     category: "details",
     year: "2025",
     client: "Linen & Co.",
@@ -139,7 +139,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "Spring tea festival posters",
-    local: "æ˜¥èŒ¶ç¯€é‹ç‡Ÿæµ·å ±",
+    local: "春茶節運營海報",
     category: "posters",
     year: "2026",
     client: "Leafhouse",
@@ -151,7 +151,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "Night market operations poster",
-    local: "å¤œå¸‚é‹ç‡Ÿæµ·å ±",
+    local: "夜市運營海報",
     category: "posters",
     year: "2025",
     client: "Harbour Night Market",
@@ -162,7 +162,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "Glass sneaker render",
-    local: "çŽ»ç’ƒçƒéž‹æ¸²æŸ“",
+    local: "玻璃球鞋渲染",
     category: "render",
     year: "2026",
     client: "Personal",
@@ -174,7 +174,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "Citrus soda key visual",
-    local: "æŸ‘æ©˜æ±½æ°´ä¸»è¦–è¦º",
+    local: "柑橘汽水主視覺",
     category: "render",
     year: "2025",
     client: "Pop Fizz",
@@ -185,7 +185,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "11.11 mega sale campaign",
-    local: "é›™åä¸€æ´»å‹•å°ˆé¡Œé ",
+    local: "雙十一活動專題頁",
     category: "sale",
     year: "2025",
     client: "Northwind Mall",
@@ -200,7 +200,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "618 summer deals landing",
-    local: "618 å¤æ—¥ç‰¹æƒ ",
+    local: "618 夏日特惠",
     category: "sale",
     year: "2026",
     client: "Northwind Mall",
@@ -211,7 +211,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "Palm Studio identity",
-    local: "æ£•æ«šå·¥ä½œå®¤å“ç‰Œ",
+    local: "棕櫚工作室品牌",
     category: "others",
     year: "2024",
     client: "Palm Studio",
@@ -222,7 +222,7 @@ const DEFAULT_PROJECTS: FolderProject[] = [
   },
   {
     title: "Tide Notes zine",
-    local: "æ½®æ±ç­†è¨˜å°èªŒ",
+    local: "潮汐筆記小誌",
     category: "others",
     year: "2024",
     client: "Self-published",
@@ -246,18 +246,18 @@ const DEFAULT_TIMELINE: FolderTimelineItem[] = [
 ]
 
 const DEFAULT_CHAPTERS: FolderChapter[] = [
-  { title: "Self-introduction", local: "è‡ªæˆ‘ä»‹ç´¹", points: ["Skills", "Work content", "Interests", "How I grew"], target: "about" },
-  { title: "Content output", local: "ä½œå“è¼¸å‡º", points: ["Details pages", "Posters", "3D renders", "Sale pages"], target: "work" },
-  { title: "Working process", local: "å·¥ä½œæµç¨‹", points: ["Discover", "Define", "Design", "Deliver"], target: "process" },
-  { title: "Team evaluation", local: "åœ˜éšŠè©•åƒ¹", points: ["Leads", "Peers", "Clients"], target: "words" },
-  { title: "Future planning", local: "æœªä¾†è¦åŠƒ", points: ["What I'm looking for", "How to reach me"], target: "contact" },
+  { title: "Self-introduction", local: "自我介紹", points: ["Skills", "Work content", "Interests", "How I grew"], target: "about" },
+  { title: "Content output", local: "作品輸出", points: ["Details pages", "Posters", "3D renders", "Sale pages"], target: "work" },
+  { title: "Working process", local: "工作流程", points: ["Discover", "Define", "Design", "Deliver"], target: "process" },
+  { title: "Team evaluation", local: "團隊評價", points: ["Leads", "Peers", "Clients"], target: "words" },
+  { title: "Future planning", local: "未來規劃", points: ["What I'm looking for", "How to reach me"], target: "contact" },
 ]
 
 const DEFAULT_STEPS: FolderStep[] = [
-  { title: "Discover", local: "æ´žå¯Ÿ", duration: "Day 1â€“2", body: "I start with the shelf, not the brief: what the customer sees next to us, what they already believe, and the one thing they need to hear first.", outputs: ["Shelf audit", "Reference board", "One-line promise"] },
-  { title: "Define", local: "å®šç¾©", duration: "Day 3", body: "The promise becomes a page skeleton. One claim per screen, ranked, with the proof each claim needs. Nothing gets drawn until the order is agreed.", outputs: ["Screen list", "Claim ranking", "Shot list"] },
-  { title: "Design", local: "è¨­è¨ˆ", duration: "Day 4â€“8", body: "Type and grid first, colour second, decoration last. I design the busiest screen first, because if that one works the quiet ones always do.", outputs: ["Key screens", "Type system", "3D / photo direction"] },
-  { title: "Deliver", local: "äº¤ä»˜", duration: "Day 9â€“10", body: "Every size, every platform, from one component sheet. I hand over files a junior can update without calling me, and I check the live page myself.", outputs: ["Export kit", "Banner sizes", "Live QA"] },
+  { title: "Discover", local: "洞察", duration: "Day 1–2", body: "I start with the shelf, not the brief: what the customer sees next to us, what they already believe, and the one thing they need to hear first.", outputs: ["Shelf audit", "Reference board", "One-line promise"] },
+  { title: "Define", local: "定義", duration: "Day 3", body: "The promise becomes a page skeleton. One claim per screen, ranked, with the proof each claim needs. Nothing gets drawn until the order is agreed.", outputs: ["Screen list", "Claim ranking", "Shot list"] },
+  { title: "Design", local: "設計", duration: "Day 4–8", body: "Type and grid first, colour second, decoration last. I design the busiest screen first, because if that one works the quiet ones always do.", outputs: ["Key screens", "Type system", "3D / photo direction"] },
+  { title: "Deliver", local: "交付", duration: "Day 9–10", body: "Every size, every platform, from one component sheet. I hand over files a junior can update without calling me, and I check the live page myself.", outputs: ["Export kit", "Banner sizes", "Live QA"] },
 ]
 
 const DEFAULT_WORDS: FolderWord[] = [
@@ -319,12 +319,12 @@ const GLYPHS: Record<string, Glyph> = {
   "9": { w: 102, d: "M14 94 C26 98 38 100 50 100 C82 100 102 78 102 48 C102 20 80 0 50 0 C20 0 0 14 0 34 C0 54 20 66 48 66 C72 66 94 56 102 42" },
   "#": { w: 96, d: "M34 6 L22 94 M78 6 L66 94 M6 34 H96 M0 66 H90" },
   "-": { w: 48, d: "M0 56 H48" },
-  "â€“": { w: 64, d: "M0 56 H64" },
+  "–": { w: 64, d: "M0 56 H64" },
   ".": { w: 0, d: "M0 99.5 L0 100" },
   ",": { w: 6, d: "M6 96 L0 112" },
   ":": { w: 0, d: "M0 44 L0 44.5 M0 99.5 L0 100" },
   "'": { w: 0, d: "M0 0 V24" },
-  "â€™": { w: 0, d: "M0 0 V24" },
+  "’": { w: 0, d: "M0 0 V24" },
   "/": { w: 70, d: "M70 -4 L0 104" },
   "+": { w: 76, d: "M0 50 H76 M38 12 V88" },
   "(": { w: 32, d: "M32 -8 Q-12 50 32 108" },
@@ -550,9 +550,8 @@ const FTP_CSS = `
 .ftp-mast-notes{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;padding:24px 24px 0 0;font-size:clamp(14px,1.7vw,20px);color:var(--ftp-blue);letter-spacing:.06em}
 .ftp-mast-notes i{width:1.5px;height:16px;background:var(--ftp-blue);opacity:.6}
 
-.ftp-navwrap{position:sticky;top:12px;z-index:40;display:flex;justify-content:center;padding:18px 16px 0;pointer-events:none;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform}
+.ftp-navwrap{position:sticky;top:12px;z-index:40;display:flex;justify-content:center;padding:18px 16px 0;pointer-events:none}
 .ftp-nav{pointer-events:auto;display:flex;align-items:center;gap:4px;max-width:100%;padding:5px;border-radius:16px;border:1px solid var(--ftp-line);background:var(--ftp-glass);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:var(--ftp-shadow)}
-@media (max-width: 640px) { .ftp-nav { backdrop-filter: blur(8px) saturate(1.2); -webkit-backdrop-filter: blur(8px) saturate(1.2); } }
 .ftp-count{display:flex;align-items:baseline;gap:3px;padding:0 10px 0 8px;font-size:12px;font-weight:700;color:var(--ftp-blue);font-variant-numeric:tabular-nums;letter-spacing:.04em}
 .ftp-count small{font-size:10px;color:var(--ftp-muted);font-weight:600}
 .ftp-links{position:relative;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
@@ -771,8 +770,8 @@ const FTP_CSS = `
 
 .ftp-toast{position:fixed;left:50%;bottom:24px;z-index:90;display:flex;align-items:center;gap:8px;padding:11px 18px;border-radius:14px;background:var(--ftp-blue);color:#fff;font-size:14px;font-weight:600;box-shadow:0 14px 30px -12px rgba(0,0,0,.45);animation:ftp-toast .4s cubic-bezier(.2,.9,.3,1.2) both}
 
-.ftp-rv{opacity:0;transition:opacity .6s ease}
-.ftp-rv[data-in="true"]{opacity:1}
+.ftp-rv{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
+.ftp-rv[data-in="true"]{opacity:1;transform:none}
 .ftp-twinkle{animation:ftp-twinkle 3.2s ease-in-out infinite;animation-delay:var(--dl,0s)}
 .ftp-shimmer{animation:ftp-shimmer 6s ease-in-out infinite alternate}
 @keyframes ftp-twinkle{0%,100%{opacity:.95}50%{opacity:.25}}
@@ -1164,7 +1163,7 @@ function CoverArt({ kind, seed, mark, colors }: { kind: CoverKind; seed: number;
           <path d="M44 14 L22 28 V54 L44 40Z" fill={colors.green} opacity=".7" />
         </g>
         <text x="18" y="30" fontFamily={font} fontSize="11" fontWeight="700" letterSpacing="2" fill="#1b2234" opacity=".7">
-          {mark} Â· 3D
+          {mark} · 3D
         </text>
       </svg>
     )
@@ -1193,14 +1192,14 @@ function CoverArt({ kind, seed, mark, colors }: { kind: CoverKind; seed: number;
         <g transform="translate(170 64)">
           <rect width="118" height="40" rx="12" fill="#ffffff" />
           <text x="14" y="26" fontFamily={font} fontSize="16" fontWeight="800" fill="#1b2234">
-            {"Â¥" + (59 + Math.floor(rnd() * 140))}
+            {"¥" + (59 + Math.floor(rnd() * 140))}
           </text>
           <rect x="74" y="12" width="32" height="16" rx="8" fill={colors.orange} />
           <rect x="0" y="54" width="92" height="30" rx="10" fill="#ffffff" opacity=".85" />
           <rect x="12" y="66" width="56" height="6" rx="3" fill="#c6cad5" />
           <rect x="0" y="96" width="110" height="30" rx="10" fill={a} opacity=".9" />
           <text x="14" y="116" fontFamily={font} fontSize="10" fontWeight="700" letterSpacing="1.5" fill="#ffffff">
-            DETAILS â†’
+            DETAILS →
           </text>
         </g>
       </svg>
@@ -1233,7 +1232,7 @@ function CoverArt({ kind, seed, mark, colors }: { kind: CoverKind; seed: number;
           {mark}
         </text>
         <text x="22" y="196" fontFamily={font} fontSize="12" fontWeight="700" letterSpacing="4" fill="#1b2234" opacity=".6">
-          LIMITED Â· OFF
+          LIMITED · OFF
         </text>
         <g transform="translate(24 30) rotate(-8)">
           <path d="M0 0 H74 L90 16 L74 32 H0Z" fill={colors.blue} />
@@ -1381,16 +1380,16 @@ const DECK_SLOTS = [
 
 export default function FolderTabPortfolioTemplate({
   name = "Aoi Lin",
-  localName = "æž—è‘µ",
+  localName = "林葵",
   handle = "@aoilin.studio",
   signature,
-  years = "2025â€“2026",
+  years = "2025–2026",
   role = "Visual designer",
   disciplines = ["Visual design", "Details page", "Posters"],
   word = "Portfolio",
   tag = "#2026",
-  subtitle = ["è¨­è¨ˆ", "ä½œå“é›†"],
-  notes = ["é«”é©—æ€è€ƒ", "è¦–è¦ºæå‡", "ç¸½çµå¾©ç›¤"],
+  subtitle = ["設計", "作品集"],
+  notes = ["體驗思考", "視覺提升", "總結復盤"],
   blurb = "A passionate and creative visual designer who loves to explore and practise across the many corners of design. E-commerce is the core of my work, and I keep growing in graphic and three-dimensional design.",
   greeting = "Hi, I am",
   photo,
@@ -1693,7 +1692,7 @@ export default function FolderTabPortfolioTemplate({
         <div className="ftp-mast-row">
           <div className="ftp-mast-tab">
             <StrokeText text={word} weight={17} tracking={20} color="#ffffff" ligatures={ligatures} label={word + ", " + name} />
-            <span className="ftp-reg" aria-hidden="true">Â®</span>
+            <span className="ftp-reg" aria-hidden="true">®</span>
           </div>
           <div className="ftp-mast-notes">
             {notes.map((n, i) => (
@@ -1746,7 +1745,7 @@ export default function FolderTabPortfolioTemplate({
             <span className="ftp-plus" style={{ right: -14, top: 8 }} />
             <StrokeText text={tag} className="ftp-cover-tag" weight={8} outline={1.4} color="var(--ftp-muted)" decorative />
             <h1 id={uid + "-cover-h"} style={{ position: "relative" }}>
-              <StrokeText text={word} className="ftp-cover-word" weight={9} outline={1.9} tracking={22} color="var(--ftp-blue)" ligatures={ligatures} delay={150} label={word + " â€” " + name} />
+              <StrokeText text={word} className="ftp-cover-word" weight={9} outline={1.9} tracking={22} color="var(--ftp-blue)" ligatures={ligatures} delay={150} label={word + " — " + name} />
             </h1>
           </div>
           <div className="ftp-cover-mid">
@@ -1756,7 +1755,7 @@ export default function FolderTabPortfolioTemplate({
             </div>
             <div>
               <button type="button" className="ftp-pill" onClick={() => goTo("about")}>
-                {localName ? localName + " Â· " : ""}
+                {localName ? localName + " · " : ""}
                 {role}
                 <span className="ftp-pill-arrow">
                   <Arrow dir="down" />
@@ -1798,7 +1797,7 @@ export default function FolderTabPortfolioTemplate({
                     <span className="ftp-dl-n">{pad2(i + 1)}</span>
                   </span>
                   <span className="ftp-dl-en" style={{ display: "block" }}>
-                    {c.label} Â· {countOf(c.id)} {countOf(c.id) === 1 ? "work" : "works"}
+                    {c.label} · {countOf(c.id)} {countOf(c.id) === 1 ? "work" : "works"}
                   </span>
                   {i === 2 && <span className="ftp-dl-years">{years}</span>}
                 </Folder>
@@ -1811,7 +1810,7 @@ export default function FolderTabPortfolioTemplate({
         {chapters.length > 0 && (
           <section className="ftp-sheet ftp-rv" {...sheetProps("contents")}>
             {meta("contents")}
-            {head("contents", "(" + pad2(chapters.length) + ")", "Catalogs", { local: "ï¼ˆç›®éŒ„ï¼‰", kicker: "Table of contents for " + name + "'s " + years + " portfolio. Open a folder to see what is inside." })}
+            {head("contents", "(" + pad2(chapters.length) + ")", "Catalogs", { local: "（目錄）", kicker: "Table of contents for " + name + "'s " + years + " portfolio. Open a folder to see what is inside." })}
             <div className="ftp-band-list">
               {chapters.map((ch, i) => {
                 const open = chapter === i
@@ -1848,7 +1847,7 @@ export default function FolderTabPortfolioTemplate({
                       <div>
                         {ch.target && sections.some((s) => s.id === ch.target) && (
                           <div className="ftp-band-go">
-                            <p>{"Chapter " + pad2(i + 1) + " Â· page " + pad2(pageNo(ch.target))}</p>
+                            <p>{"Chapter " + pad2(i + 1) + " · page " + pad2(pageNo(ch.target))}</p>
                             <button type="button" className="ftp-go" tabIndex={open ? 0 : -1} onClick={() => goTo(ch.target as FolderSectionId)}>
                               Open chapter <Arrow size={12} />
                             </button>
@@ -1869,7 +1868,7 @@ export default function FolderTabPortfolioTemplate({
           {head("about", "#" + firstName, "About me", { withSig: true })}
           <div className="ftp-about">
             <div className="ftp-photo" ref={photoRef} onPointerMove={onPhotoMove} onPointerLeave={onPhotoLeave}>
-              <Folder tone="blue" tabAt={0.08} tab={initialsOf(name) + " Â· " + handle.replace(/^@/, "").split(".")[0]} bodyClass="ftp-photo-body">
+              <Folder tone="blue" tabAt={0.08} tab={initialsOf(name) + " · " + handle.replace(/^@/, "").split(".")[0]} bodyClass="ftp-photo-body">
                 <div className="ftp-photo-frame">
                   {typeof photo === "string" ? (
                     <img src={photo} alt={name} width={300} height={360} style={{ maxWidth: "none" }} />
@@ -1881,7 +1880,7 @@ export default function FolderTabPortfolioTemplate({
                 </div>
                 <div className="ftp-photo-glass" style={{ color: "var(--ftp-blue)" }}>
                   <PalmIcon size={28} />
-                  <StrokeText text={years.split(/[â€“-]/).pop() || years} weight={9} color="var(--ftp-ink)" decorative />
+                  <StrokeText text={years.split(/[–-]/).pop() || years} weight={9} color="var(--ftp-ink)" decorative />
                 </div>
               </Folder>
             </div>
@@ -1919,7 +1918,7 @@ export default function FolderTabPortfolioTemplate({
                     {timeline.map((t, i) => (
                       <li key={t.from + i} className="ftp-tl-item" data-on={tlOn === i ? "true" : "false"} onPointerEnter={() => setTlOn(i)} onFocus={() => setTlOn(i)} tabIndex={0}>
                         <span className="ftp-tl-date" style={{ display: "block" }}>
-                          {t.from}â€“{t.to}
+                          {t.from}–{t.to}
                         </span>
                         <span className="ftp-tl-dot" />
                         <span style={{ display: "block" }}>
@@ -1961,7 +1960,7 @@ export default function FolderTabPortfolioTemplate({
         {projects.length > 0 && (
           <section className="ftp-sheet ftp-rv" {...sheetProps("work")}>
             {meta("work")}
-            {head("work", "(" + pad2(projects.length) + ")", "Works", { local: "ä½œå“", kicker: "Filter the cabinet by folder. Open any file for its details page; arrow keys page through." })}
+            {head("work", "(" + pad2(projects.length) + ")", "Works", { local: "作品", kicker: "Filter the cabinet by folder. Open any file for its details page; arrow keys page through." })}
             <div className="ftp-filter">
               <TabBar items={filterItems} active={filter} onChange={setFilter} label="Filter work by category" idBase={uid + "-wf"} />
               <div className="ftp-bar" style={{ "--c": palette[filterTone] } as Vars} />
@@ -2009,7 +2008,7 @@ export default function FolderTabPortfolioTemplate({
         {steps.length > 0 && (
           <section className="ftp-sheet ftp-rv" {...sheetProps("process")}>
             {meta("process")}
-            {head("process", "(" + pad2(steps.length) + ")", "Process", { local: "æµç¨‹" })}
+            {head("process", "(" + pad2(steps.length) + ")", "Process", { local: "流程" })}
             <TabBar
               items={steps.map((s, i) => ({ id: String(i), label: pad2(i + 1) + " " + s.title, tone: stepTone(i) }))}
               active={String(Math.min(step, steps.length - 1))}
@@ -2066,7 +2065,7 @@ export default function FolderTabPortfolioTemplate({
         {words.length > 0 && (
           <section className="ftp-sheet ftp-rv" {...sheetProps("words")}>
             {meta("words")}
-            {head("words", "(" + pad2(words.length) + ")", "Kind words", { local: "è©•åƒ¹" })}
+            {head("words", "(" + pad2(words.length) + ")", "Kind words", { local: "評價" })}
             <div className="ftp-words">
               <span className="ftp-blob" style={{ left: "8%", top: "18%", width: 220, height: 220, background: palette.blue, opacity: 0.85 }} />
               <span className="ftp-blob" style={{ left: "46%", top: "40%", width: 180, height: 180, background: palette.green, opacity: 0.85 }} />
@@ -2096,12 +2095,12 @@ export default function FolderTabPortfolioTemplate({
         {/* contact */}
         <section className="ftp-sheet ftp-rv" {...sheetProps("contact")}>
           {meta("contact")}
-          {head("contact", "(:)", "Contact", { local: "è¯ç¹«", withSig: true })}
+          {head("contact", "(:)", "Contact", { local: "聯繫", withSig: true })}
           <div className="ftp-stack">
             <Folder tone="blue" tabAt={0.78} tab={<>Reflections <Arrow size={12} /></>}>
               <div className="ftp-talk">
                 <StrokeText text="Let's talk :)" weight={15} tracking={22} color="#ffffff" label="Let's talk" />
-                <p>Open to full-time roles and selected freelance from {years.split(/[â€“-]/).pop()}. Briefs, questions and coffee invitations all welcome.</p>
+                <p>Open to full-time roles and selected freelance from {years.split(/[–-]/).pop()}. Briefs, questions and coffee invitations all welcome.</p>
               </div>
             </Folder>
             <Folder tone="green" tabAt={0.56} tab={<>Elevation <Arrow size={12} /></>}>
@@ -2141,14 +2140,14 @@ export default function FolderTabPortfolioTemplate({
           <span>
             {disciplines[0] || "Visual design"}
             <small>
-              Â© {years.split(/[â€“-]/).pop()} {name}
+              © {years.split(/[–-]/).pop()} {name}
             </small>
           </span>
           <span>And</span>
           {clock && (
             <span className="ftp-clock">
               <i data-day={clock.day ? "true" : "false"} />
-              {clock.time} Â· {timeZone.split("/").pop()?.replace(/_/g, " ")}
+              {clock.time} · {timeZone.split("/").pop()?.replace(/_/g, " ")}
             </span>
           )}
           <button type="button" className="ftp-top" onClick={() => goTo("cover")}>
@@ -2176,7 +2175,7 @@ export default function FolderTabPortfolioTemplate({
             }
           >
             <button type="button" ref={closeRef} className="ftp-close" onClick={closeProject} aria-label="Close details">
-              Close âœ•
+              Close ✕
             </button>
             <div className="ftp-modal-grid" key={openProject}>
               <div className="ftp-modal-art">
@@ -2213,7 +2212,7 @@ export default function FolderTabPortfolioTemplate({
                   {project.tools && project.tools.length > 0 && (
                     <>
                       <dt>Tools</dt>
-                      <dd>{project.tools.join(" Â· ")}</dd>
+                      <dd>{project.tools.join(" · ")}</dd>
                     </>
                   )}
                 </dl>
@@ -2246,5 +2245,3 @@ export default function FolderTabPortfolioTemplate({
     </div>
   )
 }
-
-
