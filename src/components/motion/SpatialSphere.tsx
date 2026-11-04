@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+﻿import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { SPATIAL_OBJECTS, SpatialItem } from '../../data/spatialData';
 import { ArrowUpRight } from 'lucide-react';
 
@@ -135,6 +135,8 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     maxDist: 0,
     camZ: 0,
     camZTarget: 0,
+    zoom: 1,
+    zoomTarget: 1,
   });
 
   // Cached Screen-Space Stage Center & Visual Radius
@@ -208,6 +210,17 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       // Safety limit: camera moves forward smoothly but never moves sphere out of view
       const maxDolly = Math.min(50, radius * 0.14);
       stateRef.current.camZTarget = p * maxDolly;
+
+      // Scroll-driven zoom: sphere zooms in slightly as user scrolls, returns to normal at end
+      // Bell curve peaking mid-scroll for a tasteful immersive approach
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) {
+        stateRef.current.zoomTarget = 1;
+      } else {
+        const zoomAmount = 0.22; // tasteful max zoom (1.22x)
+        const zoomCurve = Math.sin(p * Math.PI); // peaks mid-scroll, 0 at start/end
+        stateRef.current.zoomTarget = 1 + zoomAmount * zoomCurve;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -255,7 +268,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
           s.omega[1] = 0;
           s.omega[2] = 0;
 
-          const idleAngle = 0.00075 * (dt * 60) * speedMultiplier; // ~25% faster; calmer if reduced motion
+          const idleAngle = 0.0009 * (dt * 60) * speedMultiplier; // ~20% faster than 0.00075; calmer if reduced motion
           const idleStep = quatFromAxisAngle([0, 1, 0], idleAngle);
           s.q = quatNormalize(quatMultiply(idleStep, s.q));
         }
@@ -266,9 +279,14 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       s.camZ += (s.camZTarget - s.camZ) * camLerp;
       s.camZ = Math.max(0, Math.min(54, s.camZ));
 
-      // Update #orb transform via full 3D rotation matrix
+      // Ease scroll-driven zoom (frame-rate independent)
+      const zoomLerp = 1 - Math.exp(-8 * dt);
+      s.zoom += (s.zoomTarget - s.zoom) * zoomLerp;
+      s.zoom = Math.max(0.9, Math.min(1.35, s.zoom));
+
+      // Update #orb transform via full 3D rotation matrix + scroll zoom
       if (orbRef.current) {
-        orbRef.current.style.transform = quatToMatrix3d(s.q, s.camZ);
+        orbRef.current.style.transform = quatToMatrix3d(s.q, s.camZ) + ` scale(${s.zoom.toFixed(4)})`;
       }
 
       // Update #headline: counter-rotate via inverse quaternion to stay optically centered & upright
@@ -418,7 +436,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     }
   };
 
-  // Node Click with Tap vs Drag Detection (mobile click slop ≈ 14px)
+  // Node Click with Tap vs Drag Detection (mobile click slop â‰ˆ 14px)
   const handleNodeClick = (item: SpatialItem, e: React.MouseEvent | React.PointerEvent) => {
     if (stateRef.current.maxDist > 14) return; // If moved more than slop, it's a drag
     e.stopPropagation();
@@ -643,8 +661,8 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       {/* Floating Instructions Cue at Bottom */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 rounded-full bg-neutral-900/80 border border-neutral-800 text-[11px] font-mono text-neutral-400 pointer-events-none">
         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-        <span className="hidden sm:inline">GRAB SPHERE TO ROTATE IN 3D · SCROLL FOR CAMERA DOLLY · TAP ITEM</span>
-        <span className="sm:hidden">GRAB SPHERE TO ROTATE · TAP ITEM</span>
+        <span className="hidden sm:inline">SCROLL FOR CAMERA DOLLY - TAP ITEM TO OPEN</span>
+        <span className="sm:hidden">TAP ITEM TO OPEN</span>
       </div>
     </div>
   );
