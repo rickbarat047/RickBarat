@@ -135,8 +135,6 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     maxDist: 0,
     camZ: 0,
     camZTarget: 0,
-    zoom: 1,
-    zoomTarget: 1,
   });
 
   // Cached Screen-Space Stage Center & Visual Radius
@@ -210,17 +208,6 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       // Safety limit: camera moves forward smoothly but never moves sphere out of view
       const maxDolly = Math.min(50, radius * 0.14);
       stateRef.current.camZTarget = p * maxDolly;
-
-      // Scroll-driven zoom: sphere zooms in slightly as user scrolls, returns to normal at end
-      // Bell curve peaking mid-scroll for a tasteful immersive approach
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduceMotion) {
-        stateRef.current.zoomTarget = 1;
-      } else {
-        const zoomAmount = 0.22; // tasteful max zoom (1.22x)
-        const zoomCurve = Math.sin(p * Math.PI); // peaks mid-scroll, 0 at start/end
-        stateRef.current.zoomTarget = 1 + zoomAmount * zoomCurve;
-      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -268,7 +255,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
           s.omega[1] = 0;
           s.omega[2] = 0;
 
-          const idleAngle = 0.0009 * (dt * 60) * speedMultiplier; // ~20% faster than 0.00075; calmer if reduced motion
+          const idleAngle = 0.001035 * (dt * 60) * speedMultiplier; // ~15% faster than 0.0009; calmer if reduced motion
           const idleStep = quatFromAxisAngle([0, 1, 0], idleAngle);
           s.q = quatNormalize(quatMultiply(idleStep, s.q));
         }
@@ -279,14 +266,9 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
       s.camZ += (s.camZTarget - s.camZ) * camLerp;
       s.camZ = Math.max(0, Math.min(54, s.camZ));
 
-      // Ease scroll-driven zoom (frame-rate independent)
-      const zoomLerp = 1 - Math.exp(-8 * dt);
-      s.zoom += (s.zoomTarget - s.zoom) * zoomLerp;
-      s.zoom = Math.max(0.9, Math.min(1.35, s.zoom));
-
-      // Update #orb transform via full 3D rotation matrix + scroll zoom
+      // Update #orb transform via full 3D rotation matrix (no zoom)
       if (orbRef.current) {
-        orbRef.current.style.transform = quatToMatrix3d(s.q, s.camZ) + ` scale(${s.zoom.toFixed(4)})`;
+        orbRef.current.style.transform = quatToMatrix3d(s.q, s.camZ);
       }
 
       // Update #headline: counter-rotate via inverse quaternion to stay optically centered & upright
