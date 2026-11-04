@@ -5,6 +5,8 @@ import { SPATIAL_OBJECTS } from "./data/spatialData";
 // Map verified projects to the template's project format
 const projects = SPATIAL_OBJECTS
   .filter((item) => item.category === "PROJECT")
+  // Move Munjoy (incomplete) to the end so it is less prominent
+  .sort((a, b) => (a.id === "munjoy" ? 1 : b.id === "munjoy" ? -1 : 0))
   .map((item) => ({
     title: item.title,
     category: item.id,
@@ -18,7 +20,6 @@ const projects = SPATIAL_OBJECTS
   }));
 
 const categories = [
-  { id: "munjoy", label: "Munjoy", tone: "orange" as const, kind: "brand" as const },
   { id: "autotube", label: "AutoTube", tone: "blue" as const, kind: "render" as const },
   { id: "fashion-hub", label: "Fashion Hub", tone: "green" as const, kind: "page" as const },
   { id: "vesper-studio", label: "Vesper", tone: "yellow" as const, kind: "poster" as const },
@@ -26,6 +27,7 @@ const categories = [
   { id: "leadpilot", label: "LeadPilot", tone: "orange" as const, kind: "brand" as const },
   { id: "jobpilot-ai", label: "JobPilot", tone: "blue" as const, kind: "page" as const },
   { id: "autotube-studio", label: "AutoTube Studio", tone: "green" as const, kind: "render" as const },
+  { id: "munjoy", label: "Munjoy", tone: "orange" as const, kind: "brand" as const },
 ];
 
 export default function App() {
