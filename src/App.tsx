@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import FolderTabPortfolioTemplate from "./components/FolderTabPortfolio";
+import LoadingIntro from "./components/LoadingIntro";
 import { SPATIAL_OBJECTS } from "./data/spatialData";
 
 // Map verified projects to the template's project format
@@ -31,8 +32,12 @@ const categories = [
 ];
 
 export default function App() {
+  const [loaded, setLoaded] = useState(false);
+
   return (
-    <FolderTabPortfolioTemplate
+    <>
+      {!loaded && <LoadingIntro onComplete={() => setLoaded(true)} duration={2000} />}
+      <FolderTabPortfolioTemplate
       name="Rick Barat"
       handle="@rickbarat047"
       role="Independent Developer & AI Builder"
@@ -53,5 +58,6 @@ export default function App() {
       ]}
       defaultTheme="dark"
     />
+    </>
   );
 }
