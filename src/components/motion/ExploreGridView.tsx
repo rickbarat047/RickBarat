@@ -35,7 +35,7 @@ export const ExploreGridView: React.FC<ExploreGridViewProps> = ({ onSelectObject
         <button
           type="button"
           onClick={onCloseGrid}
-          className="self-start sm:self-auto px-5 py-2.5 rounded-full border border-neutral-800 bg-neutral-900/70 hover:bg-neutral-800 text-[11px] font-mono uppercase tracking-[0.15em] text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer shadow-editorial"
+          className="self-start sm:self-auto px-5 py-2.5 rounded-full border border-neutral-800 bg-neutral-900/70 hover:bg-neutral-800 text-[11px] font-mono uppercase tracking-[0.15em] text-neutral-400 hover:text-white transition-colors duration-200 cursor-pointer shadow-editorial"
         >
           ← Return to 3D Sphere
         </button>
@@ -54,7 +54,7 @@ export const ExploreGridView: React.FC<ExploreGridViewProps> = ({ onSelectObject
               onSelectObject(item, rect);
             }}
             data-cursor-hover
-            className="group relative rounded-2xl bg-neutral-900/70 border border-neutral-800/80 hover:border-amber-400/60 hover:bg-neutral-900 p-5 flex flex-col min-h-[280px] transition-all duration-300 hover:shadow-editorial cursor-pointer overflow-hidden"
+            className="group relative rounded-2xl bg-neutral-900/70 border border-neutral-800/80 hover:border-amber-400/60 hover:bg-neutral-900 p-5 flex flex-col min-h-[280px] transition-[border-color,background-color,box-shadow] duration-300 hover:shadow-editorial cursor-pointer overflow-hidden"
           >
             {/* Top indicator */}
             <div className="flex items-center justify-between text-xs font-mono text-neutral-500 mb-4">

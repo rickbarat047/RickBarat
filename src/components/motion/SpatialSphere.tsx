@@ -477,7 +477,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
 
             const renderCardFigure = () => (
               <figure
-                className="relative w-full h-full m-0 p-0 overflow-hidden rounded-xl bg-neutral-900 border border-neutral-800/90 shadow-2xl backdrop-blur-md group-hover:border-amber-400/80 transition-colors duration-200"
+                className="relative w-full h-full m-0 p-0 overflow-hidden rounded-xl bg-neutral-900 border border-neutral-800/90 shadow-lg sm:shadow-2xl backdrop-blur-sm sm:backdrop-blur-md group-hover:border-amber-400/80 transition-colors duration-200"
                 style={{
                   width: '100%',
                   height: '100%',

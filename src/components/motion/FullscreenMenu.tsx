@@ -58,7 +58,7 @@ export const FullscreenMenu: React.FC<FullscreenMenuProps> = ({
           <button
             type="button"
             onClick={onToggleExplore}
-            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-800 bg-neutral-950/80 hover:bg-neutral-900 text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer shadow-editorial"
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-800 bg-neutral-950/80 hover:bg-neutral-900 text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-400 hover:text-white transition-colors duration-200 cursor-pointer shadow-editorial"
             aria-label="Toggle explore grid mode"
           >
             <span className="text-[10px] font-mono tracking-[0.12em]">{isExploreMode ? '3D SPHERE' : 'EXPLORE'}</span>
@@ -68,7 +68,7 @@ export const FullscreenMenu: React.FC<FullscreenMenuProps> = ({
             type="button"
             onClick={() => setIsOpen(true)}
             aria-label="Open navigation menu"
-            className="group flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-800 bg-neutral-950/80 hover:bg-neutral-900 hover:border-neutral-700 text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer shadow-editorial"
+            className="group flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-800 bg-neutral-950/80 hover:bg-neutral-900 hover:border-neutral-700 text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-400 hover:text-white transition-colors duration-200 cursor-pointer shadow-editorial"
           >
             <span>MENU</span>
             <MenuIcon className="w-3.5 h-3.5 text-neutral-500 group-hover:text-amber-400 transition-colors duration-200" />

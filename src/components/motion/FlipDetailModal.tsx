@@ -59,7 +59,7 @@ export const FlipDetailModal: React.FC<FlipDetailModalProps> = ({ item, sourceRe
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35 }}
           onClick={handleTriggerClose}
-          className="fixed inset-0 bg-black/90 backdrop-blur-md cursor-pointer"
+          className="fixed inset-0 bg-black/85 sm:bg-black/90 backdrop-blur-sm sm:backdrop-blur-md cursor-pointer"
         />
 
         {/* FLIP Container: Expands from source rect to centered dialog and back */}
@@ -205,7 +205,7 @@ export const FlipDetailModal: React.FC<FlipDetailModalProps> = ({ item, sourceRe
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-400 text-neutral-950 font-sans font-bold text-sm inline-flex items-center justify-center gap-2 hover:bg-amber-300 active:scale-95 transition-all cursor-pointer shadow-lg shadow-amber-400/20"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-400 text-neutral-950 font-sans font-bold text-sm inline-flex items-center justify-center gap-2 hover:bg-amber-300 active:scale-95 transition-[background-color,transform,box-shadow] duration-200 cursor-pointer shadow-lg shadow-amber-400/20"
                 >
                   <span>{item.urlLabel || 'OPEN WEBSITE ↗'}</span>
                   <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
