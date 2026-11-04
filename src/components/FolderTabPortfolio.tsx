@@ -499,7 +499,7 @@ const SECTIONS: { id: FolderSectionId; label: string; page: string }[] = [
 
 const FTP_CSS = `
 .ftp-root{--ftp-bg:#eef0f4;--ftp-sheet:#ffffff;--ftp-ink:#1b2234;--ftp-soft:#4a5268;--ftp-muted:#8a91a3;--ftp-faint:#c6cad5;--ftp-line:#e3e6ed;--ftp-ghost:#e6e9f0;--ftp-glass:rgba(255,255,255,.62);--ftp-shadow:0 1px 2px rgba(27,34,52,.05),0 18px 40px -24px rgba(27,34,52,.28);position:relative;isolation:isolate;overflow-x:clip;background:var(--ftp-bg);color:var(--ftp-ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Hiragino Sans","Noto Sans CJK SC","Microsoft YaHei",Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;transition:background-color .4s ease,color .4s ease}
-.ftp-root[data-theme="dark"]{--ftp-bg:#0b0f1c;--ftp-sheet:#131a2c;--ftp-ink:#eaedf6;--ftp-soft:#bfc5d6;--ftp-muted:#8790a8;--ftp-faint:#3b445e;--ftp-line:#232b42;--ftp-ghost:#1f2740;--ftp-glass:rgba(22,29,48,.62);--ftp-shadow:0 1px 2px rgba(0,0,0,.4),0 20px 44px -22px rgba(0,0,0,.8)}
+.ftp-root[data-theme="dark"]{--ftp-bg:#0b0f1c;--ftp-sheet:#131a2c;--ftp-ink:#eaedf6;--ftp-soft:#bfc5d6;--ftp-muted:#8790a8;--ftp-faint:#3b445e;--ftp-line:#232b42;--ftp-ghost:#1f2740;--ftp-glass:rgba(22,29,48,.75);--ftp-shadow:0 1px 2px rgba(0,0,0,.55),0 24px 48px -22px rgba(0,0,0,.9);--ftp-blue:#fbbf24;--ftp-green:#06b6d4;--ftp-orange:#f59e0b;--ftp-yellow:#eab308}
 .ftp-root ::selection{background:var(--ftp-blue);color:#fff}
 .ftp-root :focus-visible{outline:2px solid var(--ftp-blue);outline-offset:3px;border-radius:8px}
 .ftp-root :where(button){font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit}
@@ -581,7 +581,7 @@ const FTP_CSS = `
 
 .ftp-head{position:relative;margin:30px 0 26px}
 .ftp-head-tag{position:absolute;left:4px;top:-8px;height:clamp(22px,3vw,34px);width:auto;opacity:.9}
-.ftp-head-word{position:relative;height:clamp(40px,7.4vw,92px);width:auto;max-width:100%;margin-top:14px}
+.ftp-head-word{position:relative;height:clamp(44px,8.5vw,100px);width:auto;max-width:100%;margin-top:14px}
 .ftp-head-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px 24px}
 .ftp-head-local{font-size:clamp(28px,4.6vw,58px);font-weight:800;color:var(--ftp-blue);letter-spacing:.02em;line-height:1}
 .ftp-head-sig{position:absolute;left:clamp(150px,34vw,440px);top:clamp(20px,4vw,50px);height:clamp(56px,8.4vw,110px);width:auto;color:var(--ftp-green)}
@@ -592,7 +592,7 @@ const FTP_CSS = `
 .ftp-palm{position:absolute;right:-6%;top:-18%;width:min(62%,640px);height:auto;color:var(--ftp-blue);opacity:.07;pointer-events:none;transform-origin:30% 100%;animation:ftp-sway 9s ease-in-out infinite alternate}
 @keyframes ftp-sway{from{transform:rotate(-2deg)}to{transform:rotate(3deg)}}
 .ftp-cover-tag{position:absolute;left:2px;top:-4px;height:clamp(26px,4.6vw,60px);width:auto}
-.ftp-cover-word{position:relative;width:100%;height:auto;margin-top:clamp(26px,4.6vw,60px)}
+.ftp-cover-word{position:relative;width:100%;height:auto;margin-top:clamp(26px,4.6vw,60px);height:clamp(56px,10.5vw,118px)}
 .ftp-cover-mid{position:relative;display:grid;grid-template-columns:1.25fr 1fr;gap:20px 40px;align-items:end;margin-top:clamp(14px,2vw,24px)}
 .ftp-sub{position:relative;font-size:clamp(38px,7vw,92px);font-weight:500;line-height:1;letter-spacing:.02em;color:var(--ftp-muted);white-space:nowrap}
 .ftp-sub b{font-weight:700;color:var(--ftp-blue)}
@@ -605,7 +605,7 @@ const FTP_CSS = `
 .ftp-qlink:hover{transform:translateY(-2px)}
 .ftp-qlink::before{content:"("}
 .ftp-qlink::after{content:")"}
-.ftp-blurb{font-size:12px;color:var(--ftp-muted);line-height:1.6;max-width:420px}
+.ftp-blurb{font-size:13px;color:var(--ftp-muted);line-height:1.65;max-width:460px}
 
 .ftp-deck{position:relative;height:var(--dh,262px);margin:clamp(22px,3vw,34px) calc(clamp(18px,3.4vw,44px) * -1) 0;overflow:hidden}
 .ftp-dfold{position:absolute;left:calc(var(--l) * 1%);width:calc(var(--w) * 1%);top:var(--t);transition:transform .55s cubic-bezier(.3,1.3,.4,1)}
@@ -1665,7 +1665,7 @@ export default function FolderTabPortfolioTemplate({
         <h2 id={uid + "-" + id + "-h"} style={{ minWidth: 0, flex: "1 1 auto" }}>
           <StrokeText text={wordText} className="ftp-head-word" weight={10} outline={2.2} color="var(--ftp-blue)" ligatures={ligatures} />
         </h2>
-        {opts.local && <span className="ftp-head-local" lang="zh">{opts.local}</span>}
+        {opts.local && <span className="ftp-head-local" lang="en">{opts.local}</span>}
       </div>
       {opts.withSig && <Signature text={sig} className="ftp-head-sig" delay={500} />}
       {opts.kicker && <p className="ftp-kicker" style={{ marginTop: 14 }}>{opts.kicker}</p>}
@@ -1750,7 +1750,7 @@ export default function FolderTabPortfolioTemplate({
             </h1>
           </div>
           <div className="ftp-cover-mid">
-            <div className="ftp-sub" lang="zh">
+            <div className="ftp-sub" lang="en">
               {subtitle.map((s, i) => (i % 2 ? <b key={i}>{s}</b> : <span key={i}>{s}</span>))}
               <Signature text={sig} className="ftp-sub-sig" delay={900} />
             </div>
@@ -1794,7 +1794,7 @@ export default function FolderTabPortfolioTemplate({
                   aria-label={"Open " + c.label + ", " + countOf(c.id) + " projects"}
                 >
                   <span className="ftp-dl">
-                    <span className="ftp-dl-local" lang="zh">{c.local || c.label}</span>
+                    <span className="ftp-dl-local" lang="en">{c.local || c.label}</span>
                     <span className="ftp-dl-n">{pad2(i + 1)}</span>
                   </span>
                   <span className="ftp-dl-en" style={{ display: "block" }}>
@@ -1834,7 +1834,7 @@ export default function FolderTabPortfolioTemplate({
                       <span className="ftp-band-n">{pad2(i + 1)}</span>
                       <span style={{ minWidth: 0 }}>
                         <span className="ftp-band-t" style={{ display: "block" }}>{ch.title}</span>
-                        {open && ch.local && <span className="ftp-band-local" lang="zh">{ch.local}</span>}
+                        {open && ch.local && <span className="ftp-band-local" lang="en">{ch.local}</span>}
                       </span>
                       {open && ch.points && ch.points.length > 0 && (
                         <ul className="ftp-band-pts">
@@ -1993,7 +1993,7 @@ export default function FolderTabPortfolioTemplate({
                     <span className="ftp-card-cap">
                       <span>
                         <span className="ftp-card-t" style={{ display: "block" }}>{p.title}</span>
-                        {p.local && <span className="ftp-card-l" style={{ display: "block" }} lang="zh">{p.local}</span>}
+                        {p.local && <span className="ftp-card-l" style={{ display: "block" }} lang="en">{p.local}</span>}
                       </span>
                       <span className="ftp-card-y">{p.year}</span>
                     </span>
@@ -2027,7 +2027,7 @@ export default function FolderTabPortfolioTemplate({
                       <div className="ftp-step-n">{pad2(i + 1)}</div>
                       <h3 className="ftp-step-t">
                         {s.title}
-                        {s.local && <span className="ftp-step-l" lang="zh">{s.local}</span>}
+                        {s.local && <span className="ftp-step-l" lang="en">{s.local}</span>}
                       </h3>
                       {s.duration && <span className="ftp-step-d">{s.duration}</span>}
                       <StepArt index={i} />
@@ -2187,7 +2187,7 @@ export default function FolderTabPortfolioTemplate({
                   <h3 className="ftp-modal-t" id={uid + "-dlg-t"}>
                     {project.title}
                   </h3>
-                  {project.local && <p className="ftp-modal-l" lang="zh">{project.local}</p>}
+                  {project.local && <p className="ftp-modal-l" lang="en">{project.local}</p>}
                 </div>
                 <p className="ftp-modal-p">{project.summary}</p>
                 {project.body?.map((b, i) => (
