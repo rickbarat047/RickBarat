@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { 
   ExternalLink, 
   Github, 
@@ -98,7 +98,7 @@ export const FeaturedProjects: React.FC = () => {
                 } items-center gap-10 lg:gap-14 group`}
               >
                 {/* Visual Preview Container */}
-                <div className="w-full lg:w-7/12 relative rounded-2xl overflow-hidden border border-neutral-800/90 bg-neutral-900 shadow-2xl group-hover:border-neutral-700 transition-all duration-300">
+                <div className="w-full lg:w-7/12 relative rounded-2xl overflow-hidden border border-neutral-800/90 bg-neutral-900 shadow-2xl group-hover:border-neutral-700 transition-[color,background-color,border-color,box-shadow] duration-300">
                   <div className="relative aspect-video w-full overflow-hidden bg-neutral-950">
                     <img 
                       src={project.image} 
@@ -124,7 +124,7 @@ export const FeaturedProjects: React.FC = () => {
                         type="button"
                         onClick={(e) => handleToggleBookmark(project.id, e)}
                         aria-label="Bookmark project"
-                        className={`p-2.5 rounded-full backdrop-blur-md border transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-full backdrop-blur-md border transition-colors cursor-pointer ${
                           isBookmarked 
                             ? 'bg-amber-400 text-neutral-950 border-amber-400 shadow-lg' 
                             : 'bg-neutral-950/80 text-neutral-400 border-white/10 hover:text-white'
@@ -169,7 +169,7 @@ export const FeaturedProjects: React.FC = () => {
                         <span key={tag} className="inline-flex items-center">
                           <span>{tag}</span>
                           {tIdx < project.tags.length - 1 && (
-                            <span className="ml-2 text-neutral-600">·</span>
+                            <span className="ml-2 text-neutral-600">Â·</span>
                           )}
                         </span>
                       ))}
@@ -182,7 +182,7 @@ export const FeaturedProjects: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleOpenCaseStudy(project)}
-                      className="px-5 py-2.5 rounded-full bg-white hover:bg-neutral-200 text-neutral-950 text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-lg"
+                      className="px-5 py-2.5 rounded-full bg-white hover:bg-neutral-200 text-neutral-950 text-xs sm:text-sm font-semibold flex items-center gap-2 transition-[color,background-color,border-color,box-shadow] cursor-pointer shadow-lg"
                     >
                       <FileText className="w-4 h-4 text-neutral-950" />
                       <span>Read Case Study</span>
@@ -194,7 +194,7 @@ export const FeaturedProjects: React.FC = () => {
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-white text-xs sm:text-sm font-medium flex items-center gap-1.5 transition-all"
+                        className="px-4 py-2.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-white text-xs sm:text-sm font-medium flex items-center gap-1.5 transition-colors"
                       >
                         <span>Live Demo</span>
                         <ArrowUpRight className="w-3.5 h-3.5 text-neutral-400" />
@@ -207,7 +207,7 @@ export const FeaturedProjects: React.FC = () => {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white transition-all"
+                        className="p-2.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
                         aria-label="GitHub Repository"
                       >
                         <Github className="w-4 h-4" />
@@ -236,7 +236,7 @@ export const FeaturedProjects: React.FC = () => {
             <div className="flex items-start justify-between gap-6 border-b border-neutral-800/80 pb-6">
               <div>
                 <div className="text-xs font-mono text-amber-400 uppercase tracking-widest mb-2">
-                  CASE STUDY ARCHIVE · {selectedCaseStudy.year}
+                  CASE STUDY ARCHIVE Â· {selectedCaseStudy.year}
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-bold font-display text-white">
                   {selectedCaseStudy.title}
@@ -251,7 +251,7 @@ export const FeaturedProjects: React.FC = () => {
                 type="button"
                 onClick={handleCloseCaseStudy}
                 aria-label="Close Case Study"
-                className="p-3 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white transition-all cursor-pointer"
+                className="p-3 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -344,7 +344,7 @@ export const FeaturedProjects: React.FC = () => {
                     <span key={t} className="inline-flex items-center">
                       <span className="text-white">{t}</span>
                       {idx < selectedCaseStudy.tags.length - 1 && (
-                        <span className="mx-2 text-neutral-600">·</span>
+                        <span className="mx-2 text-neutral-600">Â·</span>
                       )}
                     </span>
                   ))}
@@ -387,7 +387,7 @@ export const FeaturedProjects: React.FC = () => {
                     href={selectedCaseStudy.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-full bg-white hover:bg-neutral-200 text-neutral-950 text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all"
+                    className="px-5 py-2.5 rounded-full bg-white hover:bg-neutral-200 text-neutral-950 text-xs sm:text-sm font-semibold flex items-center gap-2 transition-colors"
                   >
                     <span>View Live Demo</span>
                     <ArrowUpRight className="w-4 h-4" />
@@ -398,7 +398,7 @@ export const FeaturedProjects: React.FC = () => {
                     href={selectedCaseStudy.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white text-xs sm:text-sm font-medium flex items-center gap-2 transition-all"
+                    className="px-5 py-2.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white text-xs sm:text-sm font-medium flex items-center gap-2 transition-colors"
                   >
                     <Github className="w-4 h-4" />
                     <span>View Repository</span>

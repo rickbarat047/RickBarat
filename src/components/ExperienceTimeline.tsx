@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { 
   Briefcase, 
   Building2, 
@@ -81,7 +81,7 @@ export const ExperienceTimeline: React.FC = () => {
 
                   {/* Experience Card with semi-transparent frosted glass for video visibility and crisp text contrast */}
                   <div 
-                    className={`rounded-2xl border transition-all duration-200 overflow-hidden cursor-pointer backdrop-blur-xl ${
+                    className={`rounded-2xl border transition-colors duration-200 overflow-hidden cursor-pointer backdrop-blur-xl ${
                       isExpanded 
                         ? 'bg-neutral-950/60 border-amber-400/50 shadow-2xl shadow-black/40 ring-1 ring-amber-400/20' 
                         : 'bg-neutral-950/40 border-white/10 hover:border-white/25 hover:bg-neutral-950/55'

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Hammer, Sparkles, Gamepad2, Palette, Compass } from 'lucide-react';
 import { PERSONAL_DATA, LittleThing } from '../data/personalData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -56,7 +56,7 @@ export const LittleThingsSection: React.FC = () => {
                   setActiveId(isToggled ? null : thing.id);
                 }}
                 onMouseEnter={() => playHover(1300 + idx * 80)}
-                className={`p-6 sm:p-7 rounded-2xl border transition-all duration-300 cursor-pointer ${
+                className={`p-6 sm:p-7 rounded-2xl border transition-colors duration-300 cursor-pointer ${
                   isToggled 
                     ? 'bg-neutral-900 border-amber-400/50 shadow-xl' 
                     : 'bg-neutral-900/40 border-neutral-800/80 hover:bg-neutral-900/80 hover:border-neutral-700'

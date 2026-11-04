@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+﻿import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Github, 
@@ -114,7 +114,7 @@ export const PrmptArchiveCard: React.FC<PrmptArchiveCardProps> = ({
             id={`project-bookmark-btn-${project.id}`}
             type="button"
             onClick={(e) => onToggleBookmark(project.id, e)}
-            className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border transition-all duration-200 z-10 ${
+            className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border transition-colors duration-200 z-10 ${
               isBookmarked
                 ? 'bg-amber-400 text-neutral-950 border-amber-300 shadow-lg scale-105'
                 : 'bg-neutral-950/70 text-neutral-300 hover:text-white hover:bg-neutral-900 border-neutral-700/80'

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   MessageSquareQuote, 
   Star, 
@@ -171,7 +171,7 @@ export const Testimonials: React.FC = () => {
             >
               <div
                 id={`testimonial-card-${t.id}`}
-                className="p-6 sm:p-7 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/15 flex flex-col justify-between space-y-6 hover:border-amber-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40 h-full"
+                className="p-6 sm:p-7 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/15 flex flex-col justify-between space-y-6 hover:border-amber-400/40 transition-[color,background-color,border-color,box-shadow] duration-300 hover:shadow-2xl hover:shadow-black/40 h-full"
               >
                 {/* Quote text */}
                 <div className="space-y-4">
@@ -226,7 +226,7 @@ export const Testimonials: React.FC = () => {
                 <button
                   type="button"
                   onClick={signInWithGoogle}
-                  className="self-start sm:self-auto flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition-all shadow-sm"
+                  className="self-start sm:self-auto flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition-[color,background-color,border-color,box-shadow] shadow-sm"
                 >
                   <LogIn className="w-3.5 h-3.5 text-amber-400" />
                   <span>Sign in with Google to Post</span>
@@ -267,7 +267,7 @@ export const Testimonials: React.FC = () => {
                     id="guestbook-submit-btn"
                     type="submit"
                     disabled={!newComment.trim() || isSubmitting}
-                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-amber-400 hover:bg-amber-300 text-neutral-950 text-xs font-bold transition-all shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-amber-400 hover:bg-amber-300 text-neutral-950 text-xs font-bold transition-[color,background-color,border-color,box-shadow] shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>{isSubmitting ? 'Posting...' : 'Sign Guestbook'}</span>
@@ -282,7 +282,7 @@ export const Testimonials: React.FC = () => {
                 <button
                   type="button"
                   onClick={signInWithGoogle}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-neutral-950 text-xs font-bold hover:bg-neutral-200 transition-all shadow-md"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-neutral-950 text-xs font-bold hover:bg-neutral-200 transition-[color,background-color,border-color,box-shadow] shadow-md"
                 >
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

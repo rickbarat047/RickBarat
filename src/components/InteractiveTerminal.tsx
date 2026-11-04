@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+﻿import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   Terminal as TerminalIcon, 
   Maximize2, 
@@ -161,7 +161,7 @@ export const InteractiveTerminal: React.FC = () => {
       type: 'output',
       content: (
         <div className="text-xs font-mono text-neutral-400">
-          ✓ Rick Barat Workspace loaded · Status: Available for projects
+          âœ“ Rick Barat Workspace loaded Â· Status: Available for projects
         </div>
       )
     }
@@ -276,9 +276,9 @@ export const InteractiveTerminal: React.FC = () => {
                 <span>TERMINAL THEME SELECTOR (Current: {activeTheme.name})</span>
               </div>
               <div className="space-y-1.5 pl-2 border-l-2 border-current opacity-90">
-                <div>• <span className="font-bold underline">theme modern</span> - Clean, high-contrast modern dark mode</div>
-                <div>• <span className="font-bold underline">theme crt</span> - Vintage amber phosphor CRT with scanlines</div>
-                <div>• <span className="font-bold underline">theme hacker</span> - Cyberpunk matrix phosphor green</div>
+                <div>â€¢ <span className="font-bold underline">theme modern</span> - Clean, high-contrast modern dark mode</div>
+                <div>â€¢ <span className="font-bold underline">theme crt</span> - Vintage amber phosphor CRT with scanlines</div>
+                <div>â€¢ <span className="font-bold underline">theme hacker</span> - Cyberpunk matrix phosphor green</div>
               </div>
               <div className="text-[11px] opacity-75">
                 Tip: You can also use the theme buttons in the terminal top bar.
@@ -291,21 +291,21 @@ export const InteractiveTerminal: React.FC = () => {
             changeTheme('crt', false);
             outputContent = (
               <div className="text-xs font-mono space-y-1">
-                <div>✓ Classic CRT Mode Activated: Warm amber phosphor raster scanlines enabled.</div>
+                <div>âœ“ Classic CRT Mode Activated: Warm amber phosphor raster scanlines enabled.</div>
               </div>
             );
           } else if (target === 'hacker' || target === 'matrix' || target === 'green' || target === 'cyber') {
             changeTheme('hacker', false);
             outputContent = (
               <div className="text-xs font-mono space-y-1">
-                <div>✓ Hacker Green Mode Activated: Matrix cyber shell initialized.</div>
+                <div>âœ“ Hacker Green Mode Activated: Matrix cyber shell initialized.</div>
               </div>
             );
           } else if (target === 'modern' || target === 'dark' || target === 'zsh' || target === 'default') {
             changeTheme('modern', false);
             outputContent = (
               <div className="text-xs font-mono space-y-1">
-                <div>✓ Modern Dark Mode Activated: Crisp obsidian developer aesthetic restored.</div>
+                <div>âœ“ Modern Dark Mode Activated: Crisp obsidian developer aesthetic restored.</div>
               </div>
             );
           } else {
@@ -322,19 +322,19 @@ export const InteractiveTerminal: React.FC = () => {
       case 'crt':
       case 'retro':
         changeTheme('crt', false);
-        outputContent = <div className="text-xs font-mono">✓ Classic CRT Theme Activated.</div>;
+        outputContent = <div className="text-xs font-mono">âœ“ Classic CRT Theme Activated.</div>;
         break;
 
       case 'matrix':
       case 'hacker':
         changeTheme('hacker', false);
-        outputContent = <div className="text-xs font-mono">✓ Hacker Green Theme Activated. Wake up, Neo...</div>;
+        outputContent = <div className="text-xs font-mono">âœ“ Hacker Green Theme Activated. Wake up, Neo...</div>;
         break;
 
       case 'modern':
       case 'dark':
         changeTheme('modern', false);
-        outputContent = <div className="text-xs font-mono">✓ Modern Dark Theme Activated.</div>;
+        outputContent = <div className="text-xs font-mono">âœ“ Modern Dark Theme Activated.</div>;
         break;
 
       case 'about':
@@ -478,7 +478,7 @@ export const InteractiveTerminal: React.FC = () => {
   developer: PERSONAL_INFO.name,
   role: PERSONAL_INFO.title,
   email: PERSONAL_INFO.email,
-  education: PERSONAL_INFO.education.degree + " — " + PERSONAL_INFO.education.institution,
+  education: PERSONAL_INFO.education.degree + " â€” " + PERSONAL_INFO.education.institution,
   location: PERSONAL_INFO.location,
   status: PERSONAL_INFO.status,
   primary_focus: PERSONAL_INFO.primaryFocus,
@@ -598,7 +598,7 @@ export const InteractiveTerminal: React.FC = () => {
         {/* Terminal Window Frame */}
         <RevealOnScroll direction="up" delay={120} duration={650} distance={28}>
           <div 
-            className={`rounded-2xl border ${activeTheme.windowClass} overflow-hidden transition-all duration-300 flex flex-col font-mono text-sm relative group`}
+            className={`rounded-2xl border ${activeTheme.windowClass} overflow-hidden transition-colors duration-300 flex flex-col font-mono text-sm relative group`}
             style={{ height: isExpanded ? '680px' : '460px' }}
           >
             {/* CRT Raster Scanline & Vignette Overlays for CRT & Hacker Green themes */}
@@ -636,7 +636,7 @@ export const InteractiveTerminal: React.FC = () => {
                     id="terminal-theme-modern-btn"
                     type="button"
                     onClick={() => changeTheme('modern')}
-                    className={`px-2 py-1 rounded-md flex items-center gap-1 transition-all ${
+                    className={`px-2 py-1 rounded-md flex items-center gap-1 transition-colors ${
                       currentTheme === 'modern' 
                         ? 'bg-neutral-800 text-amber-400 font-bold shadow-sm' 
                         : 'text-neutral-400 hover:text-neutral-200'
@@ -651,7 +651,7 @@ export const InteractiveTerminal: React.FC = () => {
                     id="terminal-theme-crt-btn"
                     type="button"
                     onClick={() => changeTheme('crt')}
-                    className={`px-2 py-1 rounded-md flex items-center gap-1 transition-all ${
+                    className={`px-2 py-1 rounded-md flex items-center gap-1 transition-colors ${
                       currentTheme === 'crt' 
                         ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 shadow-sm crt-amber-glow' 
                         : 'text-neutral-400 hover:text-amber-300'
@@ -666,7 +666,7 @@ export const InteractiveTerminal: React.FC = () => {
                     id="terminal-theme-hacker-btn"
                     type="button"
                     onClick={() => changeTheme('hacker')}
-                    className={`px-2 py-1 rounded-md flex items-center gap-1 transition-all ${
+                    className={`px-2 py-1 rounded-md flex items-center gap-1 transition-colors ${
                       currentTheme === 'hacker' 
                         ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 shadow-sm crt-green-glow' 
                         : 'text-neutral-400 hover:text-emerald-300'

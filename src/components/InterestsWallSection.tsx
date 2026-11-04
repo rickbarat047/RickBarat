@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useUISounds } from '../hooks/useUISounds';
 
@@ -99,13 +99,13 @@ export const InterestsWallSection: React.FC = () => {
                   setActiveInterest(isSelected ? null : item.id);
                 }}
                 onMouseEnter={() => playHover(1350 + idx * 70)}
-                className={`transition-all duration-300 cursor-pointer group ${
+                className={`transition-colors duration-300 cursor-pointer group ${
                   idx % 2 === 1 ? 'sm:translate-x-6 md:translate-x-12' : ''
                 }`}
               >
                 {/* Main Phrase Line */}
                 <div className="flex items-baseline gap-3">
-                  <span className={`${item.sizeClass} ${item.fontClass} tracking-tight leading-[0.95] block transition-all duration-300 group-hover:text-amber-400 group-hover:translate-x-2`}>
+                  <span className={`${item.sizeClass} ${item.fontClass} tracking-tight leading-[0.95] block transition-[color,background-color,border-color,transform] duration-300 group-hover:text-amber-400 group-hover:translate-x-2`}>
                     {item.lead}
                   </span>
                 </div>
@@ -119,12 +119,12 @@ export const InterestsWallSection: React.FC = () => {
                     className="pt-3 max-w-xl pl-2 border-l border-amber-400/60 ml-1 mt-2"
                   >
                     <p className="text-sm sm:text-base font-mono text-neutral-300 leading-relaxed">
-                      ↳ &ldquo;{item.detail}&rdquo;
+                      â†³ &ldquo;{item.detail}&rdquo;
                     </p>
                   </motion.div>
                 ) : (
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs font-mono text-neutral-400 pt-1.5 pl-1 hidden sm:block">
-                    ↳ &ldquo;{item.detail}&rdquo;
+                    â†³ &ldquo;{item.detail}&rdquo;
                   </div>
                 )}
               </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Terminal, 
@@ -111,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <>
       <nav
         id="lithos-navigation"
-        className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 transition-colors duration-300 ${
           isScrolled
             ? 'bg-neutral-950/80 backdrop-blur-xl border-b border-white/10 shadow-2xl py-3.5'
             : 'bg-transparent'
@@ -160,7 +160,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   e.preventDefault();
                   handleNavClick(item.href);
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors duration-200 cursor-pointer ${
                   isActive
                     ? 'text-white bg-white/25 shadow-sm font-semibold'
                     : 'text-white/80 hover:bg-white/20 hover:text-white'
@@ -206,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Command className="w-3.5 h-3.5 text-amber-400" />
             <span>Search</span>
-            <kbd className="px-1.5 py-0.5 text-[10px] bg-black/40 text-neutral-300 rounded border border-white/15">⌘K</kbd>
+            <kbd className="px-1.5 py-0.5 text-[10px] bg-black/40 text-neutral-300 rounded border border-white/15">âŒ˜K</kbd>
           </button>
 
           {/* Resume Trigger */}
@@ -232,7 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 id="nav-user-profile-btn"
                 type="button"
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 px-2 sm:px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-amber-400/40 transition-all text-left"
+                className="flex items-center gap-2 px-2 sm:px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-amber-400/40 transition-colors text-left"
                 title={user.displayName || user.email || 'User Profile'}
               >
                 {user.photoURL ? (
@@ -337,7 +337,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 playClick();
                 signInWithGoogle();
               }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-medium transition-all cursor-pointer shadow-sm hover:shadow-md"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-medium transition-[color,background-color,border-color,box-shadow] cursor-pointer shadow-sm hover:shadow-md"
               title="Sign in with Google to sync bookmarks & guestbook"
             >
               {/* Google G Logo SVG */}
@@ -372,7 +372,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               e.preventDefault();
               handleNavClick('#contact');
             }}
-            className="hidden md:block bg-white text-gray-900 text-xs font-semibold px-5 py-2 rounded-full hover:bg-gray-100 transition-all shadow-md hover:shadow-lg cursor-pointer"
+            className="hidden md:block bg-white text-gray-900 text-xs font-semibold px-5 py-2 rounded-full hover:bg-gray-100 transition-[color,background-color,border-color,box-shadow] shadow-md hover:shadow-lg cursor-pointer"
           >
             Let's Talk
           </a>
@@ -494,7 +494,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     type="button"
                     onClick={handleToggleSound}
-                    className="min-h-[44px] px-3 py-2 rounded-full bg-white/10 hover:bg-white/15 active:scale-95 border border-white/15 text-neutral-300 text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="min-h-[44px] px-3 py-2 rounded-full bg-white/10 hover:bg-white/15 active:scale-95 border border-white/15 text-neutral-300 text-xs font-mono flex items-center gap-1.5 transition-[color,background-color,border-color,transform] cursor-pointer"
                     aria-label={soundEnabled ? 'Disable sound effects' : 'Enable sound effects'}
                   >
                     {soundEnabled ? (
@@ -518,7 +518,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       playClick();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 border border-white/20 text-white flex items-center justify-center transition-all cursor-pointer shadow-md"
+                    className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 border border-white/20 text-white flex items-center justify-center transition-[color,background-color,border-color,transform,box-shadow] cursor-pointer shadow-md"
                     aria-label="Close navigation overlay"
                   >
                     <X className="w-5 h-5" />
@@ -559,7 +559,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           e.preventDefault();
                           handleNavClick(item.href);
                         }}
-                        className={`min-h-[56px] flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98] ${
+                        className={`min-h-[56px] flex items-center justify-between px-4 py-3.5 rounded-2xl transition-[color,background-color,border-color,transform] active:scale-[0.98] ${
                           isActive
                             ? 'bg-white/15 border border-amber-400/40 text-white shadow-lg shadow-amber-500/10 font-semibold'
                             : 'bg-white/[0.04] hover:bg-white/[0.08] active:bg-white/12 border border-white/5 text-neutral-200'
@@ -620,7 +620,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setMobileMenuOpen(false);
                       onOpenResume();
                     }}
-                    className="min-h-[48px] rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 border border-white/15 text-white text-xs font-medium flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    className="min-h-[48px] rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 border border-white/15 text-white text-xs font-medium flex items-center justify-center gap-2 transition-[color,background-color,border-color,transform] cursor-pointer"
                   >
                     <FileText className="w-4 h-4 text-amber-300" />
                     <span>Credentials & CV</span>
@@ -633,10 +633,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setMobileMenuOpen(false);
                       onOpenCommandMenu();
                     }}
-                    className="min-h-[48px] rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 border border-white/15 text-white text-xs font-medium flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    className="min-h-[48px] rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 border border-white/15 text-white text-xs font-medium flex items-center justify-center gap-2 transition-[color,background-color,border-color,transform] cursor-pointer"
                   >
                     <Command className="w-4 h-4 text-amber-400" />
-                    <span>Terminal ⌘K</span>
+                    <span>Terminal âŒ˜K</span>
                   </button>
                 </div>
 
@@ -671,7 +671,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setMobileMenuOpen(false);
                         logout();
                       }}
-                      className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-medium hover:bg-rose-500/30 active:scale-95 transition-all cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-medium hover:bg-rose-500/30 active:scale-95 transition-[color,background-color,border-color,transform] cursor-pointer"
                     >
                       Sign Out
                     </button>
@@ -684,7 +684,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setMobileMenuOpen(false);
                       signInWithGoogle();
                     }}
-                    className="w-full min-h-[48px] rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 border border-white/20 text-white text-xs font-semibold flex items-center justify-center gap-2.5 transition-all shadow-sm cursor-pointer"
+                    className="w-full min-h-[48px] rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 border border-white/20 text-white text-xs font-semibold flex items-center justify-center gap-2.5 transition-[color,background-color,border-color,transform,box-shadow] shadow-sm cursor-pointer"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
                       <path
@@ -715,7 +715,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     e.preventDefault();
                     handleNavClick('#contact');
                   }}
-                  className="w-full min-h-[52px] bg-[#e8702a] hover:bg-[#d2611f] active:scale-[0.98] text-white py-3.5 rounded-2xl text-sm font-semibold text-center flex items-center justify-center gap-2 transition-all shadow-xl shadow-[#e8702a]/25 cursor-pointer"
+                  className="w-full min-h-[52px] bg-[#e8702a] hover:bg-[#d2611f] active:scale-[0.98] text-white py-3.5 rounded-2xl text-sm font-semibold text-center flex items-center justify-center gap-2 transition-[color,background-color,border-color,transform,box-shadow] shadow-xl shadow-[#e8702a]/25 cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
                   <span>Start a Conversation</span>
@@ -724,9 +724,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {/* Editorial Monospace Footer */}
                 <div className="text-center pt-1 pb-1 flex items-center justify-center gap-2 text-[10px] font-mono text-neutral-500 tracking-wider">
                   <span>RICK BARAT</span>
-                  <span>•</span>
-                  <span>22°34'N 88°21'E</span>
-                  <span>•</span>
+                  <span>â€¢</span>
+                  <span>22Â°34'N 88Â°21'E</span>
+                  <span>â€¢</span>
                   <span>ARCHIVE ED. 2026</span>
                 </div>
               </div>

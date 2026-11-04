@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 
 export const ScrollProgress: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState<number>(0);
@@ -44,7 +44,7 @@ export const ScrollProgress: React.FC = () => {
     >
       <div 
         id="scroll-progress-bar"
-        className="h-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.6)] transition-all duration-75 ease-out"
+        className="h-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 shadow-[0_0_8px_rgba(251,191,36,0.6)] transition-[color,background-color,border-color,box-shadow] duration-75 ease-out"
         style={{ width: `${scrollProgress}%` }}
       />
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Instagram, Github, ArrowUpRight } from 'lucide-react';
 import { PERSONAL_DATA } from '../data/personalData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -31,7 +31,7 @@ export const PersonalNav: React.FC = () => {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 sm:px-12 md:px-16 py-4 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 px-6 sm:px-12 md:px-16 py-4 ${
         isScrolled 
           ? 'bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-3' 
           : 'bg-transparent'

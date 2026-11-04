@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Layers, Cpu, Server, Database, Sparkles, Check } from 'lucide-react';
 import { SKILL_CATEGORIES } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -80,7 +80,7 @@ export const SkillsMatrix: React.FC = () => {
                             return next;
                           });
                         }}
-                        className="group relative p-2.5 rounded-xl hover:bg-neutral-800/60 transition-all duration-200 cursor-default border border-transparent hover:border-neutral-700/60"
+                        className="group relative p-2.5 rounded-xl hover:bg-neutral-800/60 transition-colors duration-200 cursor-default border border-transparent hover:border-neutral-700/60"
                       >
                         <div className="flex items-center justify-between text-xs font-mono">
                           <span className="text-neutral-300 group-hover:text-amber-300 transition-colors font-medium">
@@ -89,7 +89,7 @@ export const SkillsMatrix: React.FC = () => {
 
                           {/* Subtle arrow or check */}
                           <span className="text-[10px] text-neutral-500 group-hover:text-amber-400 transition-colors">
-                            {isHovered ? 'Active' : '·'}
+                            {isHovered ? 'Active' : 'Â·'}
                           </span>
                         </div>
 

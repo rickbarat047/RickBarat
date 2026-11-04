@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowUpRight, Globe, Cpu, Wrench, Sparkles } from 'lucide-react';
 import { WHAT_I_BUILD } from '../data/portfolioData';
@@ -69,7 +69,7 @@ export const WhatIBuild: React.FC<WhatIBuildProps> = ({ onSelectCategory }) => {
                     onSelectCategory(item.title);
                   }
                 }}
-                className="group relative py-10 sm:py-12 transition-all duration-300 cursor-pointer"
+                className="group relative py-10 sm:py-12 transition-colors duration-300 cursor-pointer"
               >
                 {/* Subtle row highlight on hover */}
                 <div 
@@ -83,7 +83,7 @@ export const WhatIBuild: React.FC<WhatIBuildProps> = ({ onSelectCategory }) => {
                   <div className="flex items-start sm:items-center gap-6 sm:gap-10">
                     {/* Animated Index Number */}
                     <span 
-                      className={`text-xl sm:text-2xl font-mono transition-all duration-300 ${
+                      className={`text-xl sm:text-2xl font-mono transition-colors duration-300 ${
                         isHovered 
                           ? 'text-amber-400 font-bold translate-x-1' 
                           : 'text-neutral-500 font-normal'
@@ -119,13 +119,13 @@ export const WhatIBuild: React.FC<WhatIBuildProps> = ({ onSelectCategory }) => {
                         >
                           <span className="text-neutral-300">{tech}</span>
                           {tIdx < item.technologies.length - 1 && (
-                            <span className="mx-2 text-neutral-600">·</span>
+                            <span className="mx-2 text-neutral-600">Â·</span>
                           )}
                         </span>
                       ))}
                     </div>
 
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-300 shrink-0 ${
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border transition-colors duration-300 shrink-0 ${
                       isHovered 
                         ? 'border-amber-400 bg-amber-400 text-neutral-950 rotate-45 scale-110' 
                         : 'border-neutral-800 bg-neutral-900/60 text-neutral-400'

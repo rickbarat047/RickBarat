@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { 
   Bot, 
   Send, 
@@ -558,7 +558,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
             playClickSound(1000);
             setIsOpen(true);
           }}
-          className="group relative flex items-center gap-3 p-3.5 sm:px-4 sm:py-3 rounded-full bg-neutral-900/90 hover:bg-neutral-800 border border-amber-400/40 hover:border-amber-400 text-white shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105"
+          className="group relative flex items-center gap-3 p-3.5 sm:px-4 sm:py-3 rounded-full bg-neutral-900/90 hover:bg-neutral-800 border border-amber-400/40 hover:border-amber-400 text-white shadow-2xl backdrop-blur-xl transition-[color,background-color,border-color,transform,box-shadow] duration-300 hover:scale-105"
           aria-label="Open Rick Barat AI Assistant"
         >
           {/* Animated Glow Ring */}
@@ -584,7 +584,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
               </div>
               <div className="text-[10px] text-amber-300 font-mono flex items-center gap-1">
                 <span>Gemini AI</span>
-                <span>•</span>
+                <span>â€¢</span>
                 {handshakeStatus === 'checking' ? (
                   <span className="text-amber-400">Connecting...</span>
                 ) : handshakeStatus === 'error' ? (
@@ -606,7 +606,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
       {isOpen && (
         <div 
           id="gemini-chat-window"
-          className={`bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 backdrop-blur-xl ${
+          className={`bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-[color,background-color,border-color,box-shadow] duration-300 backdrop-blur-xl ${
             isExpanded 
               ? 'fixed inset-4 sm:inset-10 z-50' 
               : 'w-[92vw] sm:w-[460px] h-[600px] max-h-[85vh]'
@@ -655,7 +655,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
 
                   {user ? (
                     <span 
-                      title="Authenticated with Google • Chat synced to Firestore" 
+                      title="Authenticated with Google â€¢ Chat synced to Firestore" 
                       className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-400/10 text-amber-300 border border-amber-400/30 flex items-center gap-1"
                     >
                       <Cloud className="w-2.5 h-2.5 text-amber-400" />
@@ -675,7 +675,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                 </div>
                 <div className="text-[10px] font-mono text-neutral-400 flex items-center gap-1.5">
                   <span className="text-amber-300">{selectedModel}</span>
-                  <span>•</span>
+                  <span>â€¢</span>
                   {searchGroundingEnabled ? (
                     <span className="text-cyan-400 flex items-center gap-0.5">
                       <Globe className="w-2.5 h-2.5" />
@@ -774,7 +774,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                   setSearchGroundingEnabled(!searchGroundingEnabled);
                 }}
                 title={searchGroundingEnabled ? "Google Search Grounding: Active" : "Google Search Grounding: Disabled"}
-                className={`px-2 py-1 rounded-lg text-[10px] font-mono flex items-center gap-1 border transition-all ${
+                className={`px-2 py-1 rounded-lg text-[10px] font-mono flex items-center gap-1 border transition-colors ${
                   searchGroundingEnabled
                     ? 'bg-cyan-950/80 text-cyan-300 border-cyan-500/50 shadow-sm'
                     : 'bg-neutral-900 text-neutral-500 border-neutral-800'
@@ -813,7 +813,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
             {activeToast && (
               <div 
                 id="chat-error-toast"
-                className={`sticky top-0 z-20 p-3 rounded-xl shadow-xl backdrop-blur-md border transition-all duration-300 animate-in fade-in slide-in-from-top-2 ${
+                className={`sticky top-0 z-20 p-3 rounded-xl shadow-xl backdrop-blur-md border transition-[color,background-color,border-color,box-shadow] duration-300 animate-in fade-in slide-in-from-top-2 ${
                   activeToast.type === 'error'
                     ? 'bg-rose-950/90 border-rose-500/50 text-rose-200 shadow-rose-950/40'
                     : activeToast.type === 'warning'
@@ -863,7 +863,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                           }
                         }}
                         disabled={isLoading}
-                        className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-[10px] font-mono flex items-center gap-1 shadow transition-all hover:scale-105 disabled:opacity-50"
+                        className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold text-[10px] font-mono flex items-center gap-1 shadow transition-[color,background-color,border-color,transform,box-shadow] hover:scale-105 disabled:opacity-50"
                         title="Retry sending this prompt without page reload"
                       >
                         <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
@@ -993,7 +993,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                     ) : (
                       /* Standard AI / User Message */
                       <div
-                        className={`p-3.5 rounded-2xl leading-relaxed text-left transition-all ${
+                        className={`p-3.5 rounded-2xl leading-relaxed text-left transition-colors ${
                           isAi
                             ? 'bg-neutral-950 border border-neutral-800 text-neutral-200 shadow-md'
                             : 'bg-gradient-to-r from-amber-500 to-amber-600 text-neutral-950 font-medium rounded-tr-none'
@@ -1064,10 +1064,10 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
                     <div className={`flex items-center gap-2 text-[10px] font-mono text-neutral-500 ${isAi ? 'justify-start' : 'justify-end'}`}>
                       <span>{msg.timestamp}</span>
                       {msg.modelUsed && (
-                        <span>• {msg.modelUsed.replace('gemini-', '')}</span>
+                        <span>â€¢ {msg.modelUsed.replace('gemini-', '')}</span>
                       )}
                       {msg.hasSearchGrounding && (
-                        <span className="text-cyan-400 font-semibold">• Grounded</span>
+                        <span className="text-cyan-400 font-semibold">â€¢ Grounded</span>
                       )}
                       {isAi && !msg.isError && (
                         <button
@@ -1198,7 +1198,7 @@ How can I help you today? Feel free to pick a prompt below or ask your question!
               type="button"
               onClick={() => sendMessage()}
               disabled={!inputMessage.trim() || isLoading}
-              className="p-2.5 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold rounded-xl shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+              className="p-2.5 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold rounded-xl shadow-md transition-[color,background-color,border-color,box-shadow] disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               title="Send message"
             >
               <Send className="w-4 h-4" />

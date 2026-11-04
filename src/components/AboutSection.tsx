@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { GraduationCap, Code2, Sparkles, MapPin, Send, ArrowUpRight, Compass, Heart } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -38,7 +38,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenResume, onNavi
           {/* Left Column: Personal Narrative */}
           <div className="lg:col-span-7 space-y-8">
             <blockquote className="text-2xl sm:text-3xl font-display font-medium text-neutral-100 leading-snug text-balance">
-              &quot;I&apos;m Rick Barat — a BCA graduate and independent developer from West Bengal. I enjoy turning ideas into interactive websites, useful tools and AI-powered systems.&quot;
+              &quot;I&apos;m Rick Barat â€” a BCA graduate and independent developer from West Bengal. I enjoy turning ideas into interactive websites, useful tools and AI-powered systems.&quot;
             </blockquote>
 
             <div className="space-y-5 text-neutral-400 text-sm sm:text-base leading-relaxed">
@@ -77,7 +77,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenResume, onNavi
                     document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="px-6 py-3 rounded-full bg-white hover:bg-neutral-200 text-neutral-950 font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shadow-lg"
+                className="px-6 py-3 rounded-full bg-white hover:bg-neutral-200 text-neutral-950 font-semibold text-xs sm:text-sm flex items-center gap-2 transition-[color,background-color,border-color,box-shadow] cursor-pointer shadow-lg"
               >
                 <span>Get In Touch</span>
                 <Send className="w-4 h-4" />
@@ -90,7 +90,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenResume, onNavi
                     playClick();
                     onOpenResume();
                   }}
-                  className="px-5 py-3 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 hover:text-white text-xs sm:text-sm font-medium transition-all cursor-pointer"
+                  className="px-5 py-3 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 hover:text-white text-xs sm:text-sm font-medium transition-colors cursor-pointer"
                 >
                   <span>View Credentials</span>
                 </button>

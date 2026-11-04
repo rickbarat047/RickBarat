@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { 
   FlaskConical, 
   Play, 
@@ -47,7 +47,7 @@ export const InteractiveLab: React.FC = () => {
     'Frankfurt (EU)': 24,
     'Tokyo (AP)': 38,
     'Sydney (AU)': 42,
-    'São Paulo (SA)': 45
+    'SÃ£o Paulo (SA)': 45
   });
 
   // Token Studio State
@@ -220,7 +220,7 @@ export const InteractiveLab: React.FC = () => {
           'Frankfurt (EU)': 142,
           'Tokyo (AP)': 185,
           'Sydney (AU)': 220,
-          'São Paulo (SA)': 195
+          'SÃ£o Paulo (SA)': 195
         });
       } else if (latencyRouting === 'multiregion') {
         setPingResults({
@@ -228,7 +228,7 @@ export const InteractiveLab: React.FC = () => {
           'Frankfurt (EU)': 35,
           'Tokyo (AP)': 52,
           'Sydney (AU)': 68,
-          'São Paulo (SA)': 74
+          'SÃ£o Paulo (SA)': 74
         });
       } else {
         setPingResults({
@@ -236,7 +236,7 @@ export const InteractiveLab: React.FC = () => {
           'Frankfurt (EU)': 16,
           'Tokyo (AP)': 22,
           'Sydney (AU)': 28,
-          'São Paulo (SA)': 31
+          'SÃ£o Paulo (SA)': 31
         });
       }
       setIsPinging(false);
@@ -282,7 +282,7 @@ export const InteractiveLab: React.FC = () => {
                 playSwitch();
                 setActiveTab('canvas');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
                 activeTab === 'canvas'
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
                   : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
@@ -300,7 +300,7 @@ export const InteractiveLab: React.FC = () => {
                 playSwitch();
                 setActiveTab('synth');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
                 activeTab === 'synth'
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
                   : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
@@ -318,7 +318,7 @@ export const InteractiveLab: React.FC = () => {
                 playSwitch();
                 setActiveTab('latency');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
                 activeTab === 'latency'
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
                   : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
@@ -336,7 +336,7 @@ export const InteractiveLab: React.FC = () => {
                 playSwitch();
                 setActiveTab('tokens');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
                 activeTab === 'tokens'
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-lg shadow-amber-500/15'
                   : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800'
@@ -372,7 +372,7 @@ export const InteractiveLab: React.FC = () => {
                     toggleStarredLab(activeTab);
                   }
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-colors cursor-pointer ${
                   starredLabIds.includes(activeTab)
                     ? 'bg-amber-400 text-neutral-950 border-amber-300 font-bold shadow-md'
                     : 'bg-neutral-950 text-neutral-300 hover:text-white border-neutral-800 hover:border-amber-400/40'
@@ -522,7 +522,7 @@ export const InteractiveLab: React.FC = () => {
                       id={`synth-key-${n.name}`}
                       type="button"
                       onClick={() => playSynthNote(n.name, n.mult)}
-                      className={`w-14 sm:w-16 h-36 rounded-b-xl border flex flex-col justify-end p-3 transition-all duration-100 ${
+                      className={`w-14 sm:w-16 h-36 rounded-b-xl border flex flex-col justify-end p-3 transition-colors duration-100 ${
                         activeNote === n.name
                           ? 'bg-amber-400 border-amber-300 scale-95 shadow-lg shadow-amber-500/30 text-neutral-950'
                           : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-700/80 text-white'
@@ -586,7 +586,7 @@ export const InteractiveLab: React.FC = () => {
                     setLatencyRouting('centralized');
                     runLatencyTest();
                   }}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border text-left transition-colors ${
                     latencyRouting === 'centralized'
                       ? 'bg-neutral-950 border-amber-400 text-white'
                       : 'bg-neutral-950/40 border-neutral-800 text-neutral-400 hover:border-neutral-700'
@@ -602,7 +602,7 @@ export const InteractiveLab: React.FC = () => {
                     setLatencyRouting('multiregion');
                     runLatencyTest();
                   }}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border text-left transition-colors ${
                     latencyRouting === 'multiregion'
                       ? 'bg-neutral-950 border-amber-400 text-white'
                       : 'bg-neutral-950/40 border-neutral-800 text-neutral-400 hover:border-neutral-700'
@@ -618,7 +618,7 @@ export const InteractiveLab: React.FC = () => {
                     setLatencyRouting('edge');
                     runLatencyTest();
                   }}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border text-left transition-colors ${
                     latencyRouting === 'edge'
                       ? 'bg-neutral-950 border-amber-400 text-white'
                       : 'bg-neutral-950/40 border-neutral-800 text-neutral-400 hover:border-neutral-700'
@@ -643,7 +643,7 @@ export const InteractiveLab: React.FC = () => {
                       </div>
                       <div className="h-2 w-full bg-neutral-900 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-500 ${
+                          className={`h-full rounded-full transition-colors duration-500 ${
                             ping < 40 ? 'bg-emerald-400' : ping < 100 ? 'bg-amber-400' : 'bg-red-400'
                           }`}
                           style={{ width: `${Math.min(100, (ping / 250) * 100)}%` }}
@@ -726,7 +726,7 @@ export const InteractiveLab: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs font-mono">
                       <span className="text-neutral-400">Brand Color Hue (H)</span>
-                      <span className="text-amber-400">{brandHue}°</span>
+                      <span className="text-amber-400">{brandHue}Â°</span>
                     </div>
                     <input
                       type="range"

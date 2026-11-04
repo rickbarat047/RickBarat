@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Sparkles, Terminal, Activity, ArrowRight } from 'lucide-react';
 import { CURRENTLY_BUILDING } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -52,7 +52,7 @@ export const CurrentlyBuilding: React.FC<CurrentlyBuildingProps> = ({ onExploreP
                   onExploreProject(item.id.replace('building-', ''));
                 }
               }}
-              className="group p-6 sm:p-7 rounded-2xl bg-neutral-900/60 border border-neutral-800/80 hover:border-amber-400/40 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:bg-neutral-900/90 relative"
+              className="group p-6 sm:p-7 rounded-2xl bg-neutral-900/60 border border-neutral-800/80 hover:border-amber-400/40 transition-colors duration-300 flex flex-col justify-between cursor-pointer hover:bg-neutral-900/90 relative"
             >
               {/* Top Bar: Name & Status */}
               <div>
@@ -83,7 +83,7 @@ export const CurrentlyBuilding: React.FC<CurrentlyBuildingProps> = ({ onExploreP
                   {item.stack.map((s, sIdx) => (
                     <span key={s}>
                       <span className="text-neutral-300">{s}</span>
-                      {sIdx < item.stack.length - 1 && <span className="ml-2 text-neutral-600">·</span>}
+                      {sIdx < item.stack.length - 1 && <span className="ml-2 text-neutral-600">Â·</span>}
                     </span>
                   ))}
                 </div>

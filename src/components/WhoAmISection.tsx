@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { PERSONAL_DATA } from '../data/personalData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -54,7 +54,7 @@ export const WhoAmISection: React.FC = () => {
         {/* Interactive Emphasized Words Stream: BUILD, CREATE, LEARN, EXPERIMENT */}
         <div className="pt-8 border-t border-neutral-900/80">
           <div className="text-xs font-mono text-neutral-400 uppercase tracking-widest mb-6">
-            WHAT DRIVES ME · TAP TO EXPLORE
+            WHAT DRIVES ME Â· TAP TO EXPLORE
           </div>
 
           <div className="flex flex-wrap items-baseline gap-x-6 sm:gap-x-10 gap-y-4">
@@ -70,9 +70,9 @@ export const WhoAmISection: React.FC = () => {
                     setHighlightedWord(isActive ? null : item.word);
                   }}
                   onMouseEnter={() => playHover(1400)}
-                  className="group text-left transition-all cursor-pointer focus:outline-none"
+                  className="group text-left transition-colors cursor-pointer focus:outline-none"
                 >
-                  <span className={`text-3xl sm:text-5xl md:text-6xl font-display font-black tracking-tight transition-all duration-300 block ${
+                  <span className={`text-3xl sm:text-5xl md:text-6xl font-display font-black tracking-tight transition-colors duration-300 block ${
                     isActive 
                       ? 'text-amber-400 scale-105' 
                       : 'text-neutral-500 hover:text-white'
@@ -86,7 +86,7 @@ export const WhoAmISection: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       className="block text-xs font-mono text-amber-300/90 pt-1 tracking-normal"
                     >
-                      ↳ {item.phrase}
+                      â†³ {item.phrase}
                     </motion.span>
                   )}
                 </button>

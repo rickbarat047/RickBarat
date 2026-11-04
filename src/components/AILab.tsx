@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Cpu, Sparkles, Terminal, Activity, ArrowUpRight, Zap, RefreshCw, Box, Bot } from 'lucide-react';
 import { AI_LAB_EXPERIMENTS } from '../data/portfolioData';
 import { useUISounds } from '../hooks/useUISounds';
@@ -63,7 +63,7 @@ export const AILab: React.FC = () => {
                 setSelectedTag(tag.id);
               }}
               onMouseEnter={() => playHover(1400)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-colors cursor-pointer ${
                 selectedTag === tag.id
                   ? 'bg-amber-400 text-neutral-950 font-bold shadow-md'
                   : 'bg-neutral-900/80 text-neutral-400 hover:text-white border border-neutral-800'
@@ -80,7 +80,7 @@ export const AILab: React.FC = () => {
             <div
               key={exp.id}
               onMouseEnter={() => playHover(1350 + index * 50)}
-              className="p-6 sm:p-7 rounded-2xl bg-neutral-900/50 border border-neutral-800/80 hover:border-amber-400/40 transition-all duration-300 flex flex-col justify-between group hover:bg-neutral-900/80"
+              className="p-6 sm:p-7 rounded-2xl bg-neutral-900/50 border border-neutral-800/80 hover:border-amber-400/40 transition-colors duration-300 flex flex-col justify-between group hover:bg-neutral-900/80"
             >
               <div>
                 {/* Category & Status */}

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+﻿import React, { useRef, useState, useCallback } from 'react';
 import { 
   motion, 
   useScroll, 
@@ -217,8 +217,8 @@ export const CinematicDevicePreview: React.FC<CinematicDevicePreviewProps> = ({
             <div className="hidden sm:flex items-center px-4 pt-1.5 bg-neutral-900/60 border-b border-neutral-800/60 text-xs font-mono text-neutral-400">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-t-lg bg-neutral-950 border-t border-x border-neutral-800 text-neutral-200 text-[11px] font-medium">
                 <TabIcon className="w-3 h-3 text-amber-400" />
-                <span className="truncate max-w-[180px]">{name} — Production</span>
-                <span className="text-neutral-500 text-[9px] ml-1">×</span>
+                <span className="truncate max-w-[180px]">{name} â€” Production</span>
+                <span className="text-neutral-500 text-[9px] ml-1">Ã—</span>
               </div>
             </div>
 
@@ -245,7 +245,7 @@ export const CinematicDevicePreview: React.FC<CinematicDevicePreviewProps> = ({
                     alt={`${name} production preview interface`}
                     loading="lazy"
                     onError={() => setImageError(true)}
-                    className="w-full h-full object-cover object-top filter brightness-95 contrast-[1.02] transition-all duration-700 group-hover:scale-[1.025] group-hover:brightness-105"
+                    className="w-full h-full object-cover object-top filter brightness-95 contrast-[1.02] transition-[color,background-color,border-color,transform] duration-700 group-hover:scale-[1.025] group-hover:brightness-105"
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-950 p-6 text-center">
@@ -279,7 +279,7 @@ export const CinematicDevicePreview: React.FC<CinematicDevicePreviewProps> = ({
                     <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400">
                       {category}
                     </span>
-                    <span className="text-neutral-500 font-mono text-[10px]">· {year}</span>
+                    <span className="text-neutral-500 font-mono text-[10px]">Â· {year}</span>
                   </div>
                   <span className="text-xs sm:text-sm font-display font-bold tracking-tight block mt-0.5">
                     {name}
@@ -288,7 +288,7 @@ export const CinematicDevicePreview: React.FC<CinematicDevicePreviewProps> = ({
 
                 {/* Floating "Open Site" pill button */}
                 <div className="pointer-events-auto">
-                  <span className="inline-flex items-center gap-1.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-white text-neutral-950 text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 group-hover:bg-amber-400 group-hover:scale-105 active:scale-95">
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-white text-neutral-950 text-xs sm:text-sm font-semibold shadow-2xl transition-[color,background-color,border-color,transform,box-shadow] duration-300 group-hover:bg-amber-400 group-hover:scale-105 active:scale-95">
                     <span>Explore live</span>
                     <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </span>

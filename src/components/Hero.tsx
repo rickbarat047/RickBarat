@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowRight, 
   Send,
@@ -111,7 +111,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
         spotlightRadius={SPOTLIGHT_R}
       />
 
-      {/* Status indicator: ● Available for projects */}
+      {/* Status indicator: â— Available for projects */}
       <div className="absolute top-[8%] sm:top-[9%] left-0 right-0 flex justify-center z-50 pointer-events-auto">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-950/70 border border-white/15 backdrop-blur-md text-xs text-neutral-300 font-mono shadow-xl hero-anim hero-reveal" style={{ animationDelay: '0.1s' }}>
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/80" />
@@ -167,7 +167,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
       >
         <div className="text-xs text-neutral-400 font-mono flex items-center gap-2">
           <MapPin className="w-3.5 h-3.5 text-amber-400" />
-          <span>West Bengal, India · Remote</span>
+          <span>West Bengal, India Â· Remote</span>
         </div>
         <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-sans">
           BCA graduate from Techno India University. Turning complex ideas into intuitive websites, automation pipelines, and AI systems.
@@ -179,7 +179,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
             id="hero-quick-copy-email"
             type="button"
             onClick={handleCopyEmail}
-            className="px-3 py-1.5 rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-white/20 text-white text-xs font-mono flex items-center gap-1.5 transition-all shadow-md cursor-pointer hover:border-amber-400/60"
+            className="px-3 py-1.5 rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-white/20 text-white text-xs font-mono flex items-center gap-1.5 transition-[color,background-color,border-color,box-shadow] shadow-md cursor-pointer hover:border-amber-400/60"
           >
             {copiedEmail ? (
               <>
@@ -208,7 +208,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
             strength={0.38}
             onMouseEnter={() => playHover(1400)}
             onClick={() => handleScrollToSection('work')}
-            className="bg-white hover:bg-neutral-200 text-neutral-950 text-sm font-semibold px-6 py-3 rounded-full flex items-center gap-2 cursor-pointer shadow-xl transition-all duration-200"
+            className="bg-white hover:bg-neutral-200 text-neutral-950 text-sm font-semibold px-6 py-3 rounded-full flex items-center gap-2 cursor-pointer shadow-xl transition-[color,background-color,border-color,box-shadow] duration-200"
           >
             <span>Explore My Work</span>
             <ArrowRight className="w-4 h-4" />
@@ -229,8 +229,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onNavigateTo }) => {
 
         {/* Credentials / Status */}
         <div className="flex items-center gap-3 text-xs font-mono text-neutral-400 pt-1">
-          <span className="text-white">BCA · Techno India University</span>
-          <span>·</span>
+          <span className="text-white">BCA Â· Techno India University</span>
+          <span>Â·</span>
           <span className="text-emerald-400">Available</span>
         </div>
       </div>

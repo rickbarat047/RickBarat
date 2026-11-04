@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   Send, 
   Mail, 
@@ -215,9 +215,9 @@ export const ContactSection: React.FC = () => {
                   href={PERSONAL_INFO.socials.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-4 rounded-xl bg-gradient-to-r from-pink-500/10 via-amber-500/10 to-purple-500/10 border border-neutral-800 hover:border-pink-500/40 text-neutral-300 hover:text-white flex items-center gap-3 transition-all duration-200 group"
+                  className="p-4 rounded-xl bg-gradient-to-r from-pink-500/10 via-amber-500/10 to-purple-500/10 border border-neutral-800 hover:border-pink-500/40 text-neutral-300 hover:text-white flex items-center gap-3 transition-colors duration-200 group"
                 >
-                  <div className="p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-pink-400 group-hover:text-pink-300 group-hover:scale-105 transition-all">
+                  <div className="p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-pink-400 group-hover:text-pink-300 group-hover:scale-105 transition-[color,background-color,border-color,transform]">
                     <Instagram className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
