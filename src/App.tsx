@@ -44,6 +44,11 @@ export default function App() {
       timeZone="Asia/Kolkata"
       projects={projects}
       categories={categories}
+      contacts={[
+        { label: "Instagram", value: "@rickbarat047", href: "https://www.instagram.com/rickbarat047/" },
+        { label: "GitHub", value: "github.com/rickbarat047", href: "https://github.com/rickbarat047" },
+        { label: "Email", value: "rickbarat21@gmail.com", href: "mailto:rickbarat21@gmail.com" },
+      ]}
       defaultTheme="dark"
     />
   );
