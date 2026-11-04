@@ -98,29 +98,40 @@ export const FlipDetailModal: React.FC<FlipDetailModalProps> = ({ item, sourceRe
           }
           className="relative bg-neutral-900 border border-neutral-700/80 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col z-10"
         >
-          {/* Top Modal Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800 bg-neutral-950/60 flex-shrink-0">
-            <div className="flex items-center gap-3 text-xs font-mono text-neutral-400">
-              <span className="text-amber-400 font-bold">{item.number}</span>
-              <span className="text-neutral-600">/</span>
-              <span className="uppercase tracking-widest text-neutral-300">{item.badge}</span>
+          {/* Premium editorial header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800/80 bg-[#020617]/60 flex-shrink-0">
+            <div className="flex items-center gap-4 text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-500">
+              <span className="text-amber-400 font-bold text-sm tracking-normal">{item.number}</span>
+              <span className="w-px h-4 bg-neutral-700" />
+              <span className="text-neutral-400">{item.badge}</span>
+              {item.url && (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors duration-200 normal-case tracking-normal text-xs font-medium"
+                >
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                  <span>Open Website</span>
+                </a>
+              )}
             </div>
 
             <button
               type="button"
               onClick={handleTriggerClose}
-              className="p-1.5 rounded-full hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+              className="p-2 rounded-full hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors duration-200 cursor-pointer"
               aria-label="Close detail modal"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4.5 h-4.5" />
             </button>
           </div>
 
           {/* Scrollable Content Body */}
-          <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 select-text text-neutral-200">
-            {/* Project / Artifact Visual Hero */}
+          <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-7 select-text text-neutral-200 bg-[#020617]/40">
+            {/* Premium editorial visual hero */}
             {item.image && (
-              <div className="w-full h-52 sm:h-64 rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800 relative group">
+              <div className="w-full h-52 sm:h-64 rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800/80 relative group shadow-editorial">
                 <img
                   src={item.image}
                   alt={item.title}

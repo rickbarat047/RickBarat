@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Menu as MenuIcon, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Menu as MenuIcon, X } from 'lucide-react';
+
+interface MenuItem {
+  label: string;
+  sublabel: string;
+  target: 'about' | 'world' | 'right-now' | 'projects' | 'explore';
+  num: string;
+}
 
 interface FullscreenMenuProps {
   onNavigate: (target: 'about' | 'world' | 'right-now' | 'projects' | 'explore') => void;
@@ -11,153 +18,131 @@ interface FullscreenMenuProps {
 export const FullscreenMenu: React.FC<FullscreenMenuProps> = ({
   onNavigate,
   isExploreMode,
-  onToggleExplore
+  onToggleExplore,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const navItems = [
-    { label: "ABOUT", sublabel: "Who is Rick?", target: "about" as const, num: "01" },
-    { label: "MY WORLD", sublabel: "3D Spatial Sphere", target: "world" as const, num: "02" },
-    { label: "RIGHT NOW", sublabel: "2026 Focus & Experiments", target: "right-now" as const, num: "03" },
-    { label: "THINGS I'VE BUILT", sublabel: "Munjoy & AutoTube", target: "projects" as const, num: "04" },
-    { label: "EXPLORE", sublabel: "Flat Grid Mode", target: "explore" as const, num: "05" },
+  const navItems: MenuItem[] = [
+    { label: 'ABOUT', sublabel: 'Who is Rick?', target: 'about', num: '01' },
+    { label: 'MY WORLD', sublabel: '3D Spatial Sphere', target: 'world', num: '02' },
+    { label: 'RIGHT NOW', sublabel: '2026 Focus & Experiments', target: 'right-now', num: '03' },
+    { label: 'THINGS I\'VE BUILT', sublabel: 'Verified Real Projects', target: 'projects', num: '04' },
+    { label: 'EXPLORE', sublabel: 'Flat Grid Mode', target: 'explore', num: '05' },
   ];
 
-  const handleItemClick = (target: 'about' | 'world' | 'right-now' | 'projects' | 'explore') => {
+  const handleItemClick = (target: MenuItem['target']) => {
     setIsOpen(false);
     onNavigate(target);
   };
 
   return (
     <>
-      {/* Minimal Top Header Bar */}
-      <header className="fixed top-0 left-0 right-0 z-30 px-6 sm:px-10 py-5 sm:py-6 flex items-center justify-between pointer-events-auto select-none backdrop-blur-[2px]">
-        {/* Left: Rick Barat */}
+      {/* Minimal editorial header bar */}
+      <header className="fixed top-0 left-0 right-0 z-[60] px-6 sm:px-10 py-5 sm:py-6 flex items-center justify-between select-none">
         <button
           type="button"
           onClick={() => {
             if (isExploreMode) onToggleExplore();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="group flex items-center gap-2 text-left cursor-pointer focus:outline-none"
+          className="group flex items-center gap-3 text-left cursor-pointer bg-transparent border-none focus:outline-none"
+          aria-label="Go to top or toggle explore mode"
         >
-          <span className="w-2 h-2 rounded-full bg-amber-400 group-hover:scale-125 transition-transform" />
-          <span className="font-display font-extrabold text-base sm:text-lg tracking-tight text-white uppercase group-hover:text-amber-300 transition-colors">
+          <span className="w-2 h-2 rounded-full bg-amber-400 transition-transform duration-300 group-hover:scale-125" />
+          <span className="font-display font-extrabold text-sm sm:text-base tracking-tight text-white uppercase transition-colors duration-300 group-hover:text-amber-300">
             Rick Barat
           </span>
         </button>
 
-        {/* Right: Mode Toggle + Menu Button */}
         <div className="flex items-center gap-3 sm:gap-4">
           <button
             type="button"
             onClick={onToggleExplore}
-            className="px-3.5 py-1.5 rounded-full border border-neutral-800 bg-neutral-900/80 hover:bg-neutral-800 text-[11px] font-mono uppercase tracking-wider text-neutral-300 hover:text-white transition-all cursor-pointer hidden sm:inline-flex items-center gap-2"
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-800 bg-neutral-950/80 hover:bg-neutral-900 text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer shadow-editorial"
+            aria-label="Toggle explore grid mode"
           >
-            <span>{isExploreMode ? '3D Sphere' : 'Explore [Grid]'}</span>
+            <span className="text-[10px] font-mono tracking-[0.12em]">{isExploreMode ? '3D SPHERE' : 'EXPLORE'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="group flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-neutral-800 bg-neutral-900/80 hover:bg-neutral-800 text-xs font-mono uppercase tracking-wider text-neutral-300 hover:text-white transition-all cursor-pointer"
-            aria-label="Open Fullscreen Menu"
+            aria-label="Open navigation menu"
+            className="group flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-800 bg-neutral-950/80 hover:bg-neutral-900 hover:border-neutral-700 text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer shadow-editorial"
           >
-            <span>Menu</span>
-            <MenuIcon className="w-3.5 h-3.5 text-neutral-400 group-hover:text-amber-400 transition-colors" />
+            <span>MENU</span>
+            <MenuIcon className="w-3.5 h-3.5 text-neutral-500 group-hover:text-amber-400 transition-colors duration-200" />
           </button>
         </div>
       </header>
 
-      {/* Fullscreen Overlay Animated via Clip-Path */}
+      {/* Full-screen overlay with editorial dark theme */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ clipPath: 'circle(0% at calc(100% - 40px) 40px)' }}
-            animate={{ clipPath: 'circle(150% at calc(100% - 40px) 40px)' }}
-            exit={{ clipPath: 'circle(0% at calc(100% - 40px) 40px)' }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-50 bg-black text-white p-6 sm:p-12 flex flex-col justify-between overflow-y-auto select-none"
+            initial={{ clipPath: 'circle(0% at calc(100% - 48px) 48px)' }}
+            animate={{ clipPath: 'circle(150% at calc(100% - 48px) 48px)' }}
+            exit={{ clipPath: 'circle(0% at calc(100% - 48px) 48px)' }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[70] bg-[#020617] text-[#f8fafc] overflow-y-auto select-none"
           >
-            {/* Top Close Header */}
-            <div className="flex items-center justify-between border-b border-neutral-800/80 pb-6">
-              <div className="flex items-center gap-2 text-xs font-mono text-neutral-400 uppercase tracking-widest">
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
+            {/* Top header within overlay */}
+            <div className="flex items-center justify-between px-6 sm:px-10 py-5 sm:py-6 border-b border-neutral-800/60">
+              <div className="flex items-center gap-2 text-[10px] font-mono text-neutral-500 uppercase tracking-[0.2em]">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                 <span>RICK BARAT / NAVIGATION</span>
               </div>
-
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-full hover:bg-neutral-900 text-neutral-400 hover:text-white transition-colors cursor-pointer"
                 aria-label="Close menu"
+                className="p-2 rounded-full hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors duration-200 cursor-pointer"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Monumental Nav Typography List */}
-            <div className="my-auto py-12 max-w-4xl mx-auto w-full space-y-4 sm:space-y-6">
+            {/* Monumental editorial navigation */}
+            <nav className="max-w-6xl mx-auto px-6 sm:px-10 py-16 sm:py-24 space-y-2 sm:space-y-4">
               {navItems.map((item, idx) => (
                 <motion.div
                   key={item.target}
-                  initial={{ opacity: 0, x: -30 }}
+                  initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15 + idx * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ delay: 0.08 + idx * 0.05, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <button
                     type="button"
                     onClick={() => handleItemClick(item.target)}
-                    className="group w-full flex items-baseline justify-between text-left py-2 border-b border-neutral-900 hover:border-neutral-700 transition-colors cursor-pointer"
+                    className="group w-full text-left py-3 sm:py-4 border-b border-neutral-800/40 hover:border-neutral-700/80 transition-colors duration-200 cursor-pointer bg-transparent border-none focus:outline-none"
                   >
-                    <div className="flex items-baseline gap-4 sm:gap-8">
-                      <span className="text-xs sm:text-sm font-mono text-amber-400/80 font-bold">
-                        {item.num}
+                    <div className="flex items-baseline justify-between gap-4">
+                      <div className="flex items-baseline gap-6 sm:gap-10">
+                        <span className="font-mono text-xs sm:text-sm text-amber-400/90 font-bold tracking-[0.15em] min-w-[2rem]">
+                          {item.num}
+                        </span>
+                        <span className="font-display font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight text-neutral-300 group-hover:text-[#f8fafc] uppercase transition-colors duration-300 leading-none">
+                          {item.label}
+                        </span>
+                      </div>
+                      <span className="hidden sm:inline-flex items-center gap-2 text-[10px] font-mono text-neutral-600 group-hover:text-amber-400/80 transition-colors duration-200 tracking-[0.12em] shrink-0">
+                        <span className="hidden md:inline">{item.sublabel}</span>
+                        <ArrowUpRight className="w-4 h-4 group-hover:translate-x-[2px] group-hover:-translate-y-[2px] transition-transform duration-200" />
                       </span>
-                      <span className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight text-neutral-300 group-hover:text-white uppercase transition-colors">
-                        {item.label}
-                      </span>
-                    </div>
-
-                    <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-neutral-500 group-hover:text-amber-400 transition-colors">
-                      <span>{item.sublabel}</span>
-                      <ArrowUpRight className="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </div>
                   </button>
                 </motion.div>
               ))}
-            </div>
+            </nav>
 
-            {/* Bottom Connect / Social Links */}
-            <div className="border-t border-neutral-900 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono text-neutral-400">
+            {/* Bottom editorial footer */}
+            <div className="border-t border-neutral-800/60 px-6 sm:px-10 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-[10px] font-mono text-neutral-600 tracking-[0.15em] uppercase">
               <div className="flex items-center gap-6">
-                <a
-                  href="https://www.instagram.com/rickbarat047/?hl=en"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                >
-                  INSTAGRAM ↗
-                </a>
-                <a
-                  href="https://github.com/rickbarat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                >
-                  GITHUB ↗
-                </a>
-                <a
-                  href="mailto:rickbarat21@gmail.com"
-                  className="hover:text-white transition-colors"
-                >
-                  EMAIL ↗
-                </a>
+                <a href="https://www.instagram.com/rickbarat047/?hl=en" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200">Instagram ↗</a>
+                <a href="https://github.com/rickbarat047" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors duration-200">GitHub ↗</a>
+                <a href="mailto:rickbarat21@gmail.com" className="hover:text-amber-400 transition-colors duration-200">Email ↗</a>
               </div>
-
-              <div className="text-neutral-500">
-                WEST BENGAL, IN · 2026
-              </div>
+              <span className="text-neutral-700">West Bengal, IN · 2026</span>
             </div>
           </motion.div>
         )}

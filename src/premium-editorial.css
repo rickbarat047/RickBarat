@@ -1,0 +1,76 @@
+/* ============================================================================
+   PREMIUM EDITORIAL DARK DESIGN SYSTEM — Portfolio Pro Dark inspired
+   Combined with existing amber-400 identity for a unique premium portfolio
+   ============================================================================ */
+
+.dark-editorial {
+  background: #020617;
+  color: #f8fafc;
+}
+
+.accent-lime {
+  color: #aff33e;
+}
+
+.editorial-heading {
+  font-family: 'Instrument Serif', Georgia, serif;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+/* Premium card surface combining dark editorial depth with amber identity */
+.card-editorial {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  border-radius: 1.21rem;
+}
+
+/* Enhanced shadow for premium depth */
+.shadow-editorial {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* Premium focus ring using lime-green accent */
+.focus-editorial:focus {
+  outline: 2px solid #aff33e;
+  outline-offset: 2px;
+}
+
+/* Editorial spacing utility */
+.spacing-editorial-sm { letter-spacing: 0.15em; }
+.spacing-editorial-md { letter-spacing: 0.2em; }
+.spacing-editorial-lg { letter-spacing: 0.28em; }
+
+/* Premium dark card hover state */
+.card-editorial-hover:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+/* Elegant button treatment for premium interactions */
+.btn-editorial-primary {
+  background: #f8fafc;
+  color: #020617;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.75rem 1.75rem;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: all 0.25s ease;
+}
+
+.btn-editorial-primary:hover {
+  background: #d4d4d8;
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.08);
+}
+
+/* Glass surface with premium editorial finish */
+.glass-editorial {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
