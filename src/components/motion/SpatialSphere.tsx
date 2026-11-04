@@ -225,6 +225,8 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
 
     let lastTime = performance.now();
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Respect reduced motion: use a much calmer rotation speed rather than stopping entirely
+    const speedMultiplier = reduceMotion ? 0.15 : 1;
 
     const tick = (now: number) => {
       const s = stateRef.current;
@@ -253,7 +255,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
           s.omega[1] = 0;
           s.omega[2] = 0;
 
-          const idleAngle = 0.0006 * (dt * 60);
+          const idleAngle = 0.00075 * (dt * 60) * speedMultiplier; // ~25% faster; calmer if reduced motion
           const idleStep = quatFromAxisAngle([0, 1, 0], idleAngle);
           s.q = quatNormalize(quatMultiply(idleStep, s.q));
         }
@@ -298,6 +300,9 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
         el.style.setProperty('--depth-wash', wash.toFixed(3));
         el.style.zIndex = zIndex.toString();
         el.style.pointerEvents = zf > -0.4 ? 'auto' : 'none';
+        // Smooth fade: cards fade in as they rotate toward the camera, fade out on the back
+        const opacity = zf > -0.2 ? 1 : Math.max(0, (zf + 0.5) / 0.3);
+        el.style.opacity = opacity.toFixed(3);
       });
 
       animId = requestAnimationFrame(tick);
@@ -426,11 +431,7 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
     <div
       ref={stageRef}
       id="stage"
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
-      className={`fixed inset-0 w-screen h-[100svh] h-[100dvh] overflow-hidden select-none cursor-grab active:cursor-grabbing transition-opacity duration-700 z-10 touch-pan-y ${
+      className={`fixed inset-0 w-screen h-[100svh] h-[100dvh] overflow-hidden select-none cursor-default transition-opacity duration-700 z-10 touch-pan-y ${
         isExploreMode ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       style={{
@@ -596,23 +597,10 @@ export const SpatialSphere: React.FC<SpatialSphereProps> = ({ onSelectObject, is
                   willChange: 'transform',
                 }}
               >
-                {/* Front Face: Outward orientation */}
+                {/* Single Face: Outward orientation only (no back face to avoid mirrored text) */}
                 <div 
                   className="card-face card-front absolute inset-0 w-full h-full"
                   style={{
-                    backfaceVisibility: 'hidden',
-                    WebkitBackfaceVisibility: 'hidden',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  {renderCardFigure()}
-                </div>
-
-                {/* Back Face: Identical content oriented at rotateY(180deg) without Z offset */}
-                <div 
-                  className="card-face card-back absolute inset-0 w-full h-full"
-                  style={{
-                    transform: 'rotateY(180deg)',
                     backfaceVisibility: 'hidden',
                     WebkitBackfaceVisibility: 'hidden',
                     boxSizing: 'border-box',
