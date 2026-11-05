@@ -13,6 +13,7 @@
 // generated from your name, and the photo, project covers and palm watermark
 // are all SVG. Pass your own content through props; empty sections hide.
 import * as React from "react"
+import WorksLanyardRail from "./WorksLanyardRail"
 
 export type FolderTone = "blue" | "green" | "orange" | "yellow"
 export type CoverKind = "poster" | "render" | "page" | "sale" | "brand"
@@ -696,6 +697,43 @@ const FTP_CSS = `
 .ftp-card-l{margin-top:2px;font-size:12px;color:var(--on2)}
 .ftp-card-y{font-size:12px;font-weight:600;color:var(--on2);font-variant-numeric:tabular-nums}
 .ftp-empty{padding:40px 0;text-align:center;color:var(--ftp-muted);font-size:14px}
+.lanyard-rail{margin:28px 0 8px;padding:22px 0 6px;background:linear-gradient(180deg,color-mix(in srgb,var(--ftp-sheet) 92%,transparent),color-mix(in srgb,var(--ftp-ghost) 55%,transparent));border:1px solid var(--ftp-line);border-radius:22px}
+.lanyard-rail-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 18px;padding:0 20px}
+.lanyard-eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ftp-muted)}
+.lanyard-hint{font-size:12px;color:var(--ftp-soft)}
+.lanyard-rail-track{position:relative;display:flex;gap:14px;overflow-x:auto;padding:14px 20px 18px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--ftp-faint) transparent;margin-top:6px}
+.lanyard-rail-bar{position:absolute;left:12px;right:12px;top:24px;height:12px;border-radius:99px;background:linear-gradient(180deg,#2b3245 0%,#171d2e 55%,#0d1220 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.7),0 10px 18px -14px rgba(0,0,0,.9);pointer-events:none}
+.lanyard-item{position:relative;flex:0 0 238px;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center}
+.lanyard-cord{width:2px;height:78px;background:repeating-linear-gradient(180deg,var(--ftp-muted) 0 6px,transparent 6px 10px);opacity:.85}
+.lanyard-clip{margin-top:-2px;width:26px;height:26px;border-radius:99px;background:linear-gradient(180deg,#d6dae6,#8a91a8);box-shadow:inset 0 1px 2px rgba(255,255,255,.7),0 3px 8px -4px rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center}
+.lanyard-clip span{width:11px;height:11px;border-radius:99px;background:#0f1422;box-shadow:inset 0 0 0 2px rgba(255,255,255,.28)}
+.lanyard-badge{position:relative;width:216px;height:300px;margin-top:10px;perspective:1200px;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.lanyard-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.lanyard-item.is-flipping .lanyard-inner{transform:rotateY(180deg)}
+.lanyard-face{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;border-radius:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--ftp-line);background:var(--ftp-sheet);color:var(--ftp-ink);box-shadow:var(--ftp-shadow)}
+.lanyard-front{transform:rotateY(0)}
+.lanyard-back{transform:rotateY(180deg);background:var(--ftp-sheet);color:var(--ftp-ink)}
+.lanyard-badge:hover .lanyard-face,.lanyard-badge:focus-visible .lanyard-face{box-shadow:0 22px 40px -22px rgba(0,0,0,.55)}
+.lanyard-badge:hover .lanyard-inner,.lanyard-badge:focus-visible .lanyard-inner{transform:translateY(-6px) rotateY(0)}
+.lanyard-item.is-flipping .lanyard-badge:hover .lanyard-inner{transform:rotateY(180deg)}
+.lanyard-badge-top{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--accent);color:#fff}
+.lanyard-badge-top-txt{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lanyard-dot{width:9px;height:9px;border-radius:99px;background:#fff;opacity:.92;flex:none}
+.lanyard-photo{position:relative;display:block;height:118px;overflow:hidden;background:var(--ftp-ghost)}
+.lanyard-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lanyard-photo-fallback{display:flex;height:100%;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:var(--ftp-muted)}
+.lanyard-badge-body{padding:12px 13px 10px;display:flex;flex-direction:column;gap:5px;flex:1}
+.lanyard-title{font-size:15px;font-weight:900;letter-spacing:.02em;line-height:1.15;color:var(--ftp-ink);text-transform:uppercase}
+.lanyard-role{font-size:12px;line-height:1.45;color:var(--ftp-soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lanyard-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.lanyard-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;border:1px solid var(--ftp-line);color:var(--ftp-muted)}
+.lanyard-badge-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border-top:1px dashed var(--ftp-line);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ftp-blue)}
+.lanyard-back-title{padding:16px 16px 6px;font-size:18px;font-weight:900;text-transform:uppercase;color:var(--ftp-ink)}
+.lanyard-back-text{padding:0 16px 10px;font-size:12.5px;line-height:1.6;color:var(--ftp-soft)}
+.lanyard-back-foot{margin-top:auto;padding:12px 16px;border-top:1px dashed var(--ftp-line);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.lanyard-caption{padding:6px 20px 12px;font-size:11.5px;color:var(--ftp-muted);text-align:center}
+@media (max-width:640px){.lanyard-item{flex-basis:212px}.lanyard-badge{width:192px;height:286px}.lanyard-rail-head{padding:0 16px}}
+@media (prefers-reduced-motion:reduce){.lanyard-inner,.lanyard-badge:hover .lanyard-inner{transition:none;transform:none}.lanyard-item.is-flipping .lanyard-inner{transform:none}}
 
 .ftp-panel{position:relative;border-radius:22px;background:var(--c);color:var(--on);padding:clamp(22px,3.6vw,44px);transition:background-color .5s ease,color .5s ease}
 .ftp-step{display:grid;grid-template-columns:1.2fr 1fr;gap:24px 48px;align-items:start;animation:ftp-in .55s cubic-bezier(.2,.8,.2,1) both}
@@ -1961,11 +1999,19 @@ export default function FolderTabPortfolioTemplate({
         {projects.length > 0 && (
           <section className="ftp-sheet ftp-rv" {...sheetProps("work")}>
             {meta("work")}
-            {head("work", "(" + pad2(projects.length) + ")", "Works", { local: "", kicker: "Filter the cabinet by folder. Open any file for its details page; arrow keys page through." })}
+            {head("work", "(" + pad2(projects.length) + ")", "Works", { local: "", kicker: "Badges hang from the rail — click to flip and open details. The cabinet below stays for quick scanning." })}
             <div className="ftp-filter">
               <TabBar items={filterItems} active={filter} onChange={setFilter} label="Filter work by category" idBase={uid + "-wf"} />
               <div className="ftp-bar" style={{ "--c": palette[filterTone] } as Vars} />
             </div>
+            <WorksLanyardRail
+              projects={shown.map(({ p }) => p)}
+              indices={shown.map(({ i }) => i)}
+              catLabel={(id) => catById[id]?.label ?? id}
+              toneOf={toneOf}
+              palette={palette}
+              onOpen={openAt}
+            />
             <div className="ftp-grid" role="tabpanel" id={uid + "-wf-panel"} aria-labelledby={uid + "-wf-tab-" + filter} key={filter}>
               {shown.map(({ p, i }, k) => {
                 const tone = toneOf(p.category)
