@@ -684,18 +684,6 @@ const FTP_CSS = `
 .ftp-tabbtn[data-on="false"]:hover{transform:translateY(-8px);color:var(--ftp-ink)}
 .ftp-tabbtn .ftp-tchip{opacity:.7}
 .ftp-bar{height:8px;border-radius:6px;background:var(--c);transition:background-color .4s}
-.ftp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:34px 22px;margin-top:30px}
-.ftp-card{display:block;width:100%;text-align:left;animation:ftp-in .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 60ms)}
-.ftp-card>.ftp-fbody{padding:10px 10px 14px;transition:transform .5s cubic-bezier(.3,1.3,.4,1),box-shadow .5s}
-.ftp-card .ftp-ftab{transition:transform .5s cubic-bezier(.3,1.3,.4,1)}
-.ftp-card:hover>.ftp-fbody{box-shadow:0 24px 40px -22px rgba(27,34,52,.45)}
-.ftp-card-art{position:relative;border-radius:11px;overflow:hidden;aspect-ratio:16/11;background:rgba(255,255,255,.2)}
-.ftp-card-art>*{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
-.ftp-card:hover .ftp-card-art>*{transform:scale(1.05)}
-.ftp-card-cap{display:flex;justify-content:space-between;gap:12px;padding:12px 6px 0}
-.ftp-card-t{font-size:15px;font-weight:700;line-height:1.3;color:var(--on)}
-.ftp-card-l{margin-top:2px;font-size:12px;color:var(--on2)}
-.ftp-card-y{font-size:12px;font-weight:600;color:var(--on2);font-variant-numeric:tabular-nums}
 .ftp-empty{padding:40px 0;text-align:center;color:var(--ftp-muted);font-size:14px}
 .lanyard-rail{margin:28px 0 8px;padding:22px 0 6px;background:linear-gradient(180deg,color-mix(in srgb,var(--ftp-sheet) 92%,transparent),color-mix(in srgb,var(--ftp-ghost) 55%,transparent));border:1px solid var(--ftp-line);border-radius:22px}
 .lanyard-rail-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 18px;padding:0 20px}
@@ -1999,7 +1987,7 @@ export default function FolderTabPortfolioTemplate({
         {projects.length > 0 && (
           <section className="ftp-sheet ftp-rv" {...sheetProps("work")}>
             {meta("work")}
-            {head("work", "(" + pad2(projects.length) + ")", "Works", { local: "", kicker: "Badges hang from the rail — click to flip and open details. The cabinet below stays for quick scanning." })}
+            {head("work", "(" + pad2(projects.length) + ")", "Works", { local: "", kicker: "Badges hang from the rail — click to flip and open details." })}
             <div className="ftp-filter">
               <TabBar items={filterItems} active={filter} onChange={setFilter} label="Filter work by category" idBase={uid + "-wf"} />
               <div className="ftp-bar" style={{ "--c": palette[filterTone] } as Vars} />
@@ -2012,42 +2000,7 @@ export default function FolderTabPortfolioTemplate({
               palette={palette}
               onOpen={openAt}
             />
-            <div className="ftp-grid" role="tabpanel" id={uid + "-wf-panel"} aria-labelledby={uid + "-wf-tab-" + filter} key={filter}>
-              {shown.map(({ p, i }, k) => {
-                const tone = toneOf(p.category)
-                return (
-                  <Folder
-                    key={p.title + i}
-                    as="button"
-                    tone={tone}
-                    tabAt={(k * 0.37) % 1 > 0.85 ? 0.85 : (k * 0.37) % 1}
-                    className="ftp-card"
-                    style={{ "--i": k } as Vars}
-                    tab={
-                      <>
-                        {catById[p.category]?.label ?? p.category}
-                        <span className="ftp-tchip">{pad2(i + 1)}</span>
-                      </>
-                    }
-                    onClick={() => openAt(i)}
-                    aria-haspopup="dialog"
-                    aria-label={p.title + ", " + p.year + ". Open details"}
-                  >
-                    <span className="ftp-card-art" style={{ display: "block" }}>
-                      {p.image ? <img src={p.image} alt="" width={320} height={220} style={{ maxWidth: "none" }} /> : <CoverArt kind={kindOf(p.category)} seed={hashString(p.title)} mark={markOf(p)} colors={palette} />}
-                    </span>
-                    <span className="ftp-card-cap">
-                      <span>
-                        <span className="ftp-card-t" style={{ display: "block" }}>{p.title}</span>
-                        {p.local && <span className="ftp-card-l" style={{ display: "block" }} lang="en">{p.local}</span>}
-                      </span>
-                      <span className="ftp-card-y">{p.year}</span>
-                    </span>
-                  </Folder>
-                )
-              })}
-              {!shown.length && <p className="ftp-empty">This folder is empty for now.</p>}
-            </div>
+            {!shown.length && <p className="ftp-empty">This folder is empty for now.</p>}
           </section>
         )}
 
